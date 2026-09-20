@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Functional Ear Trainer</title>
+<meta name="theme-color" content="#3d3159">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ear Trainer">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233d3159'/%3E%3Ctext x='32' y='45' font-size='34' text-anchor='middle' fill='%23f5d98a' font-family='Georgia,serif'%3E%E2%99%AA%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --plum:#3d3159; --amber:#b07d08; --teal:#0f6f6c; --red:#c0392b; --blue:#2c6fa8;
+  --ink:#1b1b1f; --grey:#6c6c7a; --line:#e2e2e8; --bg:#ffffff; --soft:#f7f7fa;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px; line-height:1.55;
+}
+.wrap{max-width:780px;margin:0 auto;padding:0 18px 90px}
+
+/* ---------- header ---------- */
+header{
+  position:sticky; top:0; z-index:50; background:rgba(255,255,255,.96);
+  border-bottom:1px solid var(--line); backdrop-filter:blur(6px);
+}
+.hbar{max-width:780px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;
+      gap:14px;flex-wrap:wrap}
+.htitle{font-weight:700;font-size:15px;color:var(--plum);margin-right:auto}
+.pill{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;
+      background:var(--soft);color:var(--grey);border:1px solid var(--line);white-space:nowrap}
+.pill b{color:var(--plum)}
+
+h1{font-size:27px;margin:26px 0 4px;color:var(--plum);line-height:1.18}
+.sub{color:var(--grey);font-size:15px;margin:0 0 18px}
+h2{font-size:17px;color:var(--plum);margin:28px 0 8px}
+h3{font-size:14px;margin:18px 0 6px;color:var(--ink)}
+p{margin:0 0 10px}
+.muted{color:var(--grey);font-size:13.5px}
+
+/* ---------- cards ---------- */
+.card{border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:14px 0;background:#fff}
+.card.pad0{padding:0;overflow:hidden}
+.lbl{font-size:11px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;
+     color:var(--grey);margin-bottom:7px}
+
+/* ---------- buttons ---------- */
+button{font:inherit}
+.btn{border:1.6px solid var(--plum);background:#fff;color:var(--plum);border-radius:999px;
+     padding:8px 18px;font-weight:700;font-size:14px;cursor:pointer;line-height:1.2}
+.btn:hover{background:#f3f1f7}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.primary{background:var(--plum);color:#fff}
+.btn.primary:hover{background:#4c3d6d}
+.btn.teal{border-color:var(--teal);color:var(--teal)}
+.btn.teal.on,.btn.teal:active{background:var(--teal);color:#fff}
+.btn.sm{padding:4px 12px;font-size:12.5px;border-width:1.4px}
+.btn.on{background:var(--plum);color:#fff}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* ---------- degree buttons ---------- */
+.degrees{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.deg{border:2px solid var(--line);background:#fff;border-radius:10px;padding:9px 0;
+     cursor:pointer;text-align:center;flex:1 1 68px;min-width:68px;transition:.12s}
+.deg:hover{border-color:var(--plum);background:#f8f7fb}
+.deg .n{font-size:19px;font-weight:700;line-height:1}
+.deg .s{font-size:12px;color:var(--grey);margin-top:2px;font-style:italic}
+.deg.right{background:#e8f3ef;border-color:var(--teal)}
+.deg.right .n{color:var(--teal)}
+.deg.wrong{background:#fbeae7;border-color:var(--red)}
+.deg.wrong .n{color:var(--red)}
+.deg:disabled{cursor:default}
+
+/* ---------- tuner ---------- */
+.tuner{margin:14px 0}
+.meter{position:relative;height:46px;background:var(--soft);border:1px solid var(--line);
+       border-radius:8px;overflow:hidden}
+.meter .zone{position:absolute;top:0;bottom:0;left:40%;width:20%;background:#e4f0ed}
+.meter .mid{position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--teal);opacity:.8}
+.meter .needle{position:absolute;top:4px;bottom:4px;width:4px;border-radius:2px;
+               background:var(--plum);left:50%;transition:left .06s linear}
+.meter .off{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+            color:var(--grey);font-size:13px}
+.tunerrow{display:flex;justify-content:space-between;align-items:baseline;margin-top:5px}
+.tnote{font-size:20px;font-weight:700;color:var(--plum)}
+.tcents{font-size:13px;color:var(--grey)}
+
+/* ---------- feedback ---------- */
+.fb{border-radius:8px;padding:12px 15px;margin:12px 0;border-left:4px solid}
+.fb.good{background:#e8f3ef;border-color:var(--teal)}
+.fb.bad{background:#fbeae7;border-color:var(--red)}
+.fb.info{background:#fdf6e6;border-color:var(--amber)}
+.fb .big{font-size:17px;font-weight:700;margin-bottom:3px}
+.fb.good .big{color:var(--teal)} .fb.bad .big{color:var(--red)} .fb.info .big{color:var(--amber)}
+.fb .char{font-size:14px;color:var(--ink);font-style:italic}
+
+/* ---------- step indicator ---------- */
+.steps{display:flex;gap:6px;margin:0 0 12px}
+.step{flex:1;font-size:11.5px;font-weight:700;text-align:center;padding:5px 4px;border-radius:6px;
+      background:var(--soft);color:var(--grey);border:1px solid var(--line)}
+.step.active{background:var(--plum);color:#fff;border-color:var(--plum)}
+.step.done{background:#e8f3ef;color:var(--teal);border-color:var(--teal)}
+
+/* ---------- progress ---------- */
+.bars{margin-top:6px}
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:6px;font-size:13px}
+.bar .nm{width:66px;font-weight:700;flex:none}
+.bar .track{flex:1;height:16px;background:var(--soft);border-radius:8px;overflow:hidden;
+            border:1px solid var(--line)}
+.bar .fill{height:100%;border-radius:8px}
+.bar .pct{width:64px;text-align:right;color:var(--grey);flex:none;font-variant-numeric:tabular-nums}
+
+select,input[type=range]{font:inherit}
+select{padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink)}
+.hint{font-size:13px;color:var(--grey);margin:6px 0}
+.warn{background:#fbeae7;border-left:4px solid var(--red);padding:11px 14px;border-radius:8px;
+      margin:12px 0;font-size:14px}
+.okbox{background:#e8f3ef;border-left:4px solid var(--teal);padding:11px 14px;border-radius:8px;
+       margin:12px 0;font-size:14px}
+kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:1px 6px;
+    font-size:12px;font-family:inherit}
+@media (max-width:520px){
+  .deg{flex:1 1 62px;min-width:62px;padding:13px 0}   /* bigger tap targets on a phone */
+  .deg .n{font-size:21px}
+  .btn{padding:10px 18px}
+  .btn.sm{padding:7px 13px}
+  .wrap{padding:0 14px 80px}
+  h1{font-size:24px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hbar">
+    <span class="htitle">Functional Ear Trainer</span>
+    <span class="pill">Level <b id="hLevel">1</b></span>
+    <span class="pill">Key of <b id="hKey">F</b></span>
+    <span class="pill">Session <b id="hAcc">&ndash;</b></span>
+    <button class="btn sm" onclick="stopAll()">Stop sound</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+<h1>Functional Ear Trainer</h1>
+<p class="sub">Hear where a note sits in the key &mdash; not how far it is from the last one.</p>
+
+<div class="card">
+  <div class="lbl">Why this is different</div>
+  <p style="margin-bottom:8px">Naming isolated intervals is hard because two notes in a vacuum give your ear
+  nothing to hold onto. Here a <strong>tonic is always present</strong> &mdash; as a drone or a cadence
+  &mdash; so every note has a fixed reference and a recognisable <em>character</em> rather than a
+  measurement.</p>
+  <p class="muted" style="margin:0">Start at Level 1 with three notes. Don't move up until you're above 85%.
+  Intervals become easy later, as a side effect.</p>
+</div>
+
+<!-- ===================== SETUP ===================== -->
+<h2>Setup</h2>
+<div class="card">
+  <div class="lbl">Your key</div>
+  <div class="row">
+    <label class="muted" for="tonicSel">Tonic</label>
+    <select id="tonicSel"></select>
+    <button class="btn sm" onclick="previewKey()">Hear the key</button>
+  </div>
+  <div class="hint" id="rangeNote"></div>
+
+  <div class="lbl" style="margin-top:16px">Key reference</div>
+  <div class="row">
+    <button class="btn sm on" id="ctxDrone" onclick="setContext('drone')">Drone</button>
+    <button class="btn sm" id="ctxCad" onclick="setContext('cadence')">Cadence</button>
+    <button class="btn sm" id="ctxBoth" onclick="setContext('both')">Cadence then drone</button>
+  </div>
+  <div class="hint">A drone is the strongest anchor and the one to start with. Cadence mode is closer to
+  real music and a little harder.</div>
+
+  <div class="lbl" style="margin-top:16px">Microphone</div>
+  <div class="row">
+    <button class="btn teal" id="micBtn" onclick="toggleMic()">Turn on the microphone</button>
+    <span class="muted" id="micStatus">Off &mdash; singing modes will ask you to grade yourself</span>
+  </div>
+  <div class="hint">Running as: <span id="envLine">&mdash;</span></div>
+  <div class="warn" id="micHelp" style="display:none"></div>
+  <div class="warn" id="phoneWarn" style="display:none">
+    <strong>Use headphones.</strong> Without them the drone leaks into the microphone and the pitch
+    detection gets confused. The drone is muted while it listens, which helps, but headphones make it
+    reliable.
+  </div>
+</div>
+
+<!-- ===================== MODE ===================== -->
+<h2>Mode</h2>
+<div class="card">
+  <div class="row" id="modeRow">
+    <button class="btn sm" data-mode="match"    onclick="setMode('match')">Match the pitch</button>
+    <button class="btn sm" data-mode="identify" onclick="setMode('identify')">Identify only</button>
+    <button class="btn sm" data-mode="produce"  onclick="setMode('produce')">Sing a named degree</button>
+    <button class="btn sm on" data-mode="both"  onclick="setMode('both')">Hear &rarr; sing &rarr; name</button>
+  </div>
+  <div class="hint" id="modeHint"></div>
+</div>
+
+<!-- ===================== PRACTICE ===================== -->
+<h2>Practice</h2>
+<div class="card" id="practice">
+  <div class="steps" id="steps"></div>
+
+  <div class="row" style="margin-bottom:6px">
+    <button class="btn primary" id="newBtn" onclick="newQuestion()">New note</button>
+    <button class="btn sm" id="replayBtn" onclick="replay()" disabled>Replay</button>
+    <button class="btn sm" id="ctxBtn" onclick="replayContext()" disabled>Re-establish the key</button>
+    <button class="btn sm" id="inctxBtn" onclick="hearInContext()" disabled>Hear it against do</button>
+  </div>
+
+  <div id="selfCheck" class="card" style="display:none;margin:10px 0;background:#fdf6e6;
+       border-color:var(--amber)">
+    <div class="lbl" style="color:var(--amber)">Sing it, then check yourself</div>
+    <p id="selfPrompt" style="margin-bottom:10px"></p>
+    <div class="row">
+      <button class="btn sm" onclick="playTarget()">Play the note again</button>
+      <button class="btn sm teal" onclick="selfReport(true)">I matched it</button>
+      <button class="btn sm" onclick="selfReport(false)">I missed it</button>
+      <button class="btn sm" onclick="skipSing()">Skip</button>
+    </div>
+    <div class="hint" style="margin-bottom:0">Sing first, <em>then</em> press play to compare. Checking
+    before you commit teaches you nothing.</div>
+  </div>
+
+  <div id="tunerWrap" class="tuner" style="display:none">
+    <div class="meter">
+      <div class="zone"></div><div class="mid"></div>
+      <div class="needle" id="needle"></div>
+      <div class="off" id="meterOff">waiting for your voice&hellip;</div>
+    </div>
+    <div class="tunerrow">
+      <span class="tnote" id="tNote">&mdash;</span>
+      <span class="tcents" id="tCents"></span>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn sm teal" id="listenBtn" onclick="toggleListen()">Start listening</button>
+      <button class="btn sm" onclick="skipSing()">Skip the singing</button>
+    </div>
+  </div>
+
+  <div class="degrees" id="degRow"></div>
+
+  <div id="feedback"></div>
+</div>
+
+<!-- ===================== PROGRESS ===================== -->
+<h2>Progress</h2>
+<div class="card">
+  <div class="row" style="margin-bottom:10px">
+    <span class="pill">Level <b id="pLevel">1</b> &mdash; <span id="pLevelName"></span></span>
+    <span class="pill">Answered <b id="pCount">0</b></span>
+    <span class="pill">Recent <b id="pRecent">&ndash;</b></span>
+    <button class="btn sm" onclick="prevLevel()">&larr; Easier</button>
+    <button class="btn sm" onclick="nextLevel()">Harder &rarr;</button>
+    <button class="btn sm" onclick="resetProgress()">Reset</button>
+  </div>
+  <div id="advice"></div>
+  <div class="lbl" style="margin-top:12px" id="barsLabel">Naming accuracy by degree</div>
+  <div class="bars" id="bars"></div>
+  <div class="hint" id="weakNote"></div>
+</div>
+
+<h2>How to actually practise this</h2>
+<div class="card">
+  <p><strong>Ten minutes a day, not an hour a week.</strong> This is a memory task, and memory responds to
+  frequency far more than duration. Ten minutes daily will beat any amount of weekend cramming.</p>
+
+  <h3>A session looks like this</h3>
+  <p class="muted" style="margin-bottom:10px">
+  1. <em>Match the pitch</em> for one minute &mdash; no naming, just sing back what you hear. This wakes up
+  the link between ear and voice.<br>
+  2. <em>Hear &rarr; sing &rarr; name</em> for six or seven minutes at your current level.<br>
+  3. <em>Sing a named degree</em> for two minutes. This is the direction almost everyone neglects, and it is
+  the one that fixes "I can hear it but can't name it".</p>
+
+  <h3>Rules that matter</h3>
+  <p class="muted" style="margin-bottom:10px">
+  <strong>Sing every answer, even in Identify mode.</strong> Hum it under your breath if you must. Producing
+  the pitch is what builds the memory; clicking alone builds very little.<br>
+  <strong>Stay at a level until you are above 85%.</strong> Moving up early is the single most common way
+  this goes wrong, and it feels like failure when it is only impatience.<br>
+  <strong>When you get one wrong, listen to the whole correction.</strong> The comparison it plays &mdash;
+  your answer, then the real one, each against <em>do</em> &mdash; is where the learning happens. Skipping it
+  wastes the mistake.<br>
+  <strong>Say the character, not just the number.</strong> "The leaning one" sticks; "degree 7" does not.</p>
+
+  <h3>What progress looks like</h3>
+  <p class="muted" style="margin:0">Level 1 should come quickly &mdash; do, mi and sol are very distinct.
+  Level 3 is where it gets real, because <em>fa</em> and <em>ti</em> are the two people confuse, and they are
+  also the two with the strongest pull. If you stall, that is expected, not a sign this is not working. Drop
+  back a level for a few days and come back to it.</p>
+</div>
+
+<p class="muted" style="margin-top:22px">Progress is saved in this browser only. Nothing is uploaded, and
+the microphone audio never leaves this page.</p>
+
+</div>
+
+<script>
+/* =========================================================================
+   PITCH DETECTION  (normalised autocorrelation, tuned for a low male voice)
+   ========================================================================= */
+function autoCorrelate(buf, sampleRate, opts){
+  opts = opts || {};
+  var minHz = opts.minHz || 65, maxHz = opts.maxHz || 520;
+  var rmsGate = opts.rmsGate === undefined ? 0.008 : opts.rmsGate;
+  var SIZE = buf.length, rms = 0, i;
+  for(i=0;i<SIZE;i++) rms += buf[i]*buf[i];
+  rms = Math.sqrt(rms/SIZE);
+  if(rms < rmsGate) return {hz:-1, rms:rms, clarity:0};
+
+  var thres = 0.2*rms*4, r1 = 0, r2 = SIZE-1;
+  for(i=0;i<SIZE/2;i++){ if(Math.abs(buf[i])>thres){ r1=i; break; } }
+  for(i=1;i<SIZE/2;i++){ if(Math.abs(buf[SIZE-i])>thres){ r2=SIZE-i; break; } }
+  if(r2-r1 < 256){ r1=0; r2=SIZE-1; }
+  var b = buf.subarray ? buf.subarray(r1,r2) : buf.slice(r1,r2);
+  var N = b.length;
+
+  var minLag = Math.floor(sampleRate/maxHz);
+  var maxLag = Math.min(Math.floor(sampleRate/minHz), Math.floor(N/2));
+  if(maxLag <= minLag) return {hz:-1, rms:rms, clarity:0};
+
+  var bestLag=-1, bestVal=-1, corr = new Float32Array(maxLag+2), lag;
+  for(lag=minLag; lag<=maxLag; lag++){
+    var sum=0, e1=0, e2=0, lim=N-lag;
+    for(i=0;i<lim;i++){ var x=b[i], y=b[i+lag]; sum+=x*y; e1+=x*x; e2+=y*y; }
+    var den = Math.sqrt(e1*e2);
+    var v = den>0 ? sum/den : 0;
+    corr[lag]=v;
+    if(v>bestVal){ bestVal=v; bestLag=lag; }
+  }
+  if(bestLag<0 || bestVal<0.5) return {hz:-1, rms:rms, clarity:bestVal};
+
+  /* Lowest-lag LOCAL MAXIMUM near the best value, so a missing fundamental
+     doesn't drag us an octave down. Points on a rising slope must not qualify. */
+  var chosen = bestLag;
+  for(lag=minLag+1; lag<bestLag; lag++){
+    if(corr[lag]>corr[lag-1] && corr[lag]>=corr[lag+1] && corr[lag]>=bestVal*0.90){
+      chosen = lag; break;
+    }
+  }
+  var T0 = chosen;
+  if(chosen>minLag && chosen<maxLag){
+    var x1=corr[chosen-1], x2=corr[chosen], x3=corr[chosen+1];
+    var a=(x1+x3-2*x2)/2, bb=(x3-x1)/2;
+    if(a < -1e-9) T0 = chosen - bb/(2*a);
+  }
+  return {hz: sampleRate/T0, rms:rms, clarity:bestVal};
+}
+function decimate2(buf){
+  var out = new Float32Array(buf.length>>1);
+  for(var i=0;i<out.length;i++) out[i]=(buf[2*i]+buf[2*i+1])*0.5;
+  return out;
+}
+function hzToMidiFloat(hz){ return 69 + 12*Math.log2(hz/440); }
+function midiToHz(m){ return 440*Math.pow(2,(m-69)/12); }
+function compareToTarget(hz, targetMidi, tolCents){
+  tolCents = tolCents===undefined ? 50 : tolCents;
+  if(hz<=0) return null;
+  var mf = hzToMidiFloat(hz), nearest = Math.round(mf);
+  var pcS = ((nearest%12)+12)%12, pcT = ((targetMidi%12)+12)%12;
+  var d = pcS-pcT; if(d>6) d-=12; if(d<-6) d+=12;
+  var folded = targetMidi + 12*Math.round((mf-targetMidi)/12);
+  var cft = Math.round((mf-folded)*100);
+  return { midi:nearest, semitonesOff:d,
+           octaveOff: (pcS===pcT && nearest!==targetMidi),
+           centsFromTarget: cft,
+           correct: d===0 && Math.abs(cft)<=tolCents };
+}
+
+/* =========================================================================
+   DRILL LOGIC
+   ========================================================================= */
+var DEGREES = [
+ {n:1,solfa:'do', semi:0, color:'#b07d08', char:'home — complete rest, nothing pending'},
+ {n:2,solfa:'re', semi:2, color:'#5b7fa8', char:'unsettled — leaning, could go either way'},
+ {n:3,solfa:'mi', semi:4, color:'#2c6fa8', char:'bright — the note that makes it major'},
+ {n:4,solfa:'fa', semi:5, color:'#a3562f', char:'heavy — wants to sag down onto mi'},
+ {n:5,solfa:'sol',semi:7, color:'#0f6f6c', char:'strong and open — a second home'},
+ {n:6,solfa:'la', semi:9, color:'#6b5b95', char:'sweet and a little sad — the minor colour'},
+ {n:7,solfa:'ti', semi:11,color:'#c0392b', char:'a sharp lean — almost painful, must rise to do'}
+];
+var LEVELS = [
+ {name:'Tonic triad', degrees:[1,3,5],
+  blurb:'do · mi · sol — the three most stable notes in the key'},
+ {name:'Pentatonic', degrees:[1,2,3,5,6],
+  blurb:'adds re and la — still no half steps, so nothing leans yet'},
+ {name:'Full scale', degrees:[1,2,3,4,5,6,7],
+  blurb:'adds fa and ti — the two that pull, and the two people confuse'},
+ {name:'Wide range', degrees:[1,2,3,4,5,6,7], wide:true,
+  blurb:'the same seven, reaching below do and up past the octave'}
+];
+function degByN(n){ for(var i=0;i<DEGREES.length;i++) if(DEGREES[i].n===n) return DEGREES[i]; return null; }
+
+var S = {
+  tonic:53, level:0, mode:'both', context:'drone',
+  stats:{}, recent:[], answered:0, current:null, lastDegree:null,
+  phase:'idle'     // idle | sing | name | done
+};
+DEGREES.forEach(function(d){ S.stats[d.n]={id:{a:0,c:0},sing:{a:0,c:0}}; });
+
+function activeDegrees(){ return LEVELS[S.level].degrees.slice(); }
+function accuracy(n,kind){ var s=S.stats[n][kind||'id']; return s.a===0?null:s.c/s.a; }
+function weightFor(n){
+  var a=accuracy(n, scoredKind());
+  return a===null ? 2.0 : (1+2*(1-a));    // 1.0 solid .. 3.0 never right
+}
+function offsetsFor(deg){
+  var base=[deg.semi];
+  if(LEVELS[S.level].wide){
+    if(deg.semi===0) base.push(12);
+    else if(deg.semi>=7) base.push(deg.semi-12);
+  }
+  return base;
+}
+function rangeFor(level,tonic){
+  var lo=tonic, hi=tonic+11;
+  if(LEVELS[level].wide){ lo=tonic-5; hi=tonic+12; }
+  return {lo:lo,hi:hi};
+}
+function pickQuestion(){
+  var act=activeDegrees();
+  var pool=act.filter(function(n){ return act.length<=1 || n!==S.lastDegree; });
+  if(!pool.length) pool=act;
+  var w=pool.map(weightFor), tot=w.reduce(function(a,b){return a+b;},0);
+  var r=Math.random()*tot, pick=pool[pool.length-1];
+  for(var i=0;i<pool.length;i++){ r-=w[i]; if(r<=0){ pick=pool[i]; break; } }
+  var deg=degByN(pick), offs=offsetsFor(deg);
+  var off=offs[Math.floor(Math.random()*offs.length)];
+  S.lastDegree=pick;
+  S.current={degree:deg, midi:S.tonic+off, offset:off, idDone:false, singDone:false};
+  return S.current;
+}
+function recentAccuracy(){
+  if(!S.recent.length) return null;
+  return S.recent.filter(Boolean).length / S.recent.length;
+}
+function levelAdvice(){
+  var a=recentAccuracy();
+  if(a===null || S.recent.length<12) return null;
+  if(a>=0.85 && S.level<LEVELS.length-1) return 'advance';
+  if(a<0.5 && S.level>0) return 'back';
+  return null;
+}
+
+/* =========================================================================
+   AUDIO
+   ========================================================================= */
+var AC = window.AudioContext || window.webkitAudioContext;
+var ac=null, master=null, droneGain=null, droneNodes=[], live=[], timers=[];
+function ctx(){
+  if(!ac){
+    ac = new AC();
+    master = ac.createGain(); master.gain.value=0.9; master.connect(ac.destination);
+    droneGain = ac.createGain(); droneGain.gain.value=0; droneGain.connect(master);
+  }
+  if(ac.state==='suspended') ac.resume();
+  return ac;
+}
+function reg(n){ live.push(n); }
+function stopAll(){
+  live.forEach(function(n){ try{n.stop(0);}catch(e){} });
+  live=[];
+  timers.forEach(clearTimeout); timers=[];
+  stopDrone();
+}
+function pluck(m,t0,dur,gain){
+  var c=ctx(), f=midiToHz(m); gain=gain||0.32;
+  var g=c.createGain(); g.connect(master);
+  g.gain.setValueAtTime(0.0001,t0);
+  g.gain.linearRampToValueAtTime(gain,t0+0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001,t0+Math.max(dur,0.3));
+  [[1,1],[2,0.34],[3,0.15],[4,0.08],[5,0.035]].forEach(function(h){
+    var o=c.createOscillator(); o.type='sine'; o.frequency.value=f*h[0];
+    var gg=c.createGain(); gg.gain.value=h[1];
+    o.connect(gg); gg.connect(g);
+    o.start(t0); o.stop(t0+Math.max(dur,0.3)+0.1); reg(o);
+  });
+}
+function playNote(m,dur){ pluck(m, ctx().currentTime+0.02, dur||1.3); }
+function playSeq(seq,bpm,done){
+  var c=ctx(), spb=60/(bpm||80), t0=c.currentTime+0.12, pos=0;
+  seq.forEach(function(n){
+    if(n[0]!==null) pluck(n[0], t0+pos*spb, Math.max(n[1],0.5)*spb*0.95);
+    pos+=n[1];
+  });
+  if(done) timers.push(setTimeout(done,(0.12+pos*spb)*1000));
+  return (0.12+pos*spb)*1000;
+}
+function startDrone(){
+  var c=ctx();
+  stopDrone();
+  var root=S.tonic-24, fifth=S.tonic-24+7;
+  [root,root,fifth].forEach(function(m,i){
+    var o=c.createOscillator();
+    o.type = i===2 ? 'sine' : 'triangle';
+    o.frequency.value = midiToHz(m) * (i===1 ? 1.004 : 1);   // slight detune for life
+    var g=c.createGain(); g.gain.value = i===2 ? 0.16 : 0.22;
+    var lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=700;
+    o.connect(g); g.connect(lp); lp.connect(droneGain);
+    o.start(); droneNodes.push(o);
+  });
+  droneGain.gain.cancelScheduledValues(c.currentTime);
+  droneGain.gain.setValueAtTime(droneGain.gain.value, c.currentTime);
+  droneGain.gain.linearRampToValueAtTime(0.5, c.currentTime+0.35);
+}
+function stopDrone(){
+  droneNodes.forEach(function(o){ try{o.stop(0);}catch(e){} });
+  droneNodes=[];
+  if(droneGain) droneGain.gain.value=0;
+}
+function duckDrone(on){
+  if(!droneGain || !ac) return;
+  var t=ac.currentTime;
+  droneGain.gain.cancelScheduledValues(t);
+  droneGain.gain.setValueAtTime(droneGain.gain.value,t);
+  droneGain.gain.linearRampToValueAtTime(on?0.04:0.5, t+0.18);
+}
+function cadenceSeq(){
+  var t=S.tonic;
+  return [[t-12,0],[t,0],[t+4,0],[t+7,1],
+          [t-7,0],[t+5,0],[t+9,0],[t+12,1],
+          [t-5,0],[t+7,0],[t+11,0],[t+14,1],
+          [t-12,0],[t,0],[t+4,0],[t+7,1.6]];
+}
+/* Establish the key, then call back. */
+function establishKey(cb){
+  var mode=S.context;
+  if(mode==='drone'){ startDrone(); timers.push(setTimeout(cb,900)); return; }
+  if(mode==='cadence'){ stopDrone(); var ms=playSeq(cadenceSeq(),96,cb); return; }
+  stopDrone();
+  playSeq(cadenceSeq(),96,function(){ startDrone(); timers.push(setTimeout(cb,700)); });
+}
+
+/* =========================================================================
+   MICROPHONE
+   ========================================================================= */
+var micStream=null, analyser=null, micBuf=null, rafId=null, listening=false;
+var pitchHist=[], holdStart=0, holdNote=null, onLock=null;
+
+function toggleMic(){
+  if(micStream){ stopMic(); return; }
+  ctx();
+  /* Not every context exposes this -- fail with an explanation, not a crash. */
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    micFailed({name: inFrame() ? 'NotAllowedError' : 'unavailable'});
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({audio:{
+      echoCancellation:false, noiseSuppression:false, autoGainControl:false}})
+  .then(function(stream){
+    micStream=stream;
+    var src=ac.createMediaStreamSource(stream);
+    analyser=ac.createAnalyser();
+    analyser.fftSize=4096;
+    micBuf=new Float32Array(analyser.fftSize);
+    src.connect(analyser);
+    document.getElementById('micBtn').textContent='Turn the microphone off';
+    document.getElementById('micBtn').classList.add('on');
+    document.getElementById('micStatus').textContent='On — singing modes available';
+    document.getElementById('micHelp').style.display='none';
+    document.getElementById('phoneWarn').style.display='block';
+    renderMode();
+  })
+  .catch(function(err){ micFailed(err); });
+}
+/* Is this page running inside a frame? A preview pane will not hand a frame
+   microphone access, and nothing the page does can change that. */
+function inFrame(){
+  try { return window.self !== window.top; } catch(e){ return true; }
+}
+function micFailed(err){
+  var box=document.getElementById('micHelp');
+  var status=document.getElementById('micStatus');
+  var name = err && err.name ? err.name : 'unknown error';
+  var html;
+  if(name==='NotAllowedError' && inFrame()){
+    status.textContent='Blocked by the preview frame';
+    html='<strong>This page is running inside a preview panel, which does not pass '+
+         'microphone access through to it.</strong> Nothing here can work around that. '+
+         '<br><br>Download this file and open it directly in a browser tab — double-click it, '+
+         'or drag it onto a browser window — and the microphone will work. '+
+         'In the meantime <em>Identify only</em> mode needs no microphone and trains the same thing.';
+  } else if(name==='NotAllowedError'){
+    status.textContent='Permission denied';
+    html='<strong>The browser refused microphone access.</strong> Two places to check: '+
+         'the padlock or camera icon in the address bar, where you can allow the microphone '+
+         'for this page and reload; and your operating system’s privacy settings, which have '+
+         'a separate list of apps allowed to use the microphone — your browser has to be on it.';
+  } else if(name==='NotFoundError' || name==='OverconstrainedError'){
+    status.textContent='No microphone found';
+    html='No input device was found. Plug in or enable a microphone and try again.';
+  } else if(name==='NotReadableError'){
+    status.textContent='Microphone busy';
+    html='Something else is already using the microphone — a call, a recorder, another tab. '+
+         'Close it and try again.';
+  } else {
+    status.textContent='Blocked: '+name;
+    html='The microphone could not be opened ('+name+'). <em>Identify only</em> mode works '+
+         'without it.';
+  }
+  box.innerHTML=html;
+  box.style.display='block';
+}
+function isMobile(){
+  try { return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || ''); }
+  catch(e){ return false; }
+}
+function localFile(){
+  try { return location.protocol==='file:' || location.protocol==='content:'; }
+  catch(e){ return false; }
+}
+/* Diagnostics run at startup, so they must never be able to take the page down. */
+function checkEnvironment(){
+  try { checkEnvironmentInner(); } catch(e){}
+}
+function checkEnvironmentInner(){
+  var box=document.getElementById('micHelp'), msg=null;
+  if(inFrame()){
+    msg='<strong>This page is inside a preview panel</strong>, which does not pass microphone access '+
+        'through to it. Download the file and open it in its own browser tab for the microphone. '+
+        'Everything else works here, and the singing modes fall back to grading yourself.';
+  } else if(localFile() && isMobile()){
+    msg='<strong>Chrome on a phone will not give the microphone to a page opened from a local file</strong> '+
+        '— a file has no web address for the permission to attach to, so it is refused before you are '+
+        'even asked. This is not something the page can fix.'+
+        '<br><br>Either use the phone for <em>Identify only</em> and the singing modes on your computer, '+
+        'or grade yourself: the singing modes work here, you just tap whether you matched it. '+
+        'To get the microphone working on the phone, the file has to be served over https.';
+  }
+  if(msg && box){ box.innerHTML=msg; box.style.display='block'; }
+  var env=document.getElementById('envLine');
+  if(env){
+    var proto='?';
+    try { proto=location.protocol.replace(':',''); } catch(e){}
+    env.textContent = proto + (inFrame()?' · inside a frame':' · top level') +
+      (window.isSecureContext===false ? ' · not a secure context' : '') +
+      (isMobile()?' · mobile':'');
+  }
+}
+function stopMic(){
+  stopListening();
+  if(micStream){ micStream.getTracks().forEach(function(t){t.stop();}); micStream=null; }
+  analyser=null;
+  document.getElementById('micBtn').textContent='Turn on the microphone';
+  document.getElementById('micBtn').classList.remove('on');
+  document.getElementById('micStatus').textContent=
+    'Off — singing modes will ask you to grade yourself';
+  document.getElementById('phoneWarn').style.display='none';
+  renderMode();
+}
+function median(a){ var b=a.slice().sort(function(x,y){return x-y;}); return b[b.length>>1]; }
+
+function startListening(target, cb){
+  if(!analyser) return;
+  listening=true; onLock=cb; pitchHist=[]; holdNote=null; holdStart=0;
+  duckDrone(true);
+  document.getElementById('listenBtn').textContent='Listening… stop';
+  document.getElementById('listenBtn').classList.add('on');
+  var frame=0;
+  function loop(){
+    if(!listening) return;
+    rafId=requestAnimationFrame(loop);
+    frame++;
+    if(frame%2) return;                        // ~30Hz analysis is plenty
+    analyser.getFloatTimeDomainData(micBuf);
+    var r=autoCorrelate(decimate2(micBuf), ac.sampleRate/2);
+    var off=document.getElementById('meterOff');
+    if(r.hz<=0 || r.clarity<0.72){
+      off.style.display='flex'; off.textContent='sing a steady note…';
+      document.getElementById('tNote').textContent='—';
+      document.getElementById('tCents').textContent='';
+      pitchHist=[]; holdNote=null;
+      return;
+    }
+    off.style.display='none';
+    pitchHist.push(r.hz); if(pitchHist.length>5) pitchHist.shift();
+    var hz=median(pitchHist);
+    var cmp=compareToTarget(hz, target);
+    var mf=hzToMidiFloat(hz), near=Math.round(mf);
+    var cents=Math.round((mf-near)*100);
+    document.getElementById('needle').style.left=
+      Math.max(2,Math.min(98, 50 + (cmp.semitonesOff*100 + cmp.centsFromTarget)/2 ))+'%';
+    document.getElementById('tNote').textContent = noteName(near);
+    document.getElementById('tCents').textContent =
+      (cents>0?'+':'')+cents+' cents'+(Math.abs(cmp.semitonesOff)>0
+        ? '  ·  '+Math.abs(cmp.semitonesOff)+' semitone'+(Math.abs(cmp.semitonesOff)>1?'s':'')+
+          ' '+(cmp.semitonesOff>0?'above':'below')+' target' : '  ·  right note');
+    /* lock in once the same note is held steadily */
+    if(holdNote===near){
+      if(performance.now()-holdStart > 450){
+        var locked=cmp; stopListening();
+        if(onLock) onLock(locked, hz);
+      }
+    } else { holdNote=near; holdStart=performance.now(); }
+  }
+  loop();
+}
+function stopListening(){
+  listening=false;
+  if(rafId) cancelAnimationFrame(rafId);
+  rafId=null;
+  duckDrone(false);
+  var b=document.getElementById('listenBtn');
+  if(b){ b.textContent='Start listening'; b.classList.remove('on'); }
+}
+function toggleListen(){
+  if(listening){ stopListening(); return; }
+  if(!S.current) return;
+  startListening(S.current.midi, onSingResult);
+}
+var NOTE_NAMES=['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
+function noteName(m){ return NOTE_NAMES[((m%12)+12)%12] + (Math.floor(m/12)-1); }
+
+/* =========================================================================
+   UI
+   ========================================================================= */
+var MODE_HINTS = {
+  match:    'Hear a note, sing it back. No naming at all — this is the warm-up that builds the link between hearing and producing.',
+  identify: 'Hear a note, click which degree it was. No microphone needed.',
+  produce:  'You are given a degree name; sing it, and the microphone checks you. This trains the direction most people neglect — name to sound.',
+  both:     'Hear a note, sing it back (checked), then name it (checked). Trains recognition and production together.'
+};
+function isSingMode(m){ return m==='match'||m==='produce'||m==='both'; }
+/* Sing modes work without a microphone too -- you just grade yourself. */
+function usingSelfCheck(){ return isSingMode(S.mode) && !analyser; }
+
+function setMode(m){
+  /* Recent accuracy drives the level advice, and different modes measure
+     different things -- don't average singing against naming. */
+  if(m!==S.mode) S.recent=[];
+  S.mode=m; resetQuestionUI(); renderMode(); updateProgress(); save();
+}
+function scoredKind(){ return (S.mode==='match'||S.mode==='produce') ? 'sing' : 'id'; }
+function renderMode(){
+  document.querySelectorAll('#modeRow .btn').forEach(function(b){
+    b.classList.toggle('on', b.getAttribute('data-mode')===S.mode);
+    b.disabled = false;
+    b.title = isSingMode(b.getAttribute('data-mode')) && !analyser
+      ? 'Works without a microphone — you grade yourself' : '';
+  });
+  var h=MODE_HINTS[S.mode];
+  if(usingSelfCheck()) h += '  —  no microphone here, so you will grade yourself. ' +
+                            'Less reliable, but it still trains production.';
+  document.getElementById('modeHint').textContent=h;
+  renderSteps();
+}
+/* Explicit map -- building these ids by string surgery is how they drift apart. */
+var CTX_BTN = { drone:'ctxDrone', cadence:'ctxCad', both:'ctxBoth' };
+function setContext(c){
+  S.context=c;
+  Object.keys(CTX_BTN).forEach(function(k){
+    var b=document.getElementById(CTX_BTN[k]);
+    if(b) b.classList.toggle('on', k===c);
+  });
+  save();
+}
+function renderSteps(){
+  var el=document.getElementById('steps');
+  var seq = S.mode==='both' ? ['Hear it','Sing it','Name it']
+          : S.mode==='match' ? ['Hear it','Sing it']
+          : S.mode==='produce' ? ['Read the name','Sing it']
+          : ['Hear it','Name it'];
+  var idx = S.phase==='idle' ? -1
+          : S.phase==='sing' ? (S.mode==='produce'?1:1)
+          : S.phase==='name' ? seq.length-1 : seq.length;
+  if(S.phase!=='idle' && S.mode==='identify') idx = 1;
+  el.innerHTML = seq.map(function(s,i){
+    var cls = i<idx ? 'step done' : (i===idx ? 'step active' : 'step');
+    return '<div class="'+cls+'">'+s+'</div>';
+  }).join('');
+}
+function resetQuestionUI(){
+  S.phase='idle'; S.current=null;
+  document.getElementById('feedback').innerHTML='';
+  document.getElementById('degRow').innerHTML='';
+  document.getElementById('tunerWrap').style.display='none';
+  showSelfCheck(false);
+  ['replayBtn','ctxBtn','inctxBtn'].forEach(function(id){
+    document.getElementById(id).disabled=true;
+  });
+  document.getElementById('newBtn').textContent='New note';
+  stopListening();
+  renderSteps();
+}
+
+function newQuestion(){
+  stopAll();
+  document.getElementById('feedback').innerHTML='';
+  document.getElementById('degRow').innerHTML='';
+  var q=pickQuestion();
+  ['replayBtn','ctxBtn','inctxBtn'].forEach(function(id){
+    document.getElementById(id).disabled=false;
+  });
+  document.getElementById('newBtn').textContent='Skip to next';
+
+  if(S.mode==='produce'){
+    // name is given; she sings it
+    establishKey(function(){
+      document.getElementById('feedback').innerHTML =
+        '<div class="fb info"><div class="big">Sing '+q.degree.solfa+
+        ' &nbsp;(degree '+q.degree.n+')</div>'+
+        '<div class="char">'+q.degree.char+'</div></div>';
+      beginSingPhase(q);
+    });
+    return;
+  }
+
+  establishKey(function(){
+    playTarget();
+    timers.push(setTimeout(function(){
+      if(S.mode==='identify'){ S.phase='name'; renderSteps(); showDegrees(); }
+      else beginSingPhase(q);
+    }, 1500));
+  });
+}
+function beginSingPhase(q){
+  S.phase='sing'; renderSteps();
+  if(analyser){
+    showSelfCheck(false); showTuner(true);
+    startListening(q.midi, onSingResult);
+  } else {
+    showTuner(false); showSelfCheck(true);
+  }
+}
+function showSelfCheck(on){
+  var el=document.getElementById('selfCheck');
+  el.style.display = on ? 'block' : 'none';
+  if(on){
+    document.getElementById('selfPrompt').textContent =
+      S.mode==='produce'
+        ? 'Sing the degree named above. Then play it and see whether you matched.'
+        : 'Sing back the note you just heard. Then play it again and compare.';
+  }
+}
+/* No microphone: you report the result yourself. */
+function selfReport(gotIt){
+  if(!S.current || S.current.singDone) return;
+  onSingResult({ correct:gotIt, centsFromTarget:0, semitonesOff:0,
+                 octaveOff:false, midi:S.current.midi, selfReported:true });
+}
+function playTarget(){
+  if(!S.current) return;
+  duckDrone(false);
+  pluck(S.current.midi, ctx().currentTime+0.05, 1.5, 0.36);
+}
+function replay(){ stopListening(); playTarget();
+  timers.push(setTimeout(function(){
+    if(S.phase==='sing' && analyser) startListening(S.current.midi,onSingResult);
+  },1500)); }
+function replayContext(){ stopListening(); establishKey(function(){}); }
+function hearInContext(){
+  if(!S.current) return;
+  stopListening();
+  var t=S.tonic;
+  playSeq([[t,1],[S.current.midi,1],[t,1.4]],78,function(){
+    if(S.phase==='sing' && analyser) startListening(S.current.midi,onSingResult);
+  });
+}
+function showTuner(on){ document.getElementById('tunerWrap').style.display= on?'block':'none'; }
+
+function onSingResult(cmp, hz){
+  if(!S.current) return;
+  var s=S.stats[S.current.degree.n].sing;
+  s.a++; if(cmp.correct) s.c++;
+  S.current.singDone=true;
+
+  showSelfCheck(false);
+  var msg, cls;
+  if(cmp.selfReported){
+    cls = cmp.correct ? 'good' : 'bad';
+    msg = cmp.correct
+      ? '<div class="big">Logged as matched</div><div class="char">Your own judgement — be strict '+
+        'with it. If you were not sure, count it as a miss.</div>'
+      : '<div class="big">Logged as missed</div><div class="char">Play it once more and sing along '+
+        'with it before moving on.</div>';
+  } else if(cmp.correct){
+    var tight = Math.abs(cmp.centsFromTarget)<=15;
+    cls='good';
+    msg='<div class="big">Right note'+(tight?' — and dead in tune':'')+'</div>'+
+        '<div class="char">'+(tight?'':(Math.abs(cmp.centsFromTarget)+' cents '+
+          (cmp.centsFromTarget>0?'sharp':'flat')+' — close enough, but aim to narrow that.'))+
+        (cmp.octaveOff?' You sang it in a different octave, which is fine.':'')+'</div>';
+  } else {
+    cls='bad';
+    msg='<div class="big">'+Math.abs(cmp.semitonesOff)+' semitone'+
+        (Math.abs(cmp.semitonesOff)>1?'s':'')+' '+(cmp.semitonesOff>0?'sharp':'flat')+'</div>'+
+        '<div class="char">You sang '+noteName(cmp.midi)+'; the note was '+
+        noteName(S.current.midi)+'. Press Replay and try again — it does not count against you.</div>';
+  }
+  document.getElementById('feedback').innerHTML='<div class="fb '+cls+'">'+msg+'</div>';
+
+  /* In the sing-only modes there is no naming step, so singing accuracy is what
+     drives the session counter and the level advice. */
+  if(S.mode==='match' || S.mode==='produce'){
+    S.answered++;
+    S.recent.push(cmp.correct); if(S.recent.length>20) S.recent.shift();
+    S.phase='done'; renderSteps();
+    if(S.mode==='produce') timers.push(setTimeout(function(){ playTarget(); },500));
+    updateProgress(); save();
+    return;
+  }
+  // 'both' -> now name it
+  S.phase='name'; renderSteps(); showDegrees();
+}
+function skipSing(){
+  stopListening(); showSelfCheck(false);
+  if(S.mode==='match'){ S.phase='done'; renderSteps(); return; }
+  if(S.mode==='produce'){
+    S.phase='done'; renderSteps(); playTarget(); return;
+  }
+  S.phase='name'; renderSteps(); showDegrees();
+}
+
+function showDegrees(){
+  var row=document.getElementById('degRow');
+  row.innerHTML = activeDegrees().map(function(n){
+    var d=degByN(n);
+    return '<button class="deg" data-n="'+n+'" onclick="answer('+n+')">'+
+           '<div class="n" style="color:'+d.color+'">'+n+'</div>'+
+           '<div class="s">'+d.solfa+'</div></button>';
+  }).join('');
+}
+function answer(n){
+  if(!S.current || S.current.idDone) return;
+  S.current.idDone=true;
+  var correct = n===S.current.degree.n;
+  var st=S.stats[S.current.degree.n].id;
+  st.a++; if(correct) st.c++;
+  S.recent.push(correct); if(S.recent.length>20) S.recent.shift();
+  S.answered++;
+
+  document.querySelectorAll('#degRow .deg').forEach(function(b){
+    b.disabled=true;
+    var bn=parseInt(b.getAttribute('data-n'),10);
+    if(bn===S.current.degree.n) b.classList.add('right');
+    else if(bn===n) b.classList.add('wrong');
+  });
+
+  var d=S.current.degree;
+  var fb=document.getElementById('feedback');
+  if(correct){
+    fb.innerHTML='<div class="fb good"><div class="big">'+d.n+' — '+d.solfa+'</div>'+
+                 '<div class="char">'+d.char+'</div></div>';
+    timers.push(setTimeout(function(){
+      playSeq([[S.current.midi,1],[S.tonic,1.4]],84);
+    },260));
+  } else {
+    var g=degByN(n);
+    fb.innerHTML='<div class="fb bad"><div class="big">That was '+d.n+' ('+d.solfa+
+                 '), not '+n+' ('+g.solfa+')</div>'+
+                 '<div class="char">'+d.char+'</div>'+
+                 '<div class="char" style="margin-top:6px;color:var(--grey)">Listen: your answer, '+
+                 'then the real one, each against do.</div></div>';
+    // contrastive replay -- this is where the learning actually happens
+    var guessMidi = S.tonic + g.semi + (S.current.offset<0 ? -12 : 0);
+    timers.push(setTimeout(function(){
+      playSeq([[S.tonic,0.9],[guessMidi,1.1],[null,0.4],
+               [S.tonic,0.9],[S.current.midi,1.4]],80);
+    },300));
+  }
+  S.phase='done'; renderSteps();
+  updateProgress(); save();
+}
+
+/* ---------- progress ---------- */
+function updateProgress(){
+  document.getElementById('hLevel').textContent=S.level+1;
+  document.getElementById('pLevel').textContent=S.level+1;
+  document.getElementById('pLevelName').textContent=LEVELS[S.level].name;
+  document.getElementById('pCount').textContent=S.answered;
+  var ra=recentAccuracy();
+  var txt = ra===null?'–':Math.round(ra*100)+'%';
+  document.getElementById('pRecent').textContent=txt;
+  document.getElementById('hAcc').textContent=txt;
+
+  var kind=scoredKind();
+  document.getElementById('barsLabel').textContent =
+    kind==='sing' ? 'Singing accuracy by degree' : 'Naming accuracy by degree';
+  var bars=document.getElementById('bars');
+  bars.innerHTML = activeDegrees().map(function(n){
+    var d=degByN(n), a=accuracy(n,kind), st=S.stats[n][kind];
+    var pct = a===null?0:Math.round(a*100);
+    var col = a===null?'#d8d8e0':(a>=0.85?'#0f6f6c':(a>=0.6?'#b07d08':'#c0392b'));
+    return '<div class="bar"><div class="nm" style="color:'+d.color+'">'+n+' '+d.solfa+'</div>'+
+           '<div class="track"><div class="fill" style="width:'+pct+'%;background:'+col+'"></div></div>'+
+           '<div class="pct">'+(a===null?'–':pct+'%')+' <span style="opacity:.6">('+st.a+')</span></div></div>';
+  }).join('');
+
+  var adv=levelAdvice(), el=document.getElementById('advice');
+  if(adv==='advance'){
+    el.innerHTML='<div class="okbox">You are at '+Math.round(ra*100)+
+      '% over your last '+S.recent.length+'. Ready for <strong>'+LEVELS[S.level+1].name+
+      '</strong> &mdash; '+LEVELS[S.level+1].blurb+'. '+
+      '<button class="btn sm" style="margin-left:6px" onclick="nextLevel()">Move up</button></div>';
+  } else if(adv==='back'){
+    el.innerHTML='<div class="warn">'+Math.round(ra*100)+'% over your last '+S.recent.length+
+      '. That is below the level where practice helps &mdash; drop back and rebuild. '+
+      '<button class="btn sm" style="margin-left:6px" onclick="prevLevel()">Go easier</button></div>';
+  } else el.innerHTML='';
+
+  var weak=null;
+  activeDegrees().forEach(function(n){
+    var a=accuracy(n,kind);
+    if(a===null || S.stats[n][kind].a<4) return;
+    if(weak===null || a<weak.a) weak={n:n,a:a};
+  });
+  document.getElementById('weakNote').textContent = weak
+    ? 'Weakest right now: '+weak.n+' ('+degByN(weak.n).solfa+') at '+Math.round(weak.a*100)+
+      '%. It will come up more often until it improves.'
+    : 'Answer a few more and this will show which degree needs work.';
+}
+function nextLevel(){ if(S.level<LEVELS.length-1){ S.level++; S.recent=[]; S.lastDegree=null;
+  resetQuestionUI(); updateProgress(); save(); } }
+function prevLevel(){ if(S.level>0){ S.level--; S.recent=[]; S.lastDegree=null;
+  resetQuestionUI(); updateProgress(); save(); } }
+function resetProgress(){
+  DEGREES.forEach(function(d){ S.stats[d.n]={id:{a:0,c:0},sing:{a:0,c:0}}; });
+  S.recent=[]; S.answered=0; S.level=0;
+  resetQuestionUI(); updateProgress(); save();
+}
+
+/* ---------- key setup ---------- */
+var VOICE_LO=48, VOICE_HI=69;     // C3-A4, bass-baritone
+function buildTonicSelect(){
+  var sel=document.getElementById('tonicSel');
+  var html='';
+  for(var m=48;m<=60;m++){
+    var fits=true;
+    for(var l=0;l<LEVELS.length;l++){
+      var r=rangeFor(l,m);
+      if(r.lo<VOICE_LO || r.hi>VOICE_HI) fits=false;
+    }
+    html+='<option value="'+m+'"'+(m===S.tonic?' selected':'')+'>'+noteName(m)+
+          (fits?'':' — stretches your range')+'</option>';
+  }
+  sel.innerHTML=html;
+  sel.onchange=function(){ S.tonic=parseInt(this.value,10); resetQuestionUI();
+                           updateKeyNote(); save(); };
+  updateKeyNote();
+}
+function updateKeyNote(){
+  document.getElementById('hKey').textContent=noteName(S.tonic).replace(/\d/,'');
+  var r=rangeFor(S.level,S.tonic), rw=rangeFor(3,S.tonic);
+  var fits = rw.lo>=VOICE_LO && rw.hi<=VOICE_HI;
+  document.getElementById('rangeNote').innerHTML =
+    'At this level notes run '+noteName(r.lo)+'&ndash;'+noteName(r.hi)+
+    '. Across all four levels: '+noteName(rw.lo)+'&ndash;'+noteName(rw.hi)+'. '+
+    (fits ? 'That sits inside a bass-baritone range, so you can sing every answer.'
+          : '<strong>This one reaches outside C3&ndash;A4</strong> — fine if it suits you, but F3 to A3 keeps everything singable.');
+}
+function previewKey(){
+  stopAll();
+  var t=S.tonic;
+  playSeq([[t,0.6],[t+2,0.6],[t+4,0.6],[t+5,0.6],[t+7,0.6],[t+9,0.6],[t+11,0.6],[t+12,1.4]],120);
+}
+
+/* ---------- persistence ---------- */
+function save(){
+  try{
+    localStorage.setItem('eartrain.v1', JSON.stringify({
+      tonic:S.tonic, level:S.level, mode:S.mode, context:S.context,
+      stats:S.stats, answered:S.answered
+    }));
+  }catch(e){}
+}
+function load(){
+  try{
+    var raw=localStorage.getItem('eartrain.v1');
+    if(!raw) return;
+    var o=JSON.parse(raw);
+    if(o.tonic) S.tonic=o.tonic;
+    if(typeof o.level==='number') S.level=o.level;
+    if(o.mode) S.mode=o.mode;
+    if(o.context) S.context=o.context;
+    if(o.stats) S.stats=o.stats;
+    if(o.answered) S.answered=o.answered;
+    DEGREES.forEach(function(d){
+      if(!S.stats[d.n]) S.stats[d.n]={id:{a:0,c:0},sing:{a:0,c:0}};
+    });
+  }catch(e){}
+}
+
+/* ---------- boot ---------- */
+/* Offline support when served over https. Absent on file://, and a failure here
+   must never stop the app loading. */
+try {
+  if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){});
+    });
+  }
+} catch(e){}
+
+load();
+buildTonicSelect();
+setContext(S.context);
+checkEnvironment();
+renderMode();
+resetQuestionUI();
+updateProgress();
+window.addEventListener('keydown', function(e){
+  if(e.key===' '){ e.preventDefault(); newQuestion(); return; }
+  if(S.phase==='name'){
+    var n=parseInt(e.key,10);
+    if(n>=1 && n<=7 && activeDegrees().indexOf(n)>=0) answer(n);
+  }
+});
+</script>
+</body>
+</html>
