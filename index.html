@@ -166,7 +166,19 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
 <!-- ===================== SETUP ===================== -->
 <h2>Setup</h2>
 <div class="card">
-  <div class="lbl">Your key</div>
+  <div class="lbl">Your singing range</div>
+  <div class="row">
+    <label class="muted" for="loSel">Lowest comfortable</label>
+    <select id="loSel"></select>
+    <button class="btn sm" onclick="auditionNote(S.voiceLo)">Hear</button>
+    <label class="muted" for="hiSel" style="margin-left:8px">Highest</label>
+    <select id="hiSel"></select>
+    <button class="btn sm" onclick="auditionNote(S.voiceHi)">Hear</button>
+  </div>
+  <div class="hint">Sing along with each to check. Set these honestly &mdash; every note the app
+  plays is chosen so you can sing it back.</div>
+
+  <div class="lbl" style="margin-top:16px">Your key</div>
   <div class="row">
     <label class="muted" for="tonicSel">Tonic</label>
     <select id="tonicSel"></select>
@@ -182,18 +194,31 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
   </div>
   <div class="hint">A drone is the strongest anchor and the one to start with. Cadence mode is closer to
   real music and a little harder.</div>
+  <div class="row" style="margin-top:10px">
+    <label class="muted" for="droneVol">Drone volume</label>
+    <input id="droneVol" type="range" min="0" max="0.9" step="0.05" value="0.45"
+           oninput="setDroneVol(parseFloat(this.value))" style="width:150px">
+    <span class="muted" id="droneVolVal">45%</span>
+    <button class="btn sm" onclick="auditionDrone()">Hear the drone</button>
+  </div>
 
   <div class="lbl" style="margin-top:16px">Microphone</div>
   <div class="row">
     <button class="btn teal" id="micBtn" onclick="toggleMic()">Turn on the microphone</button>
     <span class="muted" id="micStatus">Off &mdash; singing modes will ask you to grade yourself</span>
   </div>
+  <div class="row" id="micPickRow" style="display:none;margin-top:10px">
+    <label class="muted" for="micSel">Sing into</label>
+    <select id="micSel" style="max-width:100%;flex:1 1 220px" onchange="switchMic(this.value)"></select>
+  </div>
+  <div class="warn" id="btWarn" style="display:none"></div>
   <div class="hint">Running as: <span id="envLine">&mdash;</span></div>
   <div class="warn" id="micHelp" style="display:none"></div>
   <div class="warn" id="phoneWarn" style="display:none">
     <strong>Use headphones.</strong> Without them the drone leaks into the microphone and the pitch
-    detection gets confused. The drone is muted while it listens, which helps, but headphones make it
-    reliable.
+    detection gets confused. Wired headphones are best. With Bluetooth headphones, sing into the
+    phone's or laptop's own microphone (pick it above) &mdash; using the headset's mic drops the
+    headphones into phone-call quality.
   </div>
 </div>
 
@@ -406,7 +431,9 @@ var LEVELS = [
 function degByN(n){ for(var i=0;i<DEGREES.length;i++) if(DEGREES[i].n===n) return DEGREES[i]; return null; }
 
 var S = {
-  tonic:53, level:0, mode:'both', context:'drone',
+  tonic:48, level:0, mode:'both', context:'drone',
+  voiceLo:40, voiceHi:64,       // E2-E4, a bass-baritone working range
+  droneVol:0.45, micId:'',
   stats:{}, recent:[], answered:0, current:null, lastDegree:null,
   phase:'idle'     // idle | sing | name | done
 };
@@ -461,11 +488,32 @@ function levelAdvice(){
    ========================================================================= */
 var AC = window.AudioContext || window.webkitAudioContext;
 var ac=null, master=null, droneGain=null, droneNodes=[], live=[], timers=[];
+var reverbSend=null;
+/* A short synthetic impulse response: decaying noise. Cheap, and it stops
+   everything sounding like it was recorded inside a box. */
+function makeImpulse(c, seconds, decay){
+  var n=Math.floor(c.sampleRate*seconds);
+  var buf=c.createBuffer(2,n,c.sampleRate);
+  for(var ch=0; ch<2; ch++){
+    var d=buf.getChannelData(ch);
+    for(var i=0;i<n;i++){
+      d[i]=(Math.random()*2-1)*Math.pow(1-i/n, decay);
+    }
+  }
+  return buf;
+}
 function ctx(){
   if(!ac){
     ac = new AC();
     master = ac.createGain(); master.gain.value=0.9; master.connect(ac.destination);
     droneGain = ac.createGain(); droneGain.gain.value=0; droneGain.connect(master);
+    try {
+      var conv=ac.createConvolver();
+      conv.buffer=makeImpulse(ac, 2.4, 2.6);
+      var wet=ac.createGain(); wet.gain.value=0.5;
+      reverbSend=ac.createGain(); reverbSend.gain.value=1;
+      reverbSend.connect(conv); conv.connect(wet); wet.connect(master);
+    } catch(e){ reverbSend=null; }
   }
   if(ac.state==='suspended') ac.resume();
   return ac;
@@ -500,26 +548,78 @@ function playSeq(seq,bpm,done){
   if(done) timers.push(setTimeout(done,(0.12+pos*spb)*1000));
   return (0.12+pos*spb)*1000;
 }
-function startDrone(){
-  var c=ctx();
-  stopDrone();
-  var root=S.tonic-24, fifth=S.tonic-24+7;
-  [root,root,fifth].forEach(function(m,i){
+/* Where the drone sits. An octave below the tonic, nudged up by octaves until it
+   clears the sub-bass -- below about 60Hz a phone reproduces no fundamental at
+   all, so you hear only harmonics, which is what made the old one sound hollow. */
+/* Always a true octave below the tonic. Never nudged, so it can never collide
+   with a note being tested -- it sits a fifth below even the lowest one. When
+   the fundamental gets low the upper partials carry it instead (see below);
+   moving the pitch to chase audibility would defeat the point of a drone. */
+function droneRootFor(tonic){ return tonic - 12; }
+/* One drone voice: a few detuned sines plus two quiet upper partials. Sine
+   partials stay smooth where a triangle buzzes, and the octave partial is what
+   makes it audible on a small speaker without adding mud. */
+function droneVoice(midi, level, lfoRate){
+  var c=ctx(), f=midiToHz(midi);
+  var out=c.createGain(); out.gain.value=level;
+
+  var lp=c.createBiquadFilter();
+  lp.type='lowpass'; lp.frequency.value=1500; lp.Q.value=0.6;
+  lp.connect(out);
+
+  /* A phone speaker reproduces almost nothing below ~150Hz, so the lower the
+     root, the more the octave and twelfth have to carry the pitch. The ear
+     reconstructs the missing fundamental from them quite happily. */
+  var lift = midi < 40 ? (40 - midi) / 14 : 0;          // 0 .. ~0.9
+  var partials = [[1,0.50,-5],[1,0.55,0],[1,0.50,5],
+                  [2,0.20+0.30*lift,0],[3,0.07+0.16*lift,3]];
+  partials.forEach(function(p){
     var o=c.createOscillator();
-    o.type = i===2 ? 'sine' : 'triangle';
-    o.frequency.value = midiToHz(m) * (i===1 ? 1.004 : 1);   // slight detune for life
-    var g=c.createGain(); g.gain.value = i===2 ? 0.16 : 0.22;
-    var lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=700;
-    o.connect(g); g.connect(lp); lp.connect(droneGain);
+    o.type='sine';
+    o.frequency.value=f*p[0]*Math.pow(2,p[2]/1200);
+    var g=c.createGain(); g.gain.value=p[1];
+    o.connect(g); g.connect(lp);
     o.start(); droneNodes.push(o);
   });
+
+  // very slow breathing so it never sits perfectly still
+  var lfo=c.createOscillator(); lfo.type='sine'; lfo.frequency.value=lfoRate;
+  var lfoAmt=c.createGain(); lfoAmt.gain.value=level*0.18;
+  lfo.connect(lfoAmt); lfoAmt.connect(out.gain);
+  lfo.start(); droneNodes.push(lfo);
+
+  return out;
+}
+var droneTonic=null;
+function droneRunning(){ return droneNodes.length>0 && droneTonic===S.tonic; }
+function startDrone(){
+  var c=ctx();
+  /* Already sounding in this key: leave it be. Restarting it every question
+     made it fade in and out constantly, which is half of why it felt odd. */
+  if(droneRunning()){
+    droneGain.gain.cancelScheduledValues(c.currentTime);
+    droneGain.gain.setValueAtTime(droneGain.gain.value, c.currentTime);
+    droneGain.gain.linearRampToValueAtTime(S.droneVol, c.currentTime+0.3);
+    return;
+  }
+  stopDrone();
+  droneTonic=S.tonic;
+  var root=droneRootFor(S.tonic);
+  droneVoice(root,      0.30, 0.061).connect(droneGain);   // tonic
+  droneVoice(root + 7,  0.19, 0.083).connect(droneGain);   // the fifth above it
+  if(reverbSend) {
+    var rs=c.createGain(); rs.gain.value=0.35;
+    droneGain.connect(rs); rs.connect(reverbSend);
+    droneNodes.push({stop:function(){ try{rs.disconnect();}catch(e){} }});
+  }
   droneGain.gain.cancelScheduledValues(c.currentTime);
   droneGain.gain.setValueAtTime(droneGain.gain.value, c.currentTime);
-  droneGain.gain.linearRampToValueAtTime(0.5, c.currentTime+0.35);
+  droneGain.gain.linearRampToValueAtTime(S.droneVol, c.currentTime+1.4);  // soft fade-in
 }
 function stopDrone(){
   droneNodes.forEach(function(o){ try{o.stop(0);}catch(e){} });
   droneNodes=[];
+  droneTonic=null;
   if(droneGain) droneGain.gain.value=0;
 }
 function duckDrone(on){
@@ -527,7 +627,18 @@ function duckDrone(on){
   var t=ac.currentTime;
   droneGain.gain.cancelScheduledValues(t);
   droneGain.gain.setValueAtTime(droneGain.gain.value,t);
-  droneGain.gain.linearRampToValueAtTime(on?0.04:0.5, t+0.18);
+  droneGain.gain.linearRampToValueAtTime(on ? S.droneVol*0.10 : S.droneVol, t+0.25);
+}
+function setDroneVol(v){
+  S.droneVol=v;
+  var out=document.getElementById('droneVolVal');
+  if(out) out.textContent=Math.round(v*100)+'%';
+  if(droneGain && ac && droneNodes.length){
+    droneGain.gain.cancelScheduledValues(ac.currentTime);
+    droneGain.gain.setValueAtTime(droneGain.gain.value, ac.currentTime);
+    droneGain.gain.linearRampToValueAtTime(v, ac.currentTime+0.15);
+  }
+  save();
 }
 function cadenceSeq(){
   var t=S.tonic;
@@ -539,7 +650,12 @@ function cadenceSeq(){
 /* Establish the key, then call back. */
 function establishKey(cb){
   var mode=S.context;
-  if(mode==='drone'){ startDrone(); timers.push(setTimeout(cb,900)); return; }
+  if(mode==='drone'){
+    var already=droneRunning();
+    startDrone();
+    timers.push(setTimeout(cb, already ? 280 : 1700));
+    return;
+  }
   if(mode==='cadence'){ stopDrone(); var ms=playSeq(cadenceSeq(),96,cb); return; }
   stopDrone();
   playSeq(cadenceSeq(),96,function(){ startDrone(); timers.push(setTimeout(cb,700)); });
@@ -559,24 +675,109 @@ function toggleMic(){
     micFailed({name: inFrame() ? 'NotAllowedError' : 'unavailable'});
     return;
   }
-  navigator.mediaDevices.getUserMedia({audio:{
-      echoCancellation:false, noiseSuppression:false, autoGainControl:false}})
-  .then(function(stream){
-    micStream=stream;
-    var src=ac.createMediaStreamSource(stream);
+  openMic(S.micId || '');
+}
+
+/* ---------- choosing which microphone ----------
+   Bluetooth headphones switch into call mode (mono, speech-band, muffled) the
+   moment their own microphone is opened. Singing into the phone's or laptop's
+   built-in mic instead leaves the headphones in full-quality playback. */
+var micSource=null;
+function micConstraints(id){
+  var a={echoCancellation:false, noiseSuppression:false, autoGainControl:false};
+  if(id) a.deviceId={exact:id};
+  return {audio:a};
+}
+function openMic(id, isRetry){
+  navigator.mediaDevices.getUserMedia(micConstraints(id))
+  .then(function(stream){ attachMic(stream); })
+  .catch(function(err){
+    /* a remembered device that has since gone away: fall back to the default */
+    if(id && !isRetry && (err.name==='OverconstrainedError' || err.name==='NotFoundError')){
+      S.micId=''; save(); openMic('', true); return;
+    }
+    micFailed(err);
+  });
+}
+function attachMic(stream){
+  if(micSource){ try{ micSource.disconnect(); }catch(e){} }
+  if(micStream && micStream!==stream){ micStream.getTracks().forEach(function(t){t.stop();}); }
+  micStream=stream;
+  micSource=ac.createMediaStreamSource(stream);
+  if(!analyser){
     analyser=ac.createAnalyser();
     analyser.fftSize=4096;
     micBuf=new Float32Array(analyser.fftSize);
-    src.connect(analyser);
-    document.getElementById('micBtn').textContent='Turn the microphone off';
-    document.getElementById('micBtn').classList.add('on');
-    document.getElementById('micStatus').textContent='On — singing modes available';
-    document.getElementById('micHelp').style.display='none';
-    document.getElementById('phoneWarn').style.display='block';
-    renderMode();
-  })
-  .catch(function(err){ micFailed(err); });
+  }
+  micSource.connect(analyser);
+  var track=stream.getAudioTracks()[0];
+  var settings = track && track.getSettings ? track.getSettings() : {};
+  if(settings.deviceId){ S.micId=settings.deviceId; save(); }
+  document.getElementById('micBtn').textContent='Turn the microphone off';
+  document.getElementById('micBtn').classList.add('on');
+  document.getElementById('micStatus').textContent='On — singing modes available';
+  document.getElementById('micHelp').style.display='none';
+  document.getElementById('phoneWarn').style.display='block';
+  renderMode();
+  listMics(track ? track.label : '', settings.sampleRate);
 }
+/* Two signals. The name, for the usual Bluetooth labels (a bare "headset" is
+   left out on purpose: wired headsets are called that too, and they are fine).
+   And the sample rate, which catches the problem itself -- a mic in call mode
+   runs at 8-16kHz where a normal one runs at 44.1-48kHz. */
+function looksLikeHeadsetMic(label){
+  return /hands[- ]?free|bluetooth|\bhfp\b|\bsco\b|airpods|\bbuds\b|buds\d|\bbt\b/i.test(label||'');
+}
+function callQuality(sampleRate){ return typeof sampleRate==='number' && sampleRate>0 && sampleRate<=24000; }
+function listMics(activeLabel, activeRate){
+  if(!navigator.mediaDevices.enumerateDevices) return;
+  navigator.mediaDevices.enumerateDevices().then(function(devs){
+    var mics=devs.filter(function(d){ return d.kind==='audioinput'; });
+    var sel=document.getElementById('micSel');
+    var row=document.getElementById('micPickRow');
+    if(!mics.length){ row.style.display='none'; return; }
+    sel.innerHTML = mics.map(function(d,i){
+      var name = d.label || ('Microphone '+(i+1));
+      if(looksLikeHeadsetMic(name)) name += '  — headset, lowers playback quality';
+      return '<option value="'+d.deviceId.replace(/"/g,'&quot;')+'"'+
+             (d.deviceId===S.micId?' selected':'')+'>'+name.replace(/</g,'&lt;')+'</option>';
+    }).join('');
+    row.style.display = mics.length>1 ? 'flex' : 'none';
+    warnIfHeadset(activeLabel, mics.length>1, activeRate);
+  }).catch(function(){});
+}
+function warnIfHeadset(label, canSwitch, rate){
+  var box=document.getElementById('btWarn');
+  var byName=looksLikeHeadsetMic(label), byRate=callQuality(rate);
+  if(!byName && !byRate){ box.style.display='none'; return; }
+  box.innerHTML='<strong>'+(byName ? 'You are singing into a Bluetooth headset microphone'
+                                    : 'This microphone is running at call quality ('+
+                                      Math.round(rate/1000)+'\u202fkHz)')+'</strong>'+
+    (label ? ' ('+String(label).replace(/</g,'&lt;')+')' : '')+'. While it is open, Bluetooth headphones drop into '+
+    'phone-call mode, so the drone and notes will sound muffled. '+
+    (canSwitch ? 'Pick the phone’s or laptop’s built-in microphone above. '
+               : 'No other microphone is available right now. ')+
+    'If playback still sounds like a call after switching, your phone is routing through the headset '+
+    'anyway — wired headphones, or the self-check modes with the mic off, avoid it.';
+  box.style.display='block';
+}
+function switchMic(id){
+  if(!micStream) return;
+  stopListening();
+  S.micId=id; save();
+  openMic(id);
+}
+try{
+  if(navigator.mediaDevices && navigator.mediaDevices.addEventListener){
+    navigator.mediaDevices.addEventListener('devicechange', function(){
+      if(micStream){
+        var t=micStream.getAudioTracks()[0];
+        var st=t && t.getSettings ? t.getSettings() : {};
+        listMics(t ? t.label : '', st.sampleRate);
+      }
+    });
+  }
+}catch(e){}
 /* Is this page running inside a frame? A preview pane will not hand a frame
    microphone access, and nothing the page does can change that. */
 function inFrame(){
@@ -654,7 +855,10 @@ function checkEnvironmentInner(){
 function stopMic(){
   stopListening();
   if(micStream){ micStream.getTracks().forEach(function(t){t.stop();}); micStream=null; }
+  if(micSource){ try{ micSource.disconnect(); }catch(e){} micSource=null; }
   analyser=null;
+  document.getElementById('micPickRow').style.display='none';
+  document.getElementById('btWarn').style.display='none';
   document.getElementById('micBtn').textContent='Turn on the microphone';
   document.getElementById('micBtn').classList.remove('on');
   document.getElementById('micStatus').textContent=
@@ -1034,33 +1238,68 @@ function resetProgress(){
 }
 
 /* ---------- key setup ---------- */
-var VOICE_LO=48, VOICE_HI=69;     // C3-A4, bass-baritone
+function fitsRange(tonic){
+  for(var l=0;l<LEVELS.length;l++){
+    var r=rangeFor(l,tonic);
+    if(r.lo<S.voiceLo || r.hi>S.voiceHi) return false;
+  }
+  return true;
+}
+function opts(from,to,selected){
+  var h='';
+  for(var m=from;m<=to;m++){
+    h+='<option value="'+m+'"'+(m===selected?' selected':'')+'>'+noteName(m)+'</option>';
+  }
+  return h;
+}
+function buildRangeSelects(){
+  var lo=document.getElementById('loSel'), hi=document.getElementById('hiSel');
+  lo.innerHTML=opts(31,55,S.voiceLo);       // G1 .. G3
+  hi.innerHTML=opts(52,76,S.voiceHi);       // E3 .. E5
+  lo.onchange=function(){
+    S.voiceLo=parseInt(this.value,10);
+    if(S.voiceHi < S.voiceLo+13){ S.voiceHi=S.voiceLo+13; hi.value=S.voiceHi; }
+    buildTonicSelect(); save();
+  };
+  hi.onchange=function(){
+    S.voiceHi=parseInt(this.value,10);
+    if(S.voiceHi < S.voiceLo+13){ S.voiceLo=S.voiceHi-13; lo.value=S.voiceLo; }
+    buildTonicSelect(); save();
+  };
+}
 function buildTonicSelect(){
   var sel=document.getElementById('tonicSel');
+  var loT=S.voiceLo, hiT=S.voiceHi-11;
+  if(hiT<loT) hiT=loT;
   var html='';
-  for(var m=48;m<=60;m++){
-    var fits=true;
-    for(var l=0;l<LEVELS.length;l++){
-      var r=rangeFor(l,m);
-      if(r.lo<VOICE_LO || r.hi>VOICE_HI) fits=false;
-    }
+  for(var m=loT;m<=hiT;m++){
     html+='<option value="'+m+'"'+(m===S.tonic?' selected':'')+'>'+noteName(m)+
-          (fits?'':' — stretches your range')+'</option>';
+          (fitsRange(m)?'':' — level 4 reaches outside')+'</option>';
   }
   sel.innerHTML=html;
+  if(S.tonic<loT || S.tonic>hiT){ S.tonic=Math.min(Math.max(S.tonic,loT),hiT); sel.value=S.tonic; }
   sel.onchange=function(){ S.tonic=parseInt(this.value,10); resetQuestionUI();
                            updateKeyNote(); save(); };
   updateKeyNote();
 }
 function updateKeyNote(){
-  document.getElementById('hKey').textContent=noteName(S.tonic).replace(/\d/,'');
+  document.getElementById('hKey').textContent=noteName(S.tonic).replace(/-?\d/,'');
   var r=rangeFor(S.level,S.tonic), rw=rangeFor(3,S.tonic);
-  var fits = rw.lo>=VOICE_LO && rw.hi<=VOICE_HI;
+  var dr=droneRootFor(S.tonic);
   document.getElementById('rangeNote').innerHTML =
     'At this level notes run '+noteName(r.lo)+'&ndash;'+noteName(r.hi)+
-    '. Across all four levels: '+noteName(rw.lo)+'&ndash;'+noteName(rw.hi)+'. '+
-    (fits ? 'That sits inside a bass-baritone range, so you can sing every answer.'
-          : '<strong>This one reaches outside C3&ndash;A4</strong> — fine if it suits you, but F3 to A3 keeps everything singable.');
+    '; across all four levels '+noteName(rw.lo)+'&ndash;'+noteName(rw.hi)+
+    '. Drone sits on '+noteName(dr)+' and '+noteName(dr+7)+'. '+
+    (fitsRange(S.tonic)
+      ? 'Everything is inside the range you set.'
+      : '<strong>Level 4 would reach outside your range.</strong> Levels 1–3 are fine; '+
+        'lower your bottom note or pick a higher tonic before you get there.');
+}
+function auditionNote(m){ stopAll(); playNote(m,2.2); }
+function auditionDrone(){
+  stopAll();
+  startDrone();
+  timers.push(setTimeout(stopDrone, 6000));
 }
 function previewKey(){
   stopAll();
@@ -1073,6 +1312,7 @@ function save(){
   try{
     localStorage.setItem('eartrain.v1', JSON.stringify({
       tonic:S.tonic, level:S.level, mode:S.mode, context:S.context,
+      voiceLo:S.voiceLo, voiceHi:S.voiceHi, droneVol:S.droneVol, micId:S.micId,
       stats:S.stats, answered:S.answered
     }));
   }catch(e){}
@@ -1083,6 +1323,10 @@ function load(){
     if(!raw) return;
     var o=JSON.parse(raw);
     if(o.tonic) S.tonic=o.tonic;
+    if(typeof o.voiceLo==='number') S.voiceLo=o.voiceLo;
+    if(typeof o.voiceHi==='number') S.voiceHi=o.voiceHi;
+    if(typeof o.droneVol==='number') S.droneVol=o.droneVol;
+    if(typeof o.micId==='string') S.micId=o.micId;
     if(typeof o.level==='number') S.level=o.level;
     if(o.mode) S.mode=o.mode;
     if(o.context) S.context=o.context;
@@ -1106,7 +1350,14 @@ try {
 } catch(e){}
 
 load();
+buildRangeSelects();
 buildTonicSelect();
+(function(){
+  var sl=document.getElementById('droneVol');
+  if(sl){ sl.value=S.droneVol; }
+  var out=document.getElementById('droneVolVal');
+  if(out) out.textContent=Math.round(S.droneVol*100)+'%';
+})();
 setContext(S.context);
 checkEnvironment();
 renderMode();
