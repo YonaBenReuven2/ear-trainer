@@ -144,6 +144,10 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
     <span class="pill">Level <b id="hLevel">1</b></span>
     <span class="pill">Key of <b id="hKey">F</b></span>
     <span class="pill">Session <b id="hAcc">&ndash;</b></span>
+    <label class="pill" for="masterVol" style="display:flex;align-items:center;gap:6px">Volume
+      <input id="masterVol" type="range" min="0" max="1" step="0.05" value="0.9"
+             oninput="setMasterVol(parseFloat(this.value))" style="width:90px;margin:0">
+    </label>
     <button class="btn sm" onclick="stopAll()">Stop sound</button>
   </div>
 </header>
@@ -282,6 +286,7 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
     <div class="row" style="margin-top:8px">
       <button class="btn sm teal" id="listenBtn" onclick="toggleListen()">Start listening</button>
       <button class="btn sm" onclick="skipSing()">Skip the singing</button>
+      <button class="btn sm" id="hideNoteBtn" onclick="toggleHideNotes()">Hide note names</button>
     </div>
   </div>
 
@@ -443,7 +448,7 @@ function degByN(n){ for(var i=0;i<DEGREES.length;i++) if(DEGREES[i].n===n) retur
 var S = {
   tonic:48, level:0, mode:'both', context:'drone',
   voiceLo:40, voiceHi:64,       // E2-E4, a bass-baritone working range
-  droneVol:0.45, micId:'', keyMode:'session',
+  droneVol:0.45, micId:'', keyMode:'session', masterVol:0.9, hideNotes:false,
   stats:{}, recent:[], answered:0, current:null, lastDegree:null,
   phase:'idle'     // idle | sing | name | done
 };
@@ -515,7 +520,7 @@ function makeImpulse(c, seconds, decay){
 function ctx(){
   if(!ac){
     ac = new AC();
-    master = ac.createGain(); master.gain.value=0.9; master.connect(ac.destination);
+    master = ac.createGain(); master.gain.value=S.masterVol; master.connect(ac.destination);
     droneGain = ac.createGain(); droneGain.gain.value=0; droneGain.connect(master);
     try {
       var conv=ac.createConvolver();
@@ -640,6 +645,17 @@ function duckDrone(on){
   droneGain.gain.cancelScheduledValues(t);
   droneGain.gain.setValueAtTime(droneGain.gain.value,t);
   droneGain.gain.linearRampToValueAtTime(on ? S.droneVol*0.10 : S.droneVol, t+0.25);
+}
+/* Everything the app plays -- notes, cadences, drone, reverb -- passes through
+   the master gain, so this scales the lot. The drone slider stays as a balance. */
+function setMasterVol(v){
+  S.masterVol=v;
+  if(master && ac){
+    master.gain.cancelScheduledValues(ac.currentTime);
+    master.gain.setValueAtTime(master.gain.value, ac.currentTime);
+    master.gain.linearRampToValueAtTime(v, ac.currentTime+0.08);
+  }
+  save();
 }
 function setDroneVol(v){
   S.droneVol=v;
@@ -883,6 +899,23 @@ function stopMic(){
   document.getElementById('phoneWarn').style.display='none';
   renderMode();
 }
+/* Seeing "A2" while you sing, in a known key, lets you work the degree out by
+   arithmetic instead of by ear. This hides note names only -- the meter, the
+   cents reading and "semitones above/below" still tell you how close you are. */
+function toggleHideNotes(){
+  S.hideNotes=!S.hideNotes;
+  renderHideNotes();
+  save();
+}
+function renderHideNotes(){
+  var b=document.getElementById('hideNoteBtn');
+  if(b){
+    b.textContent = S.hideNotes ? 'Show note names' : 'Hide note names';
+    b.classList.toggle('on', !!S.hideNotes);
+  }
+  var t=document.getElementById('tNote');
+  if(t && S.hideNotes && t.textContent!=='—') t.textContent='note hidden';
+}
 function median(a){ var b=a.slice().sort(function(x,y){return x-y;}); return b[b.length>>1]; }
 
 function startListening(target, cb){
@@ -915,7 +948,7 @@ function startListening(target, cb){
     var cents=Math.round((mf-near)*100);
     document.getElementById('needle').style.left=
       Math.max(2,Math.min(98, 50 + (cmp.semitonesOff*100 + cmp.centsFromTarget)/2 ))+'%';
-    document.getElementById('tNote').textContent = noteName(near);
+    document.getElementById('tNote').textContent = S.hideNotes ? 'note hidden' : noteName(near);
     document.getElementById('tCents').textContent =
       (cents>0?'+':'')+cents+' cents'+(Math.abs(cmp.semitonesOff)>0
         ? '  ·  '+Math.abs(cmp.semitonesOff)+' semitone'+(Math.abs(cmp.semitonesOff)>1?'s':'')+
@@ -1121,8 +1154,8 @@ function onSingResult(cmp, hz){
     cls='bad';
     msg='<div class="big">'+Math.abs(cmp.semitonesOff)+' semitone'+
         (Math.abs(cmp.semitonesOff)>1?'s':'')+' '+(cmp.semitonesOff>0?'sharp':'flat')+'</div>'+
-        '<div class="char">You sang '+noteName(cmp.midi)+'; the note was '+
-        noteName(S.current.midi)+'. Press Replay and try again — it does not count against you.</div>';
+        '<div class="char">'+(S.hideNotes ? '' : 'You sang '+noteName(cmp.midi)+'; the note was '+
+        noteName(S.current.midi)+'. ')+'Press Replay and try again — it does not count against you.</div>';
   }
   document.getElementById('feedback').innerHTML='<div class="fb '+cls+'">'+msg+'</div>';
 
@@ -1392,7 +1425,7 @@ function save(){
   try{
     localStorage.setItem('eartrain.v1', JSON.stringify({
       tonic:S.tonic, level:S.level, mode:S.mode, context:S.context,
-      voiceLo:S.voiceLo, voiceHi:S.voiceHi, droneVol:S.droneVol, micId:S.micId, keyMode:S.keyMode,
+      voiceLo:S.voiceLo, voiceHi:S.voiceHi, droneVol:S.droneVol, micId:S.micId, keyMode:S.keyMode, masterVol:S.masterVol, hideNotes:S.hideNotes,
       stats:S.stats, answered:S.answered
     }));
   }catch(e){}
@@ -1408,6 +1441,8 @@ function load(){
     if(typeof o.droneVol==='number') S.droneVol=o.droneVol;
     if(typeof o.micId==='string') S.micId=o.micId;
     if(o.keyMode==='fixed'||o.keyMode==='session'||o.keyMode==='question') S.keyMode=o.keyMode;
+    if(typeof o.masterVol==='number') S.masterVol=Math.max(0,Math.min(1,o.masterVol));
+    if(typeof o.hideNotes==='boolean') S.hideNotes=o.hideNotes;
     if(typeof o.level==='number') S.level=o.level;
     if(o.mode) S.mode=o.mode;
     if(o.context) S.context=o.context;
@@ -1435,9 +1470,12 @@ buildRangeSelects();
 buildTonicSelect();
 if(S.keyMode==='session') rotateKey();
 renderKeyMode();
+renderHideNotes();
 (function(){
   var sl=document.getElementById('droneVol');
   if(sl){ sl.value=S.droneVol; }
+  var mv=document.getElementById('masterVol');
+  if(mv){ mv.value=S.masterVol; }
   var out=document.getElementById('droneVolVal');
   if(out) out.textContent=Math.round(S.droneVol*100)+'%';
 })();

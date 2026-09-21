@@ -1,7 +1,7 @@
 /* Offline shell for the ear trainer.
    Network first so a re-upload reaches you, cache fallback so a tunnel,
    a plane or no signal doesn't stop a practice session. */
-var CACHE = 'eartrainer-v3';
+var CACHE = 'eartrainer-v4';
 var SHELL = [
   './',
   './index.html',
