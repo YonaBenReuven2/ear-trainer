@@ -4,7 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Functional Ear Trainer</title>
-<meta name="theme-color" content="#3d3159">
+<meta name="theme-color" content="#3d3159" id="themeColorMeta">
+<script id="theme-boot">
+try{
+  var __t=JSON.parse(localStorage.getItem('eartrain.v1')||'{}').theme;
+  if(__t==='light'||__t==='dark') document.documentElement.setAttribute('data-theme',__t);
+}catch(e){}
+</script>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -14,11 +20,43 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233d3159'/%3E%3Ctext x='32' y='45' font-size='34' text-anchor='middle' fill='%23f5d98a' font-family='Georgia,serif'%3E%E2%99%AA%3C/text%3E%3C/svg%3E">
 <style>
 :root{
-  --plum:#3d3159; --amber:#b07d08; --teal:#0f6f6c; --red:#c0392b; --blue:#2c6fa8;
-  --ink:#1b1b1f; --grey:#6c6c7a; --line:#e2e2e8; --bg:#ffffff; --soft:#f7f7fa;
+  --bg:#ffffff; --card:#ffffff; --soft:#f7f7fa; --line:#e2e2e8;
+  --ink:#1b1b1f; --grey:#6c6c7a;
+  --plum:#3d3159; --fill:#3d3159; --fill-hover:#4c3d6d; --on-fill:#ffffff;
+  --amber:#8f6405; --teal:#0f6f6c; --teal-fill:#0f6f6c; --red:#c0392b; --blue:#2c6fa8;
+  --hover:#f3f1f7; --deg-hover:#f8f7fb;
+  --good-bg:#e8f3ef; --bad-bg:#fbeae7; --info-bg:#fdf6e6; --zone:#e4f0ed;
+  --header-bg:rgba(255,255,255,.96); --bar-empty:#d8d8e0;
+  --d1:#8f6405; --d2:#5b7fa8; --d3:#2c6fa8; --d4:#a3562f; --d5:#0f6f6c; --d6:#6b5b95; --d7:#c0392b;
+  color-scheme:light;
+}
+/* Dark: follows the system unless light is chosen explicitly, or forced on. */
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --bg:#121116; --card:#1b1a21; --soft:#23212b; --line:#35323f;
+  --ink:#e7e5ee; --grey:#a29db1;
+  --plum:#bdb2e3; --fill:#6a58a6; --fill-hover:#7b69b9; --on-fill:#ffffff;
+  --amber:#e0ae45; --teal:#4cc2b5; --teal-fill:#1c776e; --red:#f08b78; --blue:#82b3e6;
+  --hover:#27242f; --deg-hover:#262330;
+  --good-bg:#16302c; --bad-bg:#3b1f1b; --info-bg:#34290f; --zone:#1a3531;
+  --header-bg:rgba(18,17,22,.94); --bar-empty:#3a3746;
+  --d1:#e0ae45; --d2:#9bb8dc; --d3:#82b3e6; --d4:#e8956a; --d5:#4cc2b5; --d6:#b9a9e6; --d7:#f08b78;
+  color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121116; --card:#1b1a21; --soft:#23212b; --line:#35323f;
+  --ink:#e7e5ee; --grey:#a29db1;
+  --plum:#bdb2e3; --fill:#6a58a6; --fill-hover:#7b69b9; --on-fill:#ffffff;
+  --amber:#e0ae45; --teal:#4cc2b5; --teal-fill:#1c776e; --red:#f08b78; --blue:#82b3e6;
+  --hover:#27242f; --deg-hover:#262330;
+  --good-bg:#16302c; --bad-bg:#3b1f1b; --info-bg:#34290f; --zone:#1a3531;
+  --header-bg:rgba(18,17,22,.94); --bar-empty:#3a3746;
+  --d1:#e0ae45; --d2:#9bb8dc; --d3:#82b3e6; --d4:#e8956a; --d5:#4cc2b5; --d6:#b9a9e6; --d7:#f08b78;
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;background:var(--bg)}
 body{
   margin:0; background:var(--bg); color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -28,7 +66,7 @@ body{
 
 /* ---------- header ---------- */
 header{
-  position:sticky; top:0; z-index:50; background:rgba(255,255,255,.96);
+  position:sticky; top:0; z-index:50; background:var(--header-bg);
   border-bottom:1px solid var(--line); backdrop-filter:blur(6px);
 }
 .hbar{max-width:780px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;
@@ -46,35 +84,35 @@ p{margin:0 0 10px}
 .muted{color:var(--grey);font-size:13.5px}
 
 /* ---------- cards ---------- */
-.card{border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:14px 0;background:#fff}
+.card{border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:14px 0;background:var(--card)}
 .card.pad0{padding:0;overflow:hidden}
 .lbl{font-size:11px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;
      color:var(--grey);margin-bottom:7px}
 
 /* ---------- buttons ---------- */
 button{font:inherit}
-.btn{border:1.6px solid var(--plum);background:#fff;color:var(--plum);border-radius:999px;
+.btn{border:1.6px solid var(--plum);background:var(--card);color:var(--plum);border-radius:999px;
      padding:8px 18px;font-weight:700;font-size:14px;cursor:pointer;line-height:1.2}
-.btn:hover{background:#f3f1f7}
+.btn:hover{background:var(--hover)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
-.btn.primary{background:var(--plum);color:#fff}
-.btn.primary:hover{background:#4c3d6d}
+.btn.primary{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
+.btn.primary:hover{background:var(--fill-hover)}
 .btn.teal{border-color:var(--teal);color:var(--teal)}
-.btn.teal.on,.btn.teal:active{background:var(--teal);color:#fff}
+.btn.teal.on,.btn.teal:active{background:var(--teal-fill);border-color:var(--teal-fill);color:var(--on-fill)}
 .btn.sm{padding:4px 12px;font-size:12.5px;border-width:1.4px}
-.btn.on{background:var(--plum);color:#fff}
+.btn.on{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
 /* ---------- degree buttons ---------- */
 .degrees{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-.deg{border:2px solid var(--line);background:#fff;border-radius:10px;padding:9px 0;
+.deg{border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:9px 0;
      cursor:pointer;text-align:center;flex:1 1 68px;min-width:68px;transition:.12s}
-.deg:hover{border-color:var(--plum);background:#f8f7fb}
+.deg:hover{border-color:var(--plum);background:var(--deg-hover)}
 .deg .n{font-size:19px;font-weight:700;line-height:1}
 .deg .s{font-size:12px;color:var(--grey);margin-top:2px;font-style:italic}
-.deg.right{background:#e8f3ef;border-color:var(--teal)}
+.deg.right{background:var(--good-bg);border-color:var(--teal)}
 .deg.right .n{color:var(--teal)}
-.deg.wrong{background:#fbeae7;border-color:var(--red)}
+.deg.wrong{background:var(--bad-bg);border-color:var(--red)}
 .deg.wrong .n{color:var(--red)}
 .deg:disabled{cursor:default}
 
@@ -82,7 +120,7 @@ button{font:inherit}
 .tuner{margin:14px 0}
 .meter{position:relative;height:46px;background:var(--soft);border:1px solid var(--line);
        border-radius:8px;overflow:hidden}
-.meter .zone{position:absolute;top:0;bottom:0;left:40%;width:20%;background:#e4f0ed}
+.meter .zone{position:absolute;top:0;bottom:0;left:40%;width:20%;background:var(--zone)}
 .meter .mid{position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--teal);opacity:.8}
 .meter .needle{position:absolute;top:4px;bottom:4px;width:4px;border-radius:2px;
                background:var(--plum);left:50%;transition:left .06s linear}
@@ -94,9 +132,9 @@ button{font:inherit}
 
 /* ---------- feedback ---------- */
 .fb{border-radius:8px;padding:12px 15px;margin:12px 0;border-left:4px solid}
-.fb.good{background:#e8f3ef;border-color:var(--teal)}
-.fb.bad{background:#fbeae7;border-color:var(--red)}
-.fb.info{background:#fdf6e6;border-color:var(--amber)}
+.fb.good{background:var(--good-bg);border-color:var(--teal)}
+.fb.bad{background:var(--bad-bg);border-color:var(--red)}
+.fb.info{background:var(--info-bg);border-color:var(--amber)}
 .fb .big{font-size:17px;font-weight:700;margin-bottom:3px}
 .fb.good .big{color:var(--teal)} .fb.bad .big{color:var(--red)} .fb.info .big{color:var(--amber)}
 .fb .char{font-size:14px;color:var(--ink);font-style:italic}
@@ -105,8 +143,8 @@ button{font:inherit}
 .steps{display:flex;gap:6px;margin:0 0 12px}
 .step{flex:1;font-size:11.5px;font-weight:700;text-align:center;padding:5px 4px;border-radius:6px;
       background:var(--soft);color:var(--grey);border:1px solid var(--line)}
-.step.active{background:var(--plum);color:#fff;border-color:var(--plum)}
-.step.done{background:#e8f3ef;color:var(--teal);border-color:var(--teal)}
+.step.active{background:var(--fill);color:var(--on-fill);border-color:var(--fill)}
+.step.done{background:var(--good-bg);color:var(--teal);border-color:var(--teal)}
 
 /* ---------- progress ---------- */
 .bars{margin-top:6px}
@@ -118,15 +156,23 @@ button{font:inherit}
 .bar .pct{width:64px;text-align:right;color:var(--grey);flex:none;font-variant-numeric:tabular-nums}
 
 select,input[type=range]{font:inherit}
-select{padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink)}
+select{padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
+input[type=range]{accent-color:var(--fill)}
 .hint{font-size:13px;color:var(--grey);margin:6px 0}
-.warn{background:#fbeae7;border-left:4px solid var(--red);padding:11px 14px;border-radius:8px;
+.warn{background:var(--bad-bg);border-left:4px solid var(--red);padding:11px 14px;border-radius:8px;
       margin:12px 0;font-size:14px}
-.okbox{background:#e8f3ef;border-left:4px solid var(--teal);padding:11px 14px;border-radius:8px;
+.okbox{background:var(--good-bg);border-left:4px solid var(--teal);padding:11px 14px;border-radius:8px;
        margin:12px 0;font-size:14px}
 kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:1px 6px;
     font-size:12px;font-family:inherit}
 @media (max-width:520px){
+  /* keep the sticky header to one or two short rows -- it is on screen the whole time */
+  .htitle,.wide{display:none}
+  .hbar{gap:6px;padding:7px 12px}
+  .pill{font-size:11px;padding:3px 8px}
+  #masterVol{width:64px !important}
+  header .btn.sm{padding:4px 11px}
+  html{scroll-padding-top:96px}
   .deg{flex:1 1 62px;min-width:62px;padding:13px 0}   /* bigger tap targets on a phone */
   .deg .n{font-size:21px}
   .btn{padding:10px 18px}
@@ -144,11 +190,11 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
     <span class="pill">Level <b id="hLevel">1</b></span>
     <span class="pill">Key of <b id="hKey">F</b></span>
     <span class="pill">Session <b id="hAcc">&ndash;</b></span>
-    <label class="pill" for="masterVol" style="display:flex;align-items:center;gap:6px">Volume
+    <label class="pill" for="masterVol" style="display:flex;align-items:center;gap:6px">Vol<span class="wide">ume</span>
       <input id="masterVol" type="range" min="0" max="1" step="0.05" value="0.9"
              oninput="setMasterVol(parseFloat(this.value))" style="width:90px;margin:0">
     </label>
-    <button class="btn sm" onclick="stopAll()">Stop sound</button>
+    <button class="btn sm" onclick="stopAll()">Stop<span class="wide"> sound</span></button>
   </div>
 </header>
 
@@ -170,7 +216,14 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
 <!-- ===================== SETUP ===================== -->
 <h2>Setup</h2>
 <div class="card">
-  <div class="lbl">Your singing range</div>
+  <div class="lbl">Appearance</div>
+  <div class="row" id="themeRow">
+    <button class="btn sm" data-th="system" onclick="setTheme('system')">Match system</button>
+    <button class="btn sm" data-th="light"  onclick="setTheme('light')">Light</button>
+    <button class="btn sm" data-th="dark"   onclick="setTheme('dark')">Dark</button>
+  </div>
+
+  <div class="lbl" style="margin-top:16px">Your singing range</div>
   <div class="row">
     <label class="muted" for="loSel">Lowest comfortable</label>
     <select id="loSel"></select>
@@ -259,7 +312,7 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
     <button class="btn sm" id="inctxBtn" onclick="hearInContext()" disabled>Hear it against do</button>
   </div>
 
-  <div id="selfCheck" class="card" style="display:none;margin:10px 0;background:#fdf6e6;
+  <div id="selfCheck" class="card" style="display:none;margin:10px 0;background:var(--info-bg);
        border-color:var(--amber)">
     <div class="lbl" style="color:var(--amber)">Sing it, then check yourself</div>
     <p id="selfPrompt" style="margin-bottom:10px"></p>
@@ -425,13 +478,13 @@ function compareToTarget(hz, targetMidi, tolCents){
    DRILL LOGIC
    ========================================================================= */
 var DEGREES = [
- {n:1,solfa:'do', semi:0, color:'#b07d08', char:'home — complete rest, nothing pending'},
- {n:2,solfa:'re', semi:2, color:'#5b7fa8', char:'unsettled — leaning, could go either way'},
- {n:3,solfa:'mi', semi:4, color:'#2c6fa8', char:'bright — the note that makes it major'},
- {n:4,solfa:'fa', semi:5, color:'#a3562f', char:'heavy — wants to sag down onto mi'},
- {n:5,solfa:'sol',semi:7, color:'#0f6f6c', char:'strong and open — a second home'},
- {n:6,solfa:'la', semi:9, color:'#6b5b95', char:'sweet and a little sad — the minor colour'},
- {n:7,solfa:'ti', semi:11,color:'#c0392b', char:'a sharp lean — almost painful, must rise to do'}
+ {n:1,solfa:'do', semi:0, color:'var(--d1)', char:'home — complete rest, nothing pending'},
+ {n:2,solfa:'re', semi:2, color:'var(--d2)', char:'unsettled — leaning, could go either way'},
+ {n:3,solfa:'mi', semi:4, color:'var(--d3)', char:'bright — the note that makes it major'},
+ {n:4,solfa:'fa', semi:5, color:'var(--d4)', char:'heavy — wants to sag down onto mi'},
+ {n:5,solfa:'sol',semi:7, color:'var(--d5)', char:'strong and open — a second home'},
+ {n:6,solfa:'la', semi:9, color:'var(--d6)', char:'sweet and a little sad — the minor colour'},
+ {n:7,solfa:'ti', semi:11,color:'var(--d7)', char:'a sharp lean — almost painful, must rise to do'}
 ];
 var LEVELS = [
  {name:'Tonic triad', degrees:[1,3,5],
@@ -448,7 +501,7 @@ function degByN(n){ for(var i=0;i<DEGREES.length;i++) if(DEGREES[i].n===n) retur
 var S = {
   tonic:48, level:0, mode:'both', context:'drone',
   voiceLo:40, voiceHi:64,       // E2-E4, a bass-baritone working range
-  droneVol:0.45, micId:'', keyMode:'session', masterVol:0.9, hideNotes:false,
+  droneVol:0.45, micId:'', keyMode:'session', masterVol:0.9, hideNotes:false, theme:'system',
   stats:{}, recent:[], answered:0, current:null, lastDegree:null,
   phase:'idle'     // idle | sing | name | done
 };
@@ -1250,7 +1303,7 @@ function updateProgress(){
   bars.innerHTML = activeDegrees().map(function(n){
     var d=degByN(n), a=accuracy(n,kind), st=S.stats[n][kind];
     var pct = a===null?0:Math.round(a*100);
-    var col = a===null?'#d8d8e0':(a>=0.85?'#0f6f6c':(a>=0.6?'#b07d08':'#c0392b'));
+    var col = a===null?'var(--bar-empty)':(a>=0.85?'var(--teal)':(a>=0.6?'var(--amber)':'var(--red)'));
     return '<div class="bar"><div class="nm" style="color:'+d.color+'">'+n+' '+d.solfa+'</div>'+
            '<div class="track"><div class="fill" style="width:'+pct+'%;background:'+col+'"></div></div>'+
            '<div class="pct">'+(a===null?'–':pct+'%')+' <span style="opacity:.6">('+st.a+')</span></div></div>';
@@ -1348,6 +1401,37 @@ function updateKeyNote(){
       : '<strong>Level 4 would reach outside your range.</strong> Levels 1–3 are fine; '+
         'lower your bottom note or pick a higher tonic before you get there.');
 }
+/* ---------- appearance ---------- */
+function systemDark(){
+  try { return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); }
+  catch(e){ return false; }
+}
+function isDark(){ return S.theme==='dark' || (S.theme==='system' && systemDark()); }
+function applyTheme(){
+  var root=document.documentElement;
+  if(root && root.setAttribute){
+    if(S.theme==='light'||S.theme==='dark') root.setAttribute('data-theme',S.theme);
+    else if(root.removeAttribute) root.removeAttribute('data-theme');
+  }
+  /* the phone's status bar follows the app */
+  var m=document.getElementById('themeColorMeta');
+  if(m && m.setAttribute) m.setAttribute('content', isDark() ? '#121116' : '#3d3159');
+  var row=document.getElementById('themeRow');
+  if(row && row.querySelectorAll){
+    var bs=row.querySelectorAll('.btn');
+    for(var i=0;i<bs.length;i++) bs[i].classList.toggle('on', bs[i].getAttribute('data-th')===S.theme);
+  }
+}
+function setTheme(t){ S.theme=t; applyTheme(); save(); }
+try{
+  if(window.matchMedia){
+    var __mq=window.matchMedia('(prefers-color-scheme: dark)');
+    var __onmq=function(){ if(S.theme==='system') applyTheme(); };
+    if(__mq.addEventListener) __mq.addEventListener('change',__onmq);
+    else if(__mq.addListener) __mq.addListener(__onmq);
+  }
+}catch(e){}
+
 /* ---------- key rotation ---------- */
 var KEYMODE_HINTS = {
   fixed:    'Always the key selected above. Fine for a first week at a level, but a single key lets you '+
@@ -1425,7 +1509,7 @@ function save(){
   try{
     localStorage.setItem('eartrain.v1', JSON.stringify({
       tonic:S.tonic, level:S.level, mode:S.mode, context:S.context,
-      voiceLo:S.voiceLo, voiceHi:S.voiceHi, droneVol:S.droneVol, micId:S.micId, keyMode:S.keyMode, masterVol:S.masterVol, hideNotes:S.hideNotes,
+      voiceLo:S.voiceLo, voiceHi:S.voiceHi, droneVol:S.droneVol, micId:S.micId, keyMode:S.keyMode, masterVol:S.masterVol, hideNotes:S.hideNotes, theme:S.theme,
       stats:S.stats, answered:S.answered
     }));
   }catch(e){}
@@ -1443,6 +1527,7 @@ function load(){
     if(o.keyMode==='fixed'||o.keyMode==='session'||o.keyMode==='question') S.keyMode=o.keyMode;
     if(typeof o.masterVol==='number') S.masterVol=Math.max(0,Math.min(1,o.masterVol));
     if(typeof o.hideNotes==='boolean') S.hideNotes=o.hideNotes;
+    if(o.theme==='system'||o.theme==='light'||o.theme==='dark') S.theme=o.theme;
     if(typeof o.level==='number') S.level=o.level;
     if(o.mode) S.mode=o.mode;
     if(o.context) S.context=o.context;
@@ -1471,6 +1556,7 @@ buildTonicSelect();
 if(S.keyMode==='session') rotateKey();
 renderKeyMode();
 renderHideNotes();
+applyTheme();
 (function(){
   var sl=document.getElementById('droneVol');
   if(sl){ sl.value=S.droneVol; }
