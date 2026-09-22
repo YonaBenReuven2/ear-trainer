@@ -155,6 +155,15 @@ button{font:inherit}
 .bar .fill{height:100%;border-radius:8px}
 .bar .pct{width:64px;text-align:right;color:var(--grey);flex:none;font-variant-numeric:tabular-nums}
 
+.plan{list-style:none;margin:0 0 6px;padding:0}
+.plan li{display:flex;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
+.plan li:first-child{border-top:0}
+.plan .t{flex:none;width:52px;font-size:12px;font-weight:700;color:var(--amber);padding-top:2px}
+.ladder{display:flex;flex-wrap:wrap;gap:4px;font-size:12.5px;font-weight:700}
+.ladder span{padding:4px 10px;border-radius:999px;background:var(--soft);border:1px solid var(--line);color:var(--plum)}
+.ladder span:not(:last-child)::after{content:" \2192";color:var(--grey);font-weight:400}
+.ladder span.here{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
+.ladder span.here::after{color:var(--on-fill)}
 select,input[type=range]{font:inherit}
 select{padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
 input[type=range]{accent-color:var(--fill)}
@@ -180,6 +189,12 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
   .wrap{padding:0 14px 80px}
   h1{font-size:24px}
 }
+@media (max-width:400px){
+  .hbar{gap:4px;padding:7px 8px}
+  header .pill{padding:3px 6px}
+  #masterVol{width:50px !important}
+  header .btn.sm{padding:4px 9px}
+}
 </style>
 </head>
 <body>
@@ -188,7 +203,7 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
   <div class="hbar">
     <span class="htitle">Functional Ear Trainer</span>
     <span class="pill">Level <b id="hLevel">1</b></span>
-    <span class="pill">Key of <b id="hKey">F</b></span>
+    <span class="pill">Key<span class="wide"> of</span> <b id="hKey">F</b></span>
     <span class="pill">Session <b id="hAcc">&ndash;</b></span>
     <label class="pill" for="masterVol" style="display:flex;align-items:center;gap:6px">Vol<span class="wide">ume</span>
       <input id="masterVol" type="range" min="0" max="1" step="0.05" value="0.9"
@@ -209,8 +224,9 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
   nothing to hold onto. Here a <strong>tonic is always present</strong> &mdash; as a drone or a cadence
   &mdash; so every note has a fixed reference and a recognisable <em>character</em> rather than a
   measurement.</p>
-  <p class="muted" style="margin:0">Start at Level 1 with three notes. Don't move up until you're above 85%.
-  Intervals become easy later, as a side effect.</p>
+  <p class="muted" style="margin:0">Start at Level 1 with three notes, and follow the
+  <a href="#guide" style="color:var(--plum)">session guide</a> at the bottom. Intervals become easy later,
+  as a side effect.</p>
 </div>
 
 <!-- ===================== SETUP ===================== -->
@@ -248,7 +264,18 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
   <div class="row" id="keyModeRow">
     <button class="btn sm" data-km="fixed"    onclick="setKeyMode('fixed')">Fixed</button>
     <button class="btn sm" data-km="session"  onclick="setKeyMode('session')">New key each session</button>
-    <button class="btn sm" data-km="question" onclick="setKeyMode('question')">New key every question</button>
+    <button class="btn sm" data-km="question" onclick="setKeyMode('question')">Every few questions</button>
+  </div>
+  <div class="row" id="keyEveryRow" style="margin-top:8px;display:none">
+    <label class="muted" for="keyEverySel">New key every</label>
+    <select id="keyEverySel" onchange="setKeyEvery(parseInt(this.value,10))">
+      <option value="10">10 questions</option>
+      <option value="8">8 questions</option>
+      <option value="5">5 questions</option>
+      <option value="3">3 questions</option>
+      <option value="2">2 questions</option>
+      <option value="1">question (hardest)</option>
+    </select>
   </div>
   <div class="hint" id="keyModeHint"></div>
 
@@ -366,35 +393,57 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
   <div class="hint" id="weakNote"></div>
 </div>
 
-<h2>How to actually practise this</h2>
+<h2 id="guide">Session guide</h2>
 <div class="card">
-  <p><strong>Ten minutes a day, not an hour a week.</strong> This is a memory task, and memory responds to
-  frequency far more than duration. Ten minutes daily will beat any amount of weekend cramming.</p>
+  <p><strong>Ten to twelve minutes a day, not an hour a week.</strong> This is a memory task, and memory
+  responds to frequency far more than duration.</p>
 
-  <h3>A session looks like this</h3>
-  <p class="muted" style="margin-bottom:10px">
-  1. <em>Match the pitch</em> for one minute &mdash; no naming, just sing back what you hear. This wakes up
-  the link between ear and voice.<br>
-  2. <em>Hear &rarr; sing &rarr; name</em> for six or seven minutes at your current level.<br>
-  3. <em>Sing a named degree</em> for two minutes. This is the direction almost everyone neglects, and it is
-  the one that fixes "I can hear it but can't name it".</p>
+  <h3>Every session, in this order</h3>
+  <ol class="plan">
+    <li><span class="t">1 min</span><div><strong>Settle in.</strong> Put the drone on and sing
+      <em>do&ndash;mi&ndash;sol&ndash;mi&ndash;do</em> against it, slowly. Then a minute of <em>Match the pitch</em>:
+      no naming, just sing back what you hear. This connects ear and voice before you ask anything of them.</div></li>
+    <li><span class="t">2 min</span><div><strong>Warm up in one key.</strong> <em>Hear &rarr; sing &rarr; name</em>
+      at your current level with <em>Changing keys</em> on <em>New key each session</em>. Easy on purpose:
+      it lets <em>do</em> settle in your ear before you start moving it.</div></li>
+    <li><span class="t">6 min</span><div><strong>Main block: moving keys.</strong> Same mode, same level, but switch
+      to <em>Every few questions</em> at your current step on the ladder below. Note names hidden. This is the
+      part that builds the real skill &mdash; finding <em>do</em> again when it moves.</div></li>
+    <li><span class="t">2 min</span><div><strong>Reverse it.</strong> <em>Sing a named degree</em>. The direction
+      almost everyone neglects, and the one that fixes &ldquo;I can hear it but can&rsquo;t name it&rdquo;.</div></li>
+    <li><span class="t">30 s</span><div><strong>Decide tomorrow.</strong> Look at the <em>Recent</em> score from the
+      main block and use the ladder to pick tomorrow&rsquo;s setting. The Progress card will also suggest it.</div></li>
+  </ol>
 
-  <h3>Rules that matter</h3>
+  <h3>Every question</h3>
   <p class="muted" style="margin-bottom:10px">
-  <strong>Sing every answer, even in Identify mode.</strong> Hum it under your breath if you must. Producing
-  the pitch is what builds the memory; clicking alone builds very little.<br>
-  <strong>Stay at a level until you are above 85%.</strong> Moving up early is the single most common way
-  this goes wrong, and it feels like failure when it is only impatience.<br>
-  <strong>When you get one wrong, listen to the whole correction.</strong> The comparison it plays &mdash;
-  your answer, then the real one, each against <em>do</em> &mdash; is where the learning happens. Skipping it
-  wastes the mistake.<br>
-  <strong>Say the character, not just the number.</strong> "The leaning one" sticks; "degree 7" does not.</p>
+  <strong>After a key change, find <em>do</em> before you answer.</strong> Hum it quietly the moment the cadence
+  ends. If you can&rsquo;t, press <em>Re-establish the key</em> &mdash; that isn&rsquo;t cheating, it&rsquo;s
+  the skill.<br>
+  <strong>Sing the note before you name it.</strong> Then feel which way it wants to move &mdash; up to
+  <em>do</em>, down to <em>sol</em>, nowhere at all. The pull tells you the degree.<br>
+  <strong>When you miss one, listen to the whole correction.</strong> Your answer, then the real one, each
+  against <em>do</em>. That comparison is where the learning happens.<br>
+  <strong>Say the character, not just the number.</strong> &ldquo;The leaning one&rdquo; sticks; &ldquo;degree
+  7&rdquo; doesn&rsquo;t.</p>
+
+  <h3>The key-change ladder</h3>
+  <p class="muted" style="margin-bottom:8px">Each level is climbed in steps. Stay on a step until the main block
+  scores <strong>85% or more</strong> over at least 15 questions (two sessions in a row is safer), then move one
+  step right. Below about 60%, step back one. Only when you reach <em>every question</em> is the level
+  truly done.</p>
+  <div class="ladder">
+    <span>Each session</span><span>10</span><span>8</span><span>5</span><span>3</span><span>2</span><span>Every question</span>
+  </div>
+  <p class="muted" style="margin:8px 0 10px">Then move up a level and start the ladder again from <em>Each
+  session</em>. It goes faster each time, because the skill of re-finding <em>do</em> carries over.</p>
 
   <h3>What progress looks like</h3>
-  <p class="muted" style="margin:0">Level 1 should come quickly &mdash; do, mi and sol are very distinct.
-  Level 3 is where it gets real, because <em>fa</em> and <em>ti</em> are the two people confuse, and they are
-  also the two with the strongest pull. If you stall, that is expected, not a sign this is not working. Drop
-  back a level for a few days and come back to it.</p>
+  <p class="muted" style="margin:0">A score that drops when keys start moving is normal: it means you were leaning
+  on the key staying still, and now you&rsquo;re learning not to. Level 1 comes quickly &mdash; do, mi and sol
+  are very distinct. Level 3 is where it gets real, because <em>fa</em> and <em>ti</em> are the two people
+  confuse. If you stall, that&rsquo;s expected, not a sign this isn&rsquo;t working. Step back on the ladder for a
+  few days and come back to it.</p>
 </div>
 
 <p class="muted" style="margin-top:22px">Progress is saved in this browser only. Nothing is uploaded, and
@@ -501,7 +550,7 @@ function degByN(n){ for(var i=0;i<DEGREES.length;i++) if(DEGREES[i].n===n) retur
 var S = {
   tonic:48, level:0, mode:'both', context:'drone',
   voiceLo:40, voiceHi:64,       // E2-E4, a bass-baritone working range
-  droneVol:0.45, micId:'', keyMode:'session', masterVol:0.9, hideNotes:false, theme:'system',
+  droneVol:0.45, micId:'', keyMode:'session', keyEvery:5, inKey:0, freshKey:true, masterVol:0.9, hideNotes:false, theme:'system',
   stats:{}, recent:[], answered:0, current:null, lastDegree:null,
   phase:'idle'     // idle | sing | name | done
 };
@@ -543,13 +592,22 @@ function recentAccuracy(){
   if(!S.recent.length) return null;
   return S.recent.filter(Boolean).length / S.recent.length;
 }
+/* A level is finished only when it holds up with a new key every question, so a
+   good score climbs the key ladder first and the level second. */
 function levelAdvice(){
   var a=recentAccuracy();
-  if(a===null || S.recent.length<12) return null;
-  if(a>=0.85 && S.level<LEVELS.length-1) return 'advance';
+  if(a===null || S.recent.length<15) return null;
+  var li=ladderIndex(), top=LADDER.length-1;
+  if(a>=0.85){
+    if(li<top) return 'tighten';
+    if(S.level<LEVELS.length-1) return 'advance';
+    return null;
+  }
+  if(a<0.6 && li>0) return 'loosen';
   if(a<0.5 && S.level>0) return 'back';
   return null;
 }
+function advanceLevel(){ nextLevel(); setLadder(0); }
 
 /* =========================================================================
    AUDIO
@@ -729,10 +787,11 @@ function cadenceSeq(){
           [t-12,0],[t,0],[t+4,0],[t+7,1.6]];
 }
 /* Establish the key, then call back. */
-/* With a new key every question, a drone alone is a weak signal -- the ear hangs
-   on to the previous one. So a cadence always comes first in that mode. */
+/* Right after a key change a drone alone is a weak signal -- the ear hangs on to
+   the previous key. So the first question in a new key gets a cadence first;
+   the rest of that key's run uses whatever reference is selected. */
 function effectiveContext(){
-  return (S.keyMode==='question' && S.context==='drone') ? 'both' : S.context;
+  return (S.keyMode==='question' && S.freshKey && S.context==='drone') ? 'both' : S.context;
 }
 function establishKey(cb){
   var mode=effectiveContext();
@@ -1107,7 +1166,10 @@ function resetQuestionUI(){
 function newQuestion(){
   stopNotes();
   stopListening();
-  if(S.keyMode==='question') rotateKey();
+  if(S.keyMode==='question' && S.inKey>=S.keyEvery){ rotateKey(); S.inKey=0; }
+  S.freshKey = (S.inKey===0);
+  S.inKey++;
+  updateKeyNow();
   document.getElementById('feedback').innerHTML='';
   document.getElementById('degRow').innerHTML='';
   var q=pickQuestion();
@@ -1310,11 +1372,22 @@ function updateProgress(){
   }).join('');
 
   var adv=levelAdvice(), el=document.getElementById('advice');
-  if(adv==='advance'){
-    el.innerHTML='<div class="okbox">You are at '+Math.round(ra*100)+
-      '% over your last '+S.recent.length+'. Ready for <strong>'+LEVELS[S.level+1].name+
-      '</strong> &mdash; '+LEVELS[S.level+1].blurb+'. '+
-      '<button class="btn sm" style="margin-left:6px" onclick="nextLevel()">Move up</button></div>';
+  var li=ladderIndex();
+  if(adv==='tighten'){
+    el.innerHTML='<div class="okbox">'+Math.round(ra*100)+'% over your last '+S.recent.length+
+      ' with '+ladderLabel(li)+'. Next step on the ladder: <strong>'+ladderLabel(li+1)+'</strong>. '+
+      '<button class="btn sm" style="margin-left:6px" onclick="setLadder('+(li+1)+')">Step up</button></div>';
+  } else if(adv==='loosen'){
+    el.innerHTML='<div class="warn">'+Math.round(ra*100)+'% over your last '+S.recent.length+
+      ' with '+ladderLabel(li)+'. Too big a jump for now &mdash; go back to <strong>'+ladderLabel(li-1)+
+      '</strong> for a few days. '+
+      '<button class="btn sm" style="margin-left:6px" onclick="setLadder('+(li-1)+')">Step back</button></div>';
+  } else if(adv==='advance'){
+    el.innerHTML='<div class="okbox">'+Math.round(ra*100)+
+      '% over your last '+S.recent.length+' with a new key every question &mdash; this level is done. Ready for <strong>'+
+      LEVELS[S.level+1].name+'</strong> &mdash; '+LEVELS[S.level+1].blurb+
+      '. Key changes go back to once per session for the new level. '+
+      '<button class="btn sm" style="margin-left:6px" onclick="advanceLevel()">Move up</button></div>';
   } else if(adv==='back'){
     el.innerHTML='<div class="warn">'+Math.round(ra*100)+'% over your last '+S.recent.length+
       '. That is below the level where practice helps &mdash; drop back and rebuild. '+
@@ -1383,7 +1456,7 @@ function buildTonicSelect(){
   }
   sel.innerHTML=html;
   if(S.tonic<loT || S.tonic>hiT){ S.tonic=Math.min(Math.max(S.tonic,loT),hiT); sel.value=S.tonic; }
-  sel.onchange=function(){ S.tonic=parseInt(this.value,10); resetQuestionUI();
+  sel.onchange=function(){ S.tonic=parseInt(this.value,10); S.inKey=0; resetQuestionUI();
                            updateKeyNote(); save(); };
   updateKeyNote();
 }
@@ -1438,9 +1511,33 @@ var KEYMODE_HINTS = {
             'start recognising absolute pitches instead of scale degrees.',
   session:  'A different key each time you open the app. The recommended default: no single key gets '+
             'the chance to stick, and within a session you can settle in.',
-  question: 'A new key every question, with a cadence first to announce it. The real test \u2014 use it '+
-            'once a level is solid, around level 2 or 3.'
+  question: 'A new key every few questions, announced by a cadence. Start at 10 or 8 and work down '+
+            'the ladder in the session guide; every question is the real test of a level.'
 };
+/* The key-change ladder from the session guide. Index 0 is "each session". */
+var LADDER=[0,10,8,5,3,2,1];
+function ladderIndex(){
+  if(S.keyMode!=='question') return 0;
+  var i=LADDER.indexOf(S.keyEvery);
+  return i<1 ? 1 : i;
+}
+function setLadder(i){
+  i=Math.max(0,Math.min(LADDER.length-1,i));
+  if(i===0){ S.keyMode='session'; }
+  else { S.keyMode='question'; S.keyEvery=LADDER[i]; }
+  S.inKey=0; S.recent=[];
+  renderKeyMode(); resetQuestionUI(); updateProgress(); save();
+}
+function ladderLabel(i){
+  return i===0 ? 'a new key each session' :
+         LADDER[i]===1 ? 'a new key every question' : 'a new key every '+LADDER[i]+' questions';
+}
+function setKeyEvery(n){
+  if(LADDER.indexOf(n)<1) return;
+  if(n!==S.keyEvery) S.recent=[];
+  S.keyEvery=n; S.inKey=0;
+  renderKeyMode(); updateProgress(); save();
+}
 /* Keys where every level fits the singer's range; failing that, keys where the
    current level fits; failing that, no rotation at all. */
 function rotationKeys(){
@@ -1464,10 +1561,11 @@ function rotateKey(){
 }
 function newKeyNow(){
   stopAll(); stopListening();
-  if(rotateKey()) resetQuestionUI();
+  if(rotateKey()){ S.inKey=0; resetQuestionUI(); }
 }
 function setKeyMode(m){
-  S.keyMode=m;
+  if(m!==S.keyMode) S.recent=[];
+  S.keyMode=m; S.inKey=0;
   renderKeyMode();
   save();
 }
@@ -1483,14 +1581,26 @@ function renderKeyMode(){
     h.textContent = KEYMODE_HINTS[S.keyMode] +
       (S.keyMode!=='fixed' ? '  ('+n+' key'+(n===1?'':'s')+' fit your range.)' : '');
   }
+  var er=document.getElementById('keyEveryRow');
+  if(er) er.style.display = S.keyMode==='question' ? 'flex' : 'none';
+  var es=document.getElementById('keyEverySel');
+  if(es) es.value=String(S.keyEvery);
+  var li=S.keyMode==='fixed' ? -1 : ladderIndex();
+  var steps=document.querySelectorAll ? document.querySelectorAll('.ladder span') : [];
+  for(var k=0;k<steps.length;k++) steps[k].classList.toggle('here', k===li);
   updateKeyNow();
 }
 function updateKeyNow(){
   var el=document.getElementById('keyNow');
   if(!el) return;
-  el.innerHTML='Key of <strong>'+noteName(S.tonic).replace(/-?\d/,'')+'</strong>'+
-    (S.keyMode==='question' ? ' \u2014 changes every question' :
-     S.keyMode==='session'  ? ' \u2014 new key next time you open the app' : '');
+  var tail='';
+  if(S.keyMode==='question'){
+    if(S.keyEvery===1) tail=' \u2014 changes every question';
+    else if(S.inKey===0) tail=' \u2014 changes every '+S.keyEvery+' questions';
+    else tail=' \u2014 question '+S.inKey+' of '+S.keyEvery+' in this key'+
+              (S.inKey===1 ? ' <strong style="color:var(--amber)">(new key: find <em>do</em>)</strong>' : '');
+  } else if(S.keyMode==='session') tail=' \u2014 new key next time you open the app';
+  el.innerHTML='Key of <strong>'+noteName(S.tonic).replace(/-?\d/,'')+'</strong>'+tail;
 }
 function auditionNote(m){ stopAll(); playNote(m,2.2); }
 function auditionDrone(){
@@ -1509,7 +1619,7 @@ function save(){
   try{
     localStorage.setItem('eartrain.v1', JSON.stringify({
       tonic:S.tonic, level:S.level, mode:S.mode, context:S.context,
-      voiceLo:S.voiceLo, voiceHi:S.voiceHi, droneVol:S.droneVol, micId:S.micId, keyMode:S.keyMode, masterVol:S.masterVol, hideNotes:S.hideNotes, theme:S.theme,
+      voiceLo:S.voiceLo, voiceHi:S.voiceHi, droneVol:S.droneVol, micId:S.micId, keyMode:S.keyMode, keyEvery:S.keyEvery, masterVol:S.masterVol, hideNotes:S.hideNotes, theme:S.theme,
       stats:S.stats, answered:S.answered
     }));
   }catch(e){}
@@ -1525,6 +1635,8 @@ function load(){
     if(typeof o.droneVol==='number') S.droneVol=o.droneVol;
     if(typeof o.micId==='string') S.micId=o.micId;
     if(o.keyMode==='fixed'||o.keyMode==='session'||o.keyMode==='question') S.keyMode=o.keyMode;
+    if(LADDER.indexOf(o.keyEvery)>=1) S.keyEvery=o.keyEvery;
+    else if(o.keyMode==='question') S.keyEvery=1;   /* saved before this setting existed */
     if(typeof o.masterVol==='number') S.masterVol=Math.max(0,Math.min(1,o.masterVol));
     if(typeof o.hideNotes==='boolean') S.hideNotes=o.hideNotes;
     if(o.theme==='system'||o.theme==='light'||o.theme==='dark') S.theme=o.theme;
