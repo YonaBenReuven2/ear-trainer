@@ -9,8 +9,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Note Detector">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png">
 <script id="theme-boot">
 try{
   var __t=JSON.parse(localStorage.getItem('tuner.v1')||'{}').theme;
@@ -61,6 +59,10 @@ header{position:sticky;top:0;z-index:50;background:var(--header-bg);
   border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
 .hbar{max-width:640px;margin:0 auto;padding:9px 18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .htitle{font-weight:700;font-size:15px;color:var(--plum);margin-right:auto}
+a.btn{text-decoration:none;display:inline-block}
+.pagelink{font-size:13.5px;margin:-8px 0 16px}
+.pagelink a{color:var(--plum);font-weight:700;text-decoration:none;border-bottom:1.5px solid var(--line)}
+.pagelink a:hover{border-color:var(--plum)}
 h1{font-size:25px;margin:24px 0 4px;color:var(--plum);line-height:1.2}
 .sub{color:var(--grey);font-size:15px;margin:0 0 16px}
 h2{font-size:16px;color:var(--plum);margin:26px 0 8px}
@@ -115,6 +117,7 @@ input[type=number]{width:86px}
 .log div:first-child{border-top:0}
 @media (max-width:420px){
   .hbar{gap:6px;padding:7px 12px}
+  .htitle,.wide,header .crosslink{display:none}
   .note{font-size:60px}
   .wrap{padding:0 14px 70px}
 }
@@ -124,9 +127,10 @@ input[type=number]{width:86px}
 
 <header>
   <div class="hbar">
-    <span class="htitle">Note Detector</span>
+    <a class="btn sm crosslink" href="index.html">&larr; Ear trainer</a>
+    <span class="htitle" style="margin-left:2px">Note Detector</span>
     <button class="btn sm" id="themeBtn" onclick="cycleTheme()">Theme</button>
-    <button class="btn sm" id="micBtn" onclick="toggleMic()">Turn on the microphone</button>
+    <button class="btn sm" id="micBtn" onclick="toggleMic()">Mic<span class="wide"> — turn on</span></button>
   </div>
 </header>
 
@@ -135,6 +139,7 @@ input[type=number]{width:86px}
 <h1>Note Detector</h1>
 <p class="sub">Sing or play a note &mdash; it names the note, shows how far off it is in cents, and the
 frequency in hertz.</p>
+<p class="pagelink"><a href="index.html">&larr; Ear trainer</a> <span class="muted">scale-degree practice</span></p>
 
 <div class="card">
   <div class="readout">
@@ -341,7 +346,7 @@ function attachMic(stream){
   var st = track && track.getSettings ? track.getSettings() : {};
   if(st.deviceId){ S.micId=st.deviceId; save(); }
   var b=document.getElementById('micBtn');
-  b.textContent='Turn the microphone off'; b.classList.add('on');
+  b.innerHTML='Mic<span class="wide"> — turn off</span>'; b.classList.add('on');
   hideWarn();
   listMics(track ? track.label : '', st.sampleRate);
   start();
@@ -351,7 +356,7 @@ function stopMic(){
   if(micStream){ micStream.getTracks().forEach(function(t){t.stop();}); }
   micStream=null; micSource=null;
   var b=document.getElementById('micBtn');
-  b.textContent='Turn on the microphone'; b.classList.remove('on');
+  b.innerHTML='Mic<span class="wide"> — turn on</span>'; b.classList.remove('on');
   document.getElementById('meterOff').style.display='flex';
   document.getElementById('meterOff').textContent='microphone is off';
   blankReadout();
@@ -543,7 +548,8 @@ function applyTheme(){
   var m=document.getElementById('themeColorMeta');
   if(m) m.setAttribute('content', isDark() ? '#121116' : '#3d3159');
   var b=document.getElementById('themeBtn');
-  if(b) b.textContent = S.theme==='system' ? 'Theme: auto' : (S.theme==='dark' ? 'Theme: dark' : 'Theme: light');
+  if(b) b.innerHTML = '<span class="wide">Theme: </span>' +
+    (S.theme==='system' ? 'auto' : S.theme);
 }
 function cycleTheme(){
   S.theme = S.theme==='system' ? 'light' : (S.theme==='light' ? 'dark' : 'system');
@@ -577,7 +583,7 @@ function load(){
 try {
   if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('sw.js', {scope: './'}).catch(function(){});
+      navigator.serviceWorker.register('sw.js').catch(function(){});
     });
   }
 } catch(e){}

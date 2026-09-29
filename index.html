@@ -72,6 +72,10 @@ header{
 .hbar{max-width:780px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;
       gap:14px;flex-wrap:wrap}
 .htitle{font-weight:700;font-size:15px;color:var(--plum);margin-right:auto}
+a.btn{text-decoration:none;display:inline-block}
+.pagelink{font-size:13.5px;margin:-10px 0 16px}
+.pagelink a{color:var(--plum);font-weight:700;text-decoration:none;border-bottom:1.5px solid var(--line)}
+.pagelink a:hover{border-color:var(--plum)}
 .pill{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;
       background:var(--soft);color:var(--grey);border:1px solid var(--line);white-space:nowrap}
 .pill b{color:var(--plum)}
@@ -176,7 +180,7 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
     font-size:12px;font-family:inherit}
 @media (max-width:520px){
   /* keep the sticky header to one or two short rows -- it is on screen the whole time */
-  .htitle,.wide{display:none}
+  .htitle,.wide,header .crosslink{display:none}
   .hbar{gap:6px;padding:7px 12px}
   .pill{font-size:11px;padding:3px 8px}
   #masterVol{width:64px !important}
@@ -210,6 +214,7 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
              oninput="setMasterVol(parseFloat(this.value))" style="width:90px;margin:0">
     </label>
     <button class="btn sm" onclick="stopAll()">Stop<span class="wide"> sound</span></button>
+    <a class="btn sm crosslink" href="tuner.html" title="Name any note you sing or play">Note detector</a>
   </div>
 </header>
 
@@ -217,6 +222,7 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
 
 <h1>Functional Ear Trainer</h1>
 <p class="sub">Hear where a note sits in the key &mdash; not how far it is from the last one.</p>
+<p class="pagelink"><a href="tuner.html">Note detector &rarr;</a> <span class="muted">names any note you sing or play</span></p>
 
 <div class="card">
   <div class="lbl">Why this is different</div>
