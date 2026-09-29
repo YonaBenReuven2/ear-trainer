@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Note Detector</title>
+<meta name="theme-color" content="#3d3159" id="themeColorMeta">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Note Detector">
+<link rel="manifest" href="tuner.webmanifest">
+<link rel="apple-touch-icon" href="tuner-icon-192.png">
+<script id="theme-boot">
+try{
+  var __t=JSON.parse(localStorage.getItem('tuner.v1')||'{}').theme;
+  if(__t==='light'||__t==='dark') document.documentElement.setAttribute('data-theme',__t);
+}catch(e){}
+</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233d3159'/%3E%3Ctext x='32' y='45' font-size='34' text-anchor='middle' fill='%23f5d98a' font-family='Georgia,serif'%3E%E2%99%AA%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#ffffff; --card:#ffffff; --soft:#f7f7fa; --line:#e2e2e8;
+  --ink:#1b1b1f; --grey:#6c6c7a;
+  --plum:#3d3159; --fill:#3d3159; --fill-hover:#4c3d6d; --on-fill:#ffffff;
+  --amber:#8f6405; --teal:#0f6f6c; --teal-fill:#0f6f6c; --red:#c0392b;
+  --hover:#f3f1f7;
+  --good-bg:#e8f3ef; --bad-bg:#fbeae7; --info-bg:#fdf6e6; --zone:#e4f0ed;
+  --header-bg:rgba(255,255,255,.96);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --bg:#121116; --card:#1b1a21; --soft:#23212b; --line:#35323f;
+  --ink:#e7e5ee; --grey:#a29db1;
+  --plum:#bdb2e3; --fill:#6a58a6; --fill-hover:#7b69b9; --on-fill:#ffffff;
+  --amber:#e0ae45; --teal:#4cc2b5; --teal-fill:#1c776e; --red:#f08b78;
+  --hover:#27242f;
+  --good-bg:#16302c; --bad-bg:#3b1f1b; --info-bg:#34290f; --zone:#1a3531;
+  --header-bg:rgba(18,17,22,.94);
+  color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121116; --card:#1b1a21; --soft:#23212b; --line:#35323f;
+  --ink:#e7e5ee; --grey:#a29db1;
+  --plum:#bdb2e3; --fill:#6a58a6; --fill-hover:#7b69b9; --on-fill:#ffffff;
+  --amber:#e0ae45; --teal:#4cc2b5; --teal-fill:#1c776e; --red:#f08b78;
+  --hover:#27242f;
+  --good-bg:#16302c; --bad-bg:#3b1f1b; --info-bg:#34290f; --zone:#1a3531;
+  --header-bg:rgba(18,17,22,.94);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px;line-height:1.55}
+.wrap{max-width:640px;margin:0 auto;padding:0 18px 80px}
+header{position:sticky;top:0;z-index:50;background:var(--header-bg);
+  border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+.hbar{max-width:640px;margin:0 auto;padding:9px 18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.htitle{font-weight:700;font-size:15px;color:var(--plum);margin-right:auto}
+h1{font-size:25px;margin:24px 0 4px;color:var(--plum);line-height:1.2}
+.sub{color:var(--grey);font-size:15px;margin:0 0 16px}
+h2{font-size:16px;color:var(--plum);margin:26px 0 8px}
+p{margin:0 0 10px}
+.card{border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:14px 0;background:var(--card)}
+.lbl{font-size:11px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;
+  color:var(--grey);margin-bottom:7px}
+button{font:inherit}
+.btn{border:1.6px solid var(--plum);background:var(--card);color:var(--plum);border-radius:999px;
+  padding:9px 20px;font-weight:700;font-size:14px;cursor:pointer;line-height:1.2}
+.btn:hover{background:var(--hover)}
+.btn.primary{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
+.btn.primary:hover{background:var(--fill-hover)}
+.btn.sm{padding:5px 13px;font-size:12.5px;border-width:1.4px}
+.btn.on{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+select,input[type=number]{font:inherit;padding:5px 8px;border:1px solid var(--line);
+  border-radius:6px;background:var(--card);color:var(--ink)}
+input[type=number]{width:86px}
+.hint{font-size:13px;color:var(--grey);margin:6px 0}
+.muted{color:var(--grey);font-size:13.5px}
+
+/* ---------- readout ---------- */
+.readout{display:flex;align-items:baseline;justify-content:center;gap:10px;margin:2px 0 10px;min-height:86px}
+.note{font-size:72px;font-weight:700;color:var(--plum);line-height:1;font-variant-numeric:tabular-nums}
+.note.flat-ok{color:var(--teal)}
+.oct{font-size:26px;font-weight:700;color:var(--grey)}
+.meter{position:relative;height:56px;background:var(--soft);border:1px solid var(--line);
+  border-radius:8px;overflow:hidden}
+.meter .zone{position:absolute;top:0;bottom:0;left:45%;width:10%;background:var(--zone)}
+.meter .mid{position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--teal);opacity:.85}
+.meter .tick{position:absolute;top:0;bottom:0;width:1px;background:var(--line)}
+.meter .needle{position:absolute;top:4px;bottom:4px;width:4px;border-radius:2px;
+  background:var(--plum);left:50%;transition:left .06s linear}
+.meter .needle.intune{background:var(--teal)}
+.meter .off{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:var(--grey);font-size:13px}
+.scale{display:flex;justify-content:space-between;font-size:11px;color:var(--grey);margin-top:4px;
+  font-variant-numeric:tabular-nums}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.stat{flex:1 1 130px;background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.stat .k{font-size:11px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--grey)}
+.stat .v{font-size:19px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.held{margin-top:12px;padding:10px 14px;border-radius:8px;background:var(--good-bg);
+  border-left:4px solid var(--teal);font-size:14px;display:none}
+.held b{color:var(--teal)}
+.warn{background:var(--bad-bg);border-left:4px solid var(--red);padding:11px 14px;border-radius:8px;
+  margin:12px 0;font-size:14px;display:none}
+.log{margin-top:10px;font-size:13px;color:var(--grey);font-variant-numeric:tabular-nums;
+  max-height:132px;overflow:auto}
+.log div{padding:2px 0;border-top:1px solid var(--line)}
+.log div:first-child{border-top:0}
+@media (max-width:420px){
+  .hbar{gap:6px;padding:7px 12px}
+  .note{font-size:60px}
+  .wrap{padding:0 14px 70px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hbar">
+    <span class="htitle">Note Detector</span>
+    <button class="btn sm" id="themeBtn" onclick="cycleTheme()">Theme</button>
+    <button class="btn sm" id="micBtn" onclick="toggleMic()">Turn on the microphone</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+<h1>Note Detector</h1>
+<p class="sub">Sing or play a note &mdash; it names the note, shows how far off it is in cents, and the
+frequency in hertz.</p>
+
+<div class="card">
+  <div class="readout">
+    <span class="note" id="noteBig">&mdash;</span><span class="oct" id="octBig"></span>
+  </div>
+
+  <div class="meter">
+    <div class="zone"></div>
+    <div class="tick" style="left:25%"></div><div class="tick" style="left:75%"></div>
+    <div class="mid"></div>
+    <div class="needle" id="needle"></div>
+    <div class="off" id="meterOff">microphone is off</div>
+  </div>
+  <div class="scale"><span>&minus;50&nbsp;c</span><span>&minus;25</span><span>0</span><span>+25</span><span>+50&nbsp;c</span></div>
+
+  <div class="stats">
+    <div class="stat"><div class="k">Cents</div><div class="v" id="vCents">&ndash;</div></div>
+    <div class="stat"><div class="k">Frequency</div><div class="v" id="vHz">&ndash;</div></div>
+    <div class="stat"><div class="k">Clarity</div><div class="v" id="vClarity">&ndash;</div></div>
+  </div>
+
+  <div class="held" id="held"></div>
+  <div class="warn" id="warnBox"></div>
+</div>
+
+<h2>Settings</h2>
+<div class="card">
+  <div class="row" id="micPickRow" style="display:none;margin-bottom:10px">
+    <label class="muted" for="micSel">Microphone</label>
+    <select id="micSel" onchange="switchMic(this.value)"></select>
+  </div>
+
+  <div class="row">
+    <label class="muted" for="a4">Reference A4</label>
+    <input id="a4" type="number" min="380" max="500" step="0.5" value="440"
+           onchange="setA4(parseFloat(this.value))">
+    <span class="muted">Hz</span>
+    <button class="btn sm" onclick="setA4(440)">440</button>
+  </div>
+  <div class="hint">Everything &mdash; note names and cents &mdash; is measured against this.</div>
+
+  <div class="row" style="margin-top:10px">
+    <label class="muted" for="accSel">Note spelling</label>
+    <select id="accSel" onchange="setAcc(this.value)">
+      <option value="mixed">Mixed (C♯, E♭)</option>
+      <option value="sharp">Sharps (C♯, D♯)</option>
+      <option value="flat">Flats (D♭, E♭)</option>
+    </select>
+    <label class="muted" for="holdSel" style="margin-left:8px">Log a note after</label>
+    <select id="holdSel" onchange="setHold(parseInt(this.value,10))">
+      <option value="300">0.3 s steady</option>
+      <option value="450" selected>0.45 s steady</option>
+      <option value="800">0.8 s steady</option>
+      <option value="0">never</option>
+    </select>
+  </div>
+  <div class="hint">A note held steadily for that long is logged below, so you can look away while you sing
+  or play.</div>
+</div>
+
+<h2>Notes held</h2>
+<div class="card">
+  <div class="row" style="margin-bottom:8px">
+    <button class="btn sm" onclick="clearLog()">Clear</button>
+    <span class="muted" id="logCount">nothing yet</span>
+  </div>
+  <div class="log" id="log"></div>
+</div>
+
+<p class="muted" style="margin-top:20px">Everything runs in this page. The microphone audio is analysed
+locally and never leaves the browser.</p>
+
+</div>
+
+<script>
+/* =========================================================================
+   PITCH DETECTION  (normalised autocorrelation — same detector as the ear trainer)
+   ========================================================================= */
+function autoCorrelate(buf, sampleRate, opts){
+  opts = opts || {};
+  var minHz = opts.minHz || 65, maxHz = opts.maxHz || 520;
+  var rmsGate = opts.rmsGate === undefined ? 0.008 : opts.rmsGate;
+  var SIZE = buf.length, rms = 0, i;
+  for(i=0;i<SIZE;i++) rms += buf[i]*buf[i];
+  rms = Math.sqrt(rms/SIZE);
+  if(rms < rmsGate) return {hz:-1, rms:rms, clarity:0};
+
+  var thres = 0.2*rms*4, r1 = 0, r2 = SIZE-1;
+  for(i=0;i<SIZE/2;i++){ if(Math.abs(buf[i])>thres){ r1=i; break; } }
+  for(i=1;i<SIZE/2;i++){ if(Math.abs(buf[SIZE-i])>thres){ r2=SIZE-i; break; } }
+  if(r2-r1 < 256){ r1=0; r2=SIZE-1; }
+  var b = buf.subarray ? buf.subarray(r1,r2) : buf.slice(r1,r2);
+  var N = b.length;
+
+  var minLag = Math.floor(sampleRate/maxHz);
+  var maxLag = Math.min(Math.floor(sampleRate/minHz), Math.floor(N/2));
+  if(maxLag <= minLag) return {hz:-1, rms:rms, clarity:0};
+
+  var bestLag=-1, bestVal=-1, corr = new Float32Array(maxLag+2), lag;
+  for(lag=minLag; lag<=maxLag; lag++){
+    var sum=0, e1=0, e2=0, lim=N-lag;
+    for(i=0;i<lim;i++){ var x=b[i], y=b[i+lag]; sum+=x*y; e1+=x*x; e2+=y*y; }
+    var den = Math.sqrt(e1*e2);
+    var v = den>0 ? sum/den : 0;
+    corr[lag]=v;
+    if(v>bestVal){ bestVal=v; bestLag=lag; }
+  }
+  if(bestLag<0 || bestVal<0.5) return {hz:-1, rms:rms, clarity:bestVal};
+
+  /* Lowest-lag LOCAL MAXIMUM near the best value, so a missing fundamental
+     doesn't drag us an octave down. Points on a rising slope must not qualify. */
+  var chosen = bestLag;
+  for(lag=minLag+1; lag<bestLag; lag++){
+    if(corr[lag]>corr[lag-1] && corr[lag]>=corr[lag+1] && corr[lag]>=bestVal*0.90){
+      chosen = lag; break;
+    }
+  }
+  var T0 = chosen;
+  if(chosen>minLag && chosen<maxLag){
+    var x1=corr[chosen-1], x2=corr[chosen], x3=corr[chosen+1];
+    var a=(x1+x3-2*x2)/2, bb=(x3-x1)/2;
+    if(a < -1e-9) T0 = chosen - bb/(2*a);
+  }
+  return {hz: sampleRate/T0, rms:rms, clarity:bestVal};
+}
+function decimate2(buf){
+  var out = new Float32Array(buf.length>>1);
+  for(var i=0;i<out.length;i++) out[i]=(buf[2*i]+buf[2*i+1])*0.5;
+  return out;
+}
+function median(a){ var b=a.slice().sort(function(x,y){return x-y;}); return b[b.length>>1]; }
+
+/* =========================================================================
+   NAMING
+   ========================================================================= */
+var S = { a4:440, acc:'mixed', holdMs:450, theme:'system', micId:'' };
+var NAMES = {
+  mixed:['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'],
+  sharp:['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'],
+  flat :['C','D♭','D','E♭','E','F','G♭','G','A♭','A','B♭','B']
+};
+function hzToMidiFloat(hz){ return 69 + 12*Math.log2(hz/S.a4); }
+function midiToHz(m){ return S.a4*Math.pow(2,(m-69)/12); }
+function pitchClass(m){ return NAMES[S.acc][((m%12)+12)%12]; }
+function octaveOf(m){ return Math.floor(m/12)-1; }
+function noteName(m){ return pitchClass(m)+octaveOf(m); }
+/* The nearest note and how far the sound sits from it, in cents. */
+function describe(hz){
+  if(!(hz>0)) return null;
+  var mf=hzToMidiFloat(hz), near=Math.round(mf);
+  return { midi:near, name:pitchClass(near), octave:octaveOf(near),
+           cents:Math.round((mf-near)*100), hz:hz, exactHz:midiToHz(near) };
+}
+/* Needle position: the full bar is one semitone wide, centred on the nearest note. */
+function needlePct(cents){ return Math.max(1, Math.min(99, 50 + cents)); }
+
+/* =========================================================================
+   MICROPHONE
+   ========================================================================= */
+var AC = window.AudioContext || window.webkitAudioContext;
+var ac=null, micStream=null, micSource=null, analyser=null, micBuf=null;
+var rafId=null, running=false, hist=[], holdNote=null, holdStart=0, logged=null;
+
+function ctx(){ if(!ac) ac=new AC(); if(ac.state==='suspended') ac.resume(); return ac; }
+function inFrame(){ try{ return window.self!==window.top; }catch(e){ return true; } }
+
+function toggleMic(){
+  if(micStream){ stopMic(); return; }
+  ctx();
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    micFailed({name: inFrame() ? 'NotAllowedError' : 'unavailable'});
+    return;
+  }
+  openMic(S.micId||'');
+}
+function micConstraints(id){
+  /* the three "helpful" filters all distort pitch — off */
+  var a={echoCancellation:false, noiseSuppression:false, autoGainControl:false};
+  if(id) a.deviceId={exact:id};
+  return {audio:a};
+}
+function openMic(id, isRetry){
+  navigator.mediaDevices.getUserMedia(micConstraints(id))
+  .then(function(stream){ attachMic(stream); })
+  .catch(function(err){
+    if(id && !isRetry && (err.name==='OverconstrainedError' || err.name==='NotFoundError')){
+      S.micId=''; save(); openMic('', true); return;
+    }
+    micFailed(err);
+  });
+}
+function attachMic(stream){
+  if(micSource){ try{ micSource.disconnect(); }catch(e){} }
+  if(micStream && micStream!==stream){ micStream.getTracks().forEach(function(t){t.stop();}); }
+  micStream=stream;
+  micSource=ac.createMediaStreamSource(stream);
+  if(!analyser){
+    analyser=ac.createAnalyser();
+    analyser.fftSize=4096;
+    micBuf=new Float32Array(analyser.fftSize);
+  }
+  micSource.connect(analyser);
+  var track=stream.getAudioTracks()[0];
+  var st = track && track.getSettings ? track.getSettings() : {};
+  if(st.deviceId){ S.micId=st.deviceId; save(); }
+  var b=document.getElementById('micBtn');
+  b.textContent='Turn the microphone off'; b.classList.add('on');
+  hideWarn();
+  listMics(track ? track.label : '', st.sampleRate);
+  start();
+}
+function stopMic(){
+  stop();
+  if(micStream){ micStream.getTracks().forEach(function(t){t.stop();}); }
+  micStream=null; micSource=null;
+  var b=document.getElementById('micBtn');
+  b.textContent='Turn on the microphone'; b.classList.remove('on');
+  document.getElementById('meterOff').style.display='flex';
+  document.getElementById('meterOff').textContent='microphone is off';
+  blankReadout();
+}
+function micFailed(err){
+  var n=err && err.name, msg;
+  if(inFrame() && (n==='NotAllowedError'||n==='unavailable')){
+    msg='This page is running inside a frame that has not been given the microphone. '+
+        'Open the file directly in a browser tab.';
+  } else if(n==='NotAllowedError'){
+    msg='Microphone permission was refused. Allow it for this page and try again. '+
+        'On Android, Chrome only gives the microphone to pages served over https — a file opened '+
+        'from disk will always be refused.';
+  } else if(n==='NotFoundError'){
+    msg='No microphone was found.';
+  } else if(n==='NotReadableError'){
+    msg='The microphone is busy in another app.';
+  } else {
+    msg='The microphone could not be opened ('+(n||'unknown error')+').';
+  }
+  showWarn(msg);
+}
+function showWarn(html){ var w=document.getElementById('warnBox'); w.innerHTML=html; w.style.display='block'; }
+function hideWarn(){ document.getElementById('warnBox').style.display='none'; }
+
+/* Bluetooth headsets drop into call mode when their own mic opens: mono and
+   speech-band, which both muffles playback and hurts pitch detection. */
+function looksLikeHeadsetMic(label){
+  return /hands[- ]?free|bluetooth|\bhfp\b|\bsco\b|airpods|\bbuds\b|buds\d|\bbt\b/i.test(label||'');
+}
+function callQuality(rate){ return typeof rate==='number' && rate>0 && rate<=24000; }
+function listMics(activeLabel, activeRate){
+  if(!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+  navigator.mediaDevices.enumerateDevices().then(function(devs){
+    var mics=devs.filter(function(d){ return d.kind==='audioinput'; });
+    var sel=document.getElementById('micSel'), row=document.getElementById('micPickRow');
+    if(!mics.length){ row.style.display='none'; return; }
+    sel.innerHTML = mics.map(function(d,i){
+      var name=d.label || ('Microphone '+(i+1));
+      if(looksLikeHeadsetMic(name)) name += '  — headset, call quality';
+      return '<option value="'+d.deviceId.replace(/"/g,'&quot;')+'"'+
+             (d.deviceId===S.micId?' selected':'')+'>'+name.replace(/</g,'&lt;')+'</option>';
+    }).join('');
+    row.style.display = mics.length>1 ? 'flex' : 'none';
+    warnIfHeadset(activeLabel, mics.length>1, activeRate);
+  }).catch(function(){});
+}
+function warnIfHeadset(label, canSwitch, rate){
+  var byName=looksLikeHeadsetMic(label), byRate=callQuality(rate);
+  if(!byName && !byRate){ hideWarn(); return; }
+  showWarn('<strong>'+(byName ? 'This is a Bluetooth headset microphone'
+                              : 'This microphone is running at call quality ('+
+                                Math.round(rate/1000)+' kHz)')+'</strong>'+
+    (label ? ' ('+String(label).replace(/</g,'&lt;')+')' : '')+
+    '. Call mode cuts everything above about 4 kHz, which makes the reading jumpy. '+
+    (canSwitch ? 'Pick the built-in microphone above.' : 'No other microphone is available right now.'));
+}
+function switchMic(id){
+  if(!micStream) return;
+  S.micId=id; save();
+  openMic(id);
+}
+try{
+  if(navigator.mediaDevices && navigator.mediaDevices.addEventListener){
+    navigator.mediaDevices.addEventListener('devicechange', function(){
+      if(micStream){
+        var t=micStream.getAudioTracks()[0];
+        var st=t && t.getSettings ? t.getSettings() : {};
+        listMics(t ? t.label : '', st.sampleRate);
+      }
+    });
+  }
+}catch(e){}
+
+/* =========================================================================
+   THE LOOP
+   ========================================================================= */
+function blankReadout(){
+  document.getElementById('noteBig').textContent='—';
+  document.getElementById('noteBig').classList.remove('flat-ok');
+  document.getElementById('octBig').textContent='';
+  document.getElementById('vCents').textContent='–';
+  document.getElementById('vHz').textContent='–';
+  document.getElementById('vClarity').textContent='–';
+  document.getElementById('needle').style.left='50%';
+  document.getElementById('needle').classList.remove('intune');
+}
+function start(){
+  if(!analyser || running) return;
+  running=true; hist=[]; holdNote=null; logged=null;
+  var frame=0;
+  function loop(){
+    if(!running) return;
+    rafId=requestAnimationFrame(loop);
+    frame++;
+    if(frame%2) return;                 /* ~30 analyses a second is plenty */
+    analyser.getFloatTimeDomainData(micBuf);
+    /* half the sample rate: four times less work, and no loss up to ~1 kHz */
+    var r=autoCorrelate(decimate2(micBuf), ac.sampleRate/2, {minHz:55, maxHz:1100});
+    var off=document.getElementById('meterOff');
+    if(r.hz<=0 || r.clarity<0.72){
+      off.style.display='flex';
+      off.textContent = r.rms<0.008 ? 'listening…' : 'sing or play a steady note…';
+      hist=[]; holdNote=null; logged=null;
+      blankReadout();
+      return;
+    }
+    off.style.display='none';
+    hist.push(r.hz); if(hist.length>5) hist.shift();
+    render(describe(median(hist)), r.clarity);
+  }
+  loop();
+}
+function stop(){
+  running=false;
+  if(rafId) cancelAnimationFrame(rafId);
+  rafId=null;
+}
+function render(d, clarity){
+  if(!d) return;
+  document.getElementById('noteBig').textContent=d.name;
+  document.getElementById('octBig').textContent=d.octave;
+  document.getElementById('vCents').textContent=(d.cents>0?'+':'')+d.cents;
+  document.getElementById('vHz').textContent=d.hz.toFixed(1)+' Hz';
+  document.getElementById('vClarity').textContent=Math.round(clarity*100)+'%';
+  var n=document.getElementById('needle');
+  n.style.left=needlePct(d.cents)+'%';
+  var inTune=Math.abs(d.cents)<=5;
+  n.classList.toggle('intune', inTune);
+  document.getElementById('noteBig').classList.toggle('flat-ok', inTune);
+  holdCheck(d);
+}
+/* A note held steadily gets pinned, and logged once. */
+function holdCheck(d){
+  if(!S.holdMs) return;
+  if(holdNote===d.midi){
+    if(logged!==d.midi && performance.now()-holdStart > S.holdMs){
+      logged=d.midi;
+      pin(d);
+      addLog(d);
+    }
+  } else { holdNote=d.midi; holdStart=performance.now(); logged=null; }
+}
+function pin(d){
+  var el=document.getElementById('held');
+  el.innerHTML='Held: <b>'+noteName(d.midi)+'</b> · '+(d.cents>0?'+':'')+d.cents+
+    ' cents · '+d.hz.toFixed(1)+' Hz (exact '+d.exactHz.toFixed(1)+')';
+  el.style.display='block';
+}
+var LOG=[];
+function addLog(d){
+  var t=new Date();
+  LOG.unshift({ name:noteName(d.midi), cents:d.cents, hz:d.hz,
+                at:('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2)+
+                   ':'+('0'+t.getSeconds()).slice(-2) });
+  if(LOG.length>50) LOG.pop();
+  renderLog();
+}
+function renderLog(){
+  document.getElementById('log').innerHTML = LOG.map(function(e){
+    return '<div>'+e.at+' &nbsp; <strong style="color:var(--plum)">'+e.name+'</strong> &nbsp; '+
+           (e.cents>0?'+':'')+e.cents+' c &nbsp; '+e.hz.toFixed(1)+' Hz</div>';
+  }).join('');
+  document.getElementById('logCount').textContent =
+    LOG.length ? LOG.length+' note'+(LOG.length===1?'':'s')+' held' : 'nothing yet';
+}
+function clearLog(){ LOG=[]; document.getElementById('held').style.display='none'; renderLog(); }
+
+/* =========================================================================
+   SETTINGS
+   ========================================================================= */
+function setA4(v){
+  if(!(v>=380 && v<=500)) v=440;
+  S.a4=v;
+  document.getElementById('a4').value=v;
+  save();
+}
+function setAcc(v){ if(NAMES[v]){ S.acc=v; save(); } }
+function setHold(ms){ S.holdMs=ms; holdNote=null; logged=null; save(); }
+
+function systemDark(){
+  try{ return window.matchMedia && window.matchMedia('(prefers-color-scheme:dark)').matches; }
+  catch(e){ return false; }
+}
+function isDark(){ return S.theme==='dark' || (S.theme==='system' && systemDark()); }
+function applyTheme(){
+  var r=document.documentElement;
+  if(S.theme==='system') r.removeAttribute('data-theme'); else r.setAttribute('data-theme',S.theme);
+  var m=document.getElementById('themeColorMeta');
+  if(m) m.setAttribute('content', isDark() ? '#121116' : '#3d3159');
+  var b=document.getElementById('themeBtn');
+  if(b) b.textContent = S.theme==='system' ? 'Theme: auto' : (S.theme==='dark' ? 'Theme: dark' : 'Theme: light');
+}
+function cycleTheme(){
+  S.theme = S.theme==='system' ? 'light' : (S.theme==='light' ? 'dark' : 'system');
+  applyTheme(); save();
+}
+try{
+  if(window.matchMedia){
+    var mq=window.matchMedia('(prefers-color-scheme:dark)');
+    if(mq.addEventListener) mq.addEventListener('change', applyTheme);
+  }
+}catch(e){}
+
+function save(){
+  try{ localStorage.setItem('tuner.v1', JSON.stringify(
+    {a4:S.a4, acc:S.acc, holdMs:S.holdMs, theme:S.theme, micId:S.micId})); }catch(e){}
+}
+function load(){
+  try{
+    var o=JSON.parse(localStorage.getItem('tuner.v1')||'{}');
+    if(typeof o.a4==='number' && o.a4>=380 && o.a4<=500) S.a4=o.a4;
+    if(NAMES[o.acc]) S.acc=o.acc;
+    if(o.holdMs===0 || o.holdMs>0) S.holdMs=o.holdMs;
+    if(o.theme==='system'||o.theme==='light'||o.theme==='dark') S.theme=o.theme;
+    if(typeof o.micId==='string') S.micId=o.micId;
+  }catch(e){}
+}
+
+/* ---------- boot ---------- */
+/* Offline support when served over https. Absent on file://, and a failure here
+   must never stop the page loading. */
+try {
+  if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){});
+    });
+  }
+} catch(e){}
+
+load();
+applyTheme();
+(function(){
+  var a=document.getElementById('a4'); if(a) a.value=S.a4;
+  var ac_=document.getElementById('accSel'); if(ac_) ac_.value=S.acc;
+  var h=document.getElementById('holdSel'); if(h) h.value=String(S.holdMs);
+})();
+blankReadout();
+renderLog();
+</script>
+</body>
+</html>

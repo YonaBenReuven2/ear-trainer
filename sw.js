@@ -1,14 +1,19 @@
-/* Offline shell for the ear trainer.
+/* Offline shell for the ear trainer and the note detector.
    Network first so a re-upload reaches you, cache fallback so a tunnel,
    a plane or no signal doesn't stop a practice session. */
-var CACHE = 'eartrainer-v6';
+var CACHE = 'eartrainer-v7';
 var SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png',
-  './icon-maskable-512.png'
+  './icon-maskable-512.png',
+  './tuner.html',
+  './tuner.webmanifest',
+  './tuner-icon-192.png',
+  './tuner-icon-512.png',
+  './tuner-icon-maskable-512.png'
 ];
 
 self.addEventListener('install', function (e) {
@@ -41,7 +46,11 @@ self.addEventListener('fetch', function (e) {
       return res;
     }).catch(function () {
       return caches.match(e.request).then(function (hit) {
-        return hit || caches.match('./index.html');
+        if (hit) return hit;
+        /* offline navigation to a page we have not cached: send it to the
+           right app, not always the ear trainer */
+        var toTuner = e.request.url.indexOf('tuner') !== -1;
+        return caches.match(toTuner ? './tuner.html' : './index.html');
       });
     })
   );
