@@ -1,15 +1,8 @@
-/* Offline shell for the ear trainer.
-   Network first so a re-upload reaches you, cache fallback so a tunnel,
-   a plane or no signal doesn't stop a practice session. */
-var CACHE = 'eartrainer-v8';
-var SHELL = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './icon-192.png',
-  './icon-512.png',
-  './icon-maskable-512.png'
-];
+/* Offline shell for the note detector. Its own scope, its own cache:
+   nothing here touches the ear trainer sitting one folder up. */
+var CACHE = 'note-detector-v1';
+var SHELL = ['./', './index.html', './manifest.webmanifest',
+             './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(
@@ -24,10 +17,9 @@ self.addEventListener('activate', function (e) {
   e.waitUntil(
     caches.keys().then(function (keys) {
       /* cache storage is shared across the whole origin, so only ever
-         delete our own old versions -- the note detector in ./tuner/ is a
-         separate app with its own cache */
+         delete our own old versions -- the ear trainer's caches are not ours */
       return Promise.all(keys.map(function (k) {
-        if (k !== CACHE && k.indexOf('eartrainer-') === 0) return caches.delete(k);
+        if (k !== CACHE && k.indexOf('note-detector-') === 0) return caches.delete(k);
       }));
     }).then(function () { return self.clients.claim(); })
   );
