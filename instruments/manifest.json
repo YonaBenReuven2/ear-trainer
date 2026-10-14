@@ -1,0 +1,105 @@
+{
+ "version": 1,
+ "ext": "mp3",
+ "instruments": [
+  {
+   "id": "grand-piano",
+   "name": "Grand Piano",
+   "source": "Grand Piano.sf2",
+   "lo": 28,
+   "hi": 69,
+   "ext": "mp3",
+   "bytes": 909090
+  },
+  {
+   "id": "rhodes",
+   "name": "Tine Electric Piano",
+   "source": "GeneralUser GS",
+   "lo": 28,
+   "hi": 69,
+   "ext": "mp3",
+   "bytes": 909090
+  },
+  {
+   "id": "vibraphone",
+   "name": "Vibraphone",
+   "source": "GeneralUser GS",
+   "lo": 28,
+   "hi": 69,
+   "ext": "mp3",
+   "bytes": 909090
+  },
+  {
+   "id": "marimba",
+   "name": "Marimba",
+   "source": "GeneralUser GS",
+   "lo": 31,
+   "hi": 69,
+   "ext": "mp3",
+   "bytes": 844155
+  },
+  {
+   "id": "nylon-guitar",
+   "name": "Nylon Guitar",
+   "source": "GeneralUser GS",
+   "lo": 28,
+   "hi": 65,
+   "ext": "mp3",
+   "bytes": 822510
+  },
+  {
+   "id": "harpsichord",
+   "name": "Harpsichord",
+   "source": "GeneralUser GS",
+   "lo": 28,
+   "hi": 69,
+   "ext": "mp3",
+   "bytes": 909090
+  },
+  {
+   "id": "reed-organ",
+   "name": "Reed Organ",
+   "source": "GeneralUser GS",
+   "lo": 28,
+   "hi": 69,
+   "ext": "mp3",
+   "bytes": 909090
+  },
+  {
+   "id": "strings",
+   "name": "Strings",
+   "source": "GeneralUser GS",
+   "lo": 28,
+   "hi": 69,
+   "ext": "mp3",
+   "bytes": 909090
+  },
+  {
+   "id": "voices",
+   "name": "Voices",
+   "source": "GeneralUser GS",
+   "lo": 28,
+   "hi": 69,
+   "ext": "mp3",
+   "bytes": 909090
+  },
+  {
+   "id": "flute",
+   "name": "Flute",
+   "source": "GeneralUser GS",
+   "lo": 28,
+   "hi": 69,
+   "ext": "mp3",
+   "bytes": 909090
+  },
+  {
+   "id": "clarinet",
+   "name": "Clarinet",
+   "source": "GeneralUser GS",
+   "lo": 28,
+   "hi": 69,
+   "ext": "mp3",
+   "bytes": 909090
+  }
+ ]
+}
