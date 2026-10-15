@@ -1126,6 +1126,7 @@ function attachMic(stream){
   document.getElementById('micHelp').style.display='none';
   document.getElementById('phoneWarn').style.display='block';
   renderMode();
+  renderSummaries();
   listMics(track ? track.label : '', settings.sampleRate);
 }
 /* Two signals. The name, for the usual Bluetooth labels (a bare "headset" is
@@ -1272,6 +1273,7 @@ function stopMic(){
     'Off — singing modes will ask you to grade yourself';
   document.getElementById('phoneWarn').style.display='none';
   renderMode();
+  renderSummaries();        /* the mic is the one setting that never saves */
 }
 /* Seeing "A2" while you sing, in a known key, lets you work the degree out by
    arithmetic instead of by ear. This hides note names only -- the meter, the
@@ -2548,6 +2550,10 @@ function save(){
       stats:S.stats, answered:S.answered
     }));
   }catch(e){}
+  /* The collapsed sections show their settings in the summary line, and every
+     change of a setting passes through here -- so this is the one place that
+     cannot fall out of step with the state. */
+  try{ renderSummaries(); }catch(e){}
 }
 function load(){
   try{
