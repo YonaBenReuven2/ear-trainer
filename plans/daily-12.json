@@ -1,0 +1,19 @@
+{
+  "id": "daily-12",
+  "name": "Daily 12 minutes",
+  "note": "The everyday session: wake the voice, settle the key, then the real work.",
+  "blocks": [
+    { "mins": 1, "mode": "match", "level": "keep", "key": "keep", "cad": "keep", "hide": "off",
+      "label": "Settle in",
+      "note": "Sing along with the drone, then sing back what you hear." },
+    { "mins": 2, "mode": "both", "level": "keep", "key": "session", "cad": "keep", "hide": "off",
+      "label": "Warm up in one key",
+      "note": "One key, so do settles in your ear." },
+    { "mins": 6, "mode": "both", "level": "keep", "key": "keep", "cad": "keep", "hide": "on",
+      "label": "Main block",
+      "note": "Your ladder step, note names hidden. This is the one that counts." },
+    { "mins": 2, "mode": "produce", "level": "keep", "key": "keep", "cad": "keep", "hide": "keep",
+      "label": "Reverse it",
+      "note": "Name to sound - the direction everyone neglects." }
+  ]
+}

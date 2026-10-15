@@ -71,7 +71,7 @@ header{
 }
 .hbar{max-width:780px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;
       gap:14px;flex-wrap:wrap}
-.htitle{font-weight:700;font-size:15px;color:var(--plum);margin-right:auto}
+.htitle{display:none}
 a.btn{text-decoration:none;display:inline-block}
 /* ---------- session timer ---------- */
 .timerpill{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--fill);
@@ -110,6 +110,17 @@ a.btn{text-decoration:none;display:inline-block}
 .sec>summary:hover{background:var(--hover)}
 .sec .sum{font-weight:400;font-size:13px;color:var(--grey);margin-left:auto;text-align:right}
 .sec>.card{border:0;border-top:1px solid var(--line);border-radius:0;margin:0}
+.sub{border-top:1px solid var(--line)}
+.sub:first-child{border-top:0}
+.sub>summary{list-style:none;cursor:pointer;padding:11px 16px;font-size:14px;font-weight:700;
+  color:var(--ink);display:flex;align-items:center;gap:8px}
+.sub>summary::-webkit-details-marker{display:none}
+.sub>summary::before{content:"";width:6px;height:6px;flex:none;border-right:2px solid var(--grey);
+  border-bottom:2px solid var(--grey);transform:rotate(-45deg);transition:transform .15s}
+.sub[open]>summary::before{transform:rotate(45deg)}
+.sub[open]>summary{color:var(--plum)}
+.sub>summary:hover{background:var(--hover)}
+.subbody{padding:2px 16px 16px}
 .pagelink{font-size:13.5px;margin:-10px 0 16px}
 .pagelink a{color:var(--plum);font-weight:700;text-decoration:none;border-bottom:1.5px solid var(--line)}
 .pagelink a:hover{border-color:var(--plum)}
@@ -215,10 +226,25 @@ input[type=range]{accent-color:var(--fill)}
        margin:12px 0;font-size:14px}
 kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:1px 6px;
     font-size:12px;font-family:inherit}
-@media (max-width:520px){
-  /* keep the sticky header to one or two short rows -- it is on screen the whole time */
-  .htitle,.wide,header .crosslink{display:none}
+/* While a session runs the timer matters more than the level and the score,
+   both of which are on the page a scroll away. */
+@media (max-width:860px){ header.running .opt{display:none} }
+/* and on a very narrow phone the bar keeps only the key and the controls */
+@media (max-width:380px){ header .opt{display:none} }
+/* the cross-link is a convenience, not a control: it goes first when the bar
+   runs out of room, since the same link sits under the title */
+@media (max-width:1000px){ header .crosslink{display:none} }
+header.running .crosslink{display:none}
+/* the sticky bar is on screen the whole time: it gets compact well before the
+   page does, because it is the first thing that runs out of room */
+@media (max-width:680px){
+  .wide,header .crosslink{display:none}
   .hbar{gap:6px;padding:7px 12px}
+  header .pill{font-size:11px;padding:3px 8px}
+  #masterVol{width:64px !important}
+  header .btn.sm{padding:4px 11px}
+}
+@media (max-width:520px){
   .pill{font-size:11px;padding:3px 8px}
   #masterVol{width:64px !important}
   header .btn.sm{padding:4px 11px}
@@ -240,14 +266,13 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
 </head>
 <body>
 
-<header>
+<header id="topbar">
   <div class="hbar">
-    <span class="htitle">Functional Ear Trainer</span>
-    <span class="pill">Level <b id="hLevel">1</b></span>
+    <span class="pill opt">Level <b id="hLevel">1</b></span>
     <span class="pill">Key<span class="wide"> of</span> <b id="hKey">F</b></span>
-    <span class="pill">Session <b id="hAcc">&ndash;</b></span>
-    <label class="pill" for="masterVol" style="display:flex;align-items:center;gap:6px">Vol<span class="wide">ume</span>
-      <input id="masterVol" type="range" min="0" max="1" step="0.05" value="0.9"
+    <span class="pill opt">Session <b id="hAcc">&ndash;</b></span>
+    <label class="pill" for="masterVol" style="display:flex;align-items:center;gap:6px"><span>Vol<span class="wide">ume</span></span>
+      <input id="masterVol" type="range" min="0" max="1" step="0.05" value="1"
              oninput="setMasterVol(parseFloat(this.value))" style="width:90px;margin:0">
     </label>
     <button class="pill timerpill" id="timerPill" style="display:none" onclick="togglePause()">
@@ -285,7 +310,7 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
   &mdash; so every note has a fixed reference and a recognisable <em>character</em> rather than a
   measurement.</p>
   <p class="muted" style="margin:0">Start at Level 1 with three notes, and follow the
-  <a href="#guide" style="color:var(--plum)">session guide</a> at the bottom. Intervals become easy later,
+  <a href="#guide" style="color:var(--plum)">practice notes</a> at the bottom. Intervals become easy later,
   as a side effect.</p>
   </div>
 </details>
@@ -293,15 +318,19 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
 <!-- ===================== SETUP ===================== -->
 <details class="sec" id="secSetup" data-sec="setup">
   <summary>Setup <span class="sum" id="setupSum"></span></summary>
-  <div class="card">
-  <div class="lbl">Appearance</div>
+  <div class="card pad0">
+  <details class="sub" id="subTheme"><summary>Appearance <span class="sum" id="themeSum"></span></summary>
+  <div class="subbody">
   <div class="row" id="themeRow">
     <button class="btn sm" data-th="system" onclick="setTheme('system')">Match system</button>
     <button class="btn sm" data-th="light"  onclick="setTheme('light')">Light</button>
     <button class="btn sm" data-th="dark"   onclick="setTheme('dark')">Dark</button>
   </div>
 
-  <div class="lbl" style="margin-top:16px">Your singing range</div>
+  </div></details>
+
+  <details class="sub" id="subRange"><summary>Your singing range <span class="sum" id="rangeSum"></span></summary>
+  <div class="subbody">
   <div class="row">
     <label class="muted" for="loSel">Lowest comfortable</label>
     <select id="loSel"></select>
@@ -313,7 +342,10 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
   <div class="hint">Sing along with each to check. Set these honestly &mdash; every note the app
   plays is chosen so you can sing it back.</div>
 
-  <div class="lbl" style="margin-top:16px">Your key</div>
+  </div></details>
+
+  <details class="sub" id="subKey"><summary>Key and how often it changes <span class="sum" id="keySum"></span></summary>
+  <div class="subbody">
   <div class="row">
     <label class="muted" for="tonicSel">Tonic</label>
     <select id="tonicSel"></select>
@@ -322,7 +354,7 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
   </div>
   <div class="hint" id="rangeNote"></div>
 
-  <div class="lbl" style="margin-top:16px">Changing keys</div>
+  <div class="lbl" style="margin-top:14px">Changing keys</div>
   <div class="row" id="keyModeRow">
     <button class="btn sm" data-km="fixed"    onclick="setKeyMode('fixed')">Fixed</button>
     <button class="btn sm" data-km="session"  onclick="setKeyMode('session')">New key each session</button>
@@ -341,7 +373,10 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
   </div>
   <div class="hint" id="keyModeHint"></div>
 
-  <div class="lbl" style="margin-top:16px">Key reference</div>
+  </div></details>
+
+  <details class="sub" id="subRef"><summary>Key reference <span class="sum" id="refSum"></span></summary>
+  <div class="subbody">
   <div class="row">
     <button class="btn sm on" id="ctxDrone" onclick="setContext('drone')">Drone</button>
     <button class="btn sm" id="ctxCad" onclick="setContext('cadence')">Cadence</button>
@@ -349,17 +384,7 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
   </div>
   <div class="hint">A drone is the strongest anchor and the one to start with. Cadence mode is closer to
   real music and a little harder.</div>
-  <div class="lbl" style="margin-top:16px">Instrument</div>
-  <div class="row">
-    <select id="instSel" onchange="setInstrument(this.value)" style="max-width:100%;flex:1 1 200px">
-      <option value="synth">Simple synth (no download)</option>
-    </select>
-    <button class="btn sm" onclick="auditionInstrument()">Hear it</button>
-  </div>
-  <div class="hint" id="instHint">The built-in synth. Other instruments are recordings, about
-  0.9&nbsp;MB each, fetched once and then kept for offline use.</div>
-
-  <div class="lbl" style="margin-top:16px">Cadence</div>
+  <div class="lbl" style="margin-top:14px">Cadence</div>
   <div class="row" id="cadModeRow">
     <button class="btn sm" data-cm="classic" onclick="setCadMode('classic')">Classic</button>
     <button class="btn sm" data-cm="mixed" onclick="setCadMode('mixed')">Mixed</button>
@@ -401,7 +426,10 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
     <button class="btn sm" onclick="auditionDrone()">Hear the drone</button>
   </div>
 
-  <div class="lbl" style="margin-top:16px">Microphone</div>
+  </div></details>
+
+  <details class="sub" id="subMic"><summary>Microphone <span class="sum" id="micSum"></span></summary>
+  <div class="subbody">
   <div class="row">
     <button class="btn teal" id="micBtn" onclick="toggleMic()">Turn on the microphone</button>
     <span class="muted" id="micStatus">Off &mdash; singing modes will ask you to grade yourself</span>
@@ -413,6 +441,7 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
   <div class="warn" id="btWarn" style="display:none"></div>
   <div class="hint">Running as: <span id="envLine">&mdash;</span></div>
   <div class="warn" id="micHelp" style="display:none"></div>
+  </div></details>
   <div class="warn" id="phoneWarn" style="display:none">
     <strong>Use headphones.</strong> Without them the drone leaks into the microphone and the pitch
     detection gets confused. Wired headphones are best. With Bluetooth headphones, sing into the
@@ -437,6 +466,7 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
     </div>
     <div class="row" style="margin-top:10px">
       <button class="btn primary" id="startSessBtn" onclick="startSession()">Start session</button>
+      <button class="btn primary" id="pauseBtn" style="display:none" onclick="togglePause()">Pause</button>
       <button class="btn sm" id="skipBlockBtn" style="display:none" onclick="skipBlock()">Skip block</button>
       <button class="btn sm" id="stopSessBtn" style="display:none" onclick="stopSession()">End session</button>
     </div>
@@ -447,11 +477,19 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
       <button class="btn sm" onclick="addBlock()">Add a block</button>
       <button class="btn sm" onclick="newPlan()">New plan</button>
       <button class="btn sm" onclick="duplicatePlan()">Duplicate</button>
-      <button class="btn sm" onclick="deletePlan()">Delete plan</button>
-      <button class="btn sm" onclick="resetPlans()">Reset to default</button>
+      <button class="btn sm" id="revertBtn" style="display:none" onclick="revertPlan()">Revert to repo copy</button>
+      <button class="btn sm" id="delPlanBtn" onclick="deletePlan()">Delete plan</button>
+      <button class="btn sm" onclick="copyPlan()">Copy JSON</button>
+      <button class="btn sm" onclick="resetPlans()">Reset everything</button>
     </div>
+    <textarea id="planJson" readonly style="display:none;width:100%;height:150px;margin-top:10px;
+      font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;border:1px solid var(--line);
+      border-radius:8px;background:var(--soft);color:var(--ink);padding:8px"></textarea>
+    <div class="hint" id="planSource"></div>
     <div class="hint">Each block can carry its own mode, level, key setting, cadence style and
-    note-name hiding. Anything left on <em>keep</em> stays as you have it.</div>
+    note-name hiding. Anything left on <em>keep</em> stays as you have it. Plans in
+    <code>plans/</code> in the repo load on every device; editing one here keeps your version in this
+    browser only, and <em>Copy JSON</em> gives you the text to paste back into the file.</div>
   </div>
 </details>
 
@@ -532,45 +570,45 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
 </details>
 
 <details class="sec" id="secGuide" data-sec="guide">
-  <summary id="guide">Session guide</summary>
+  <summary id="guide">How to practise</summary>
   <div class="card">
   <p><strong>Ten to twelve minutes a day, not an hour a week.</strong> This is a memory task, and memory
   responds to frequency far more than duration.</p>
+  <p class="muted" style="margin-bottom:14px">What to do <em>in</em> a session is the
+  <a href="#secSession" style="color:var(--plum)">Session plan</a> above &mdash; that is the thing that
+  actually runs, so it is the only description of a session worth keeping. What follows is the reasoning
+  behind it, which is what you need when you build a plan of your own.</p>
 
-  <h3>Every session, in this order</h3>
-  <ol class="plan">
-    <li><span class="t">1 min</span><div><strong>Settle in.</strong> Put the drone on and sing
-      <em>do&ndash;mi&ndash;sol&ndash;mi&ndash;do</em> against it, slowly. Then a minute of <em>Match the pitch</em>:
-      no naming, just sing back what you hear. This connects ear and voice before you ask anything of them.</div></li>
-    <li><span class="t">2 min</span><div><strong>Warm up in one key.</strong> <em>Hear &rarr; sing &rarr; name</em>
-      at your current level with <em>Changing keys</em> on <em>New key each session</em>. Easy on purpose:
-      it lets <em>do</em> settle in your ear before you start moving it.</div></li>
-    <li><span class="t">6 min</span><div><strong>Main block: moving keys.</strong> Same mode, same level, but switch
-      to <em>Every few questions</em> at your current step on the ladder below. Note names hidden. This is the
-      part that builds the real skill &mdash; finding <em>do</em> again when it moves.</div></li>
-    <li><span class="t">2 min</span><div><strong>Reverse it.</strong> <em>Sing a named degree</em>. The direction
-      almost everyone neglects, and the one that fixes &ldquo;I can hear it but can&rsquo;t name it&rdquo;.</div></li>
-    <li><span class="t">30 s</span><div><strong>Decide tomorrow.</strong> Look at the <em>Recent</em> score from the
-      main block and use the ladder to pick tomorrow&rsquo;s setting. The Progress card will also suggest it.</div></li>
-  </ol>
+  <h3>Shape of a session</h3>
+  <p class="muted" style="margin-bottom:10px">
+  <strong>Open with the voice, not the brain.</strong> A minute or two of <em>Match the pitch</em> connects
+  ear to voice before anything is being judged.<br>
+  <strong>Spend the bulk in one mode, at one level.</strong> Roughly two thirds of the session, in
+  <em>Hear &rarr; sing &rarr; name</em>, at your current ladder step with note names hidden. Switching
+  settings constantly feels productive and teaches very little.<br>
+  <strong>Finish in the other direction.</strong> A couple of minutes of <em>Sing a named degree</em>.
+  Name&nbsp;&rarr;&nbsp;sound is the direction almost everyone neglects, and the one that fixes
+  &ldquo;I can hear it but can&rsquo;t name it&rdquo;.<br>
+  <strong>Warm up easier than you finish.</strong> If the main block has keys moving, give the warm-up one
+  steady key so <em>do</em> settles first.</p>
 
   <h3>Every question</h3>
   <p class="muted" style="margin-bottom:10px">
-  <strong>After a key change, find <em>do</em> before you answer.</strong> Hum it quietly the moment the cadence
-  ends. If you can&rsquo;t, press <em>Re-establish the key</em> &mdash; that isn&rsquo;t cheating, it&rsquo;s
-  the skill.<br>
+  <strong>After a key change, find <em>do</em> before you answer.</strong> Hum it quietly the moment the
+  cadence ends. If you can&rsquo;t, press <em>Re-establish the key</em> &mdash; that isn&rsquo;t cheating,
+  it&rsquo;s the skill.<br>
   <strong>Sing the note before you name it.</strong> Then feel which way it wants to move &mdash; up to
   <em>do</em>, down to <em>sol</em>, nowhere at all. The pull tells you the degree.<br>
   <strong>When you miss one, listen to the whole correction.</strong> Your answer, then the real one, each
   against <em>do</em>. That comparison is where the learning happens.<br>
-  <strong>Say the character, not just the number.</strong> &ldquo;The leaning one&rdquo; sticks; &ldquo;degree
-  7&rdquo; doesn&rsquo;t.</p>
+  <strong>Say the character, not just the number.</strong> &ldquo;The leaning one&rdquo; sticks;
+  &ldquo;degree 7&rdquo; doesn&rsquo;t.</p>
 
   <h3>The key-change ladder</h3>
-  <p class="muted" style="margin-bottom:8px">Each level is climbed in steps. Stay on a step until the main block
-  scores <strong>85% or more</strong> over at least 15 questions (two sessions in a row is safer), then move one
-  step right. Below about 60%, step back one. Only when you reach <em>every question</em> is the level
-  truly done.</p>
+  <p class="muted" style="margin-bottom:8px">Each level is climbed in steps. Stay on a step until the main
+  block scores <strong>85% or more</strong> over at least 15 questions (two sessions in a row is safer),
+  then move one step right. Below about 60%, step back one. Only when you reach <em>every question</em> is
+  the level truly done.</p>
   <div class="ladder">
     <span>Each session</span><span>10</span><span>8</span><span>5</span><span>3</span><span>2</span><span>Every question</span>
   </div>
@@ -578,11 +616,11 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
   session</em>. It goes faster each time, because the skill of re-finding <em>do</em> carries over.</p>
 
   <h3>What progress looks like</h3>
-  <p class="muted" style="margin:0">A score that drops when keys start moving is normal: it means you were leaning
-  on the key staying still, and now you&rsquo;re learning not to. Level 1 comes quickly &mdash; do, mi and sol
-  are very distinct. Level 3 is where it gets real, because <em>fa</em> and <em>ti</em> are the two people
-  confuse. If you stall, that&rsquo;s expected, not a sign this isn&rsquo;t working. Step back on the ladder for a
-  few days and come back to it.</p>
+  <p class="muted" style="margin:0">A score that drops when keys start moving is normal: it means you were
+  leaning on the key staying still, and now you&rsquo;re learning not to. Level 1 comes quickly &mdash; do,
+  mi and sol are very distinct. Level 3 is where it gets real, because <em>fa</em> and <em>ti</em> are the
+  two people confuse. If you stall, that&rsquo;s expected, not a sign this isn&rsquo;t working. Step back on
+  the ladder for a few days and come back to it.</p>
   </div>
 </details>
 
@@ -690,10 +728,10 @@ function degByN(n){ for(var i=0;i<DEGREES.length;i++) if(DEGREES[i].n===n) retur
 var S = {
   tonic:48, level:0, mode:'both', context:'drone',
   voiceLo:40, voiceHi:64,       // E2-E4, a bass-baritone working range
-  droneVol:0.45, micId:'', keyMode:'session', keyEvery:5, inKey:0, freshKey:true,
+  droneVol:0.55, micId:'', keyMode:'session', keyEvery:5, inKey:0, freshKey:true,
   cadMode:'classic', cadChange:'key', cadEvery:3, cadGap:0, cadId:'classic', cadClose:0, cadBpm:96, cadCount:0,
   open:{why:false, setup:false, session:false, progress:true, guide:false},
-  plans:null, planId:'default', instrument:'synth', masterVol:0.9, hideNotes:false, theme:'system',
+  plans:null, planId:'daily-12', edits:null, masterVol:1, hideNotes:false, theme:'system',
   stats:{}, recent:[], answered:0, current:null, lastDegree:null,
   phase:'idle'     // idle | sing | name | done
 };
@@ -756,7 +794,7 @@ function advanceLevel(){ nextLevel(); setLadder(0); }
    AUDIO
    ========================================================================= */
 var AC = window.AudioContext || window.webkitAudioContext;
-var ac=null, master=null, droneGain=null, droneNodes=[], live=[], timers=[];
+var ac=null, master=null, limiter=null, droneGain=null, droneNodes=[], live=[], timers=[];
 var reverbSend=null;
 /* A short synthetic impulse response: decaying noise. Cheap, and it stops
    everything sounding like it was recorded inside a box. */
@@ -774,7 +812,19 @@ function makeImpulse(c, seconds, decay){
 function ctx(){
   if(!ac){
     ac = new AC();
-    master = ac.createGain(); master.gain.value=S.masterVol; master.connect(ac.destination);
+    master = ac.createGain(); master.gain.value=S.masterVol;
+    /* A limiter between everything and the speaker. Phone speakers are quiet,
+       so the notes need to be loud; without this, a four-note chord over a
+       drone would clip and buzz. */
+    try{
+      limiter = ac.createDynamicsCompressor();
+      limiter.threshold.value = -8;     /* measured: holds a four-note chord under 0.8 */
+      limiter.knee.value = 0;
+      limiter.ratio.value = 20;
+      limiter.attack.value = 0.001;
+      limiter.release.value = 0.25;
+      master.connect(limiter); limiter.connect(ac.destination);
+    }catch(e){ master.connect(ac.destination); }
     droneGain = ac.createGain(); droneGain.gain.value=0; droneGain.connect(master);
     try {
       var conv=ac.createConvolver();
@@ -796,10 +846,10 @@ function stopNotes(){
   timers.forEach(clearTimeout); timers=[];
 }
 function stopAll(){ stopNotes(); stopDrone(); }
-/* The built-in synth: five sine partials with a fast attack. Always available,
-   and still what the drone and the session chime use. */
-function synthPluck(m,t0,dur,gain){
-  var c=ctx(), f=midiToHz(m); gain=gain||0.32;
+/* Levels are set loud on purpose: a phone speaker at full volume is the worst
+   case, and the limiter above catches the peaks. */
+function pluck(m,t0,dur,gain){
+  var c=ctx(), f=midiToHz(m); gain=gain||0.85;
   var g=c.createGain(); g.connect(master);
   g.gain.setValueAtTime(0.0001,t0);
   g.gain.linearRampToValueAtTime(gain,t0+0.012);
@@ -810,12 +860,6 @@ function synthPluck(m,t0,dur,gain){
     o.connect(gg); gg.connect(g);
     o.start(t0); o.stop(t0+Math.max(dur,0.3)+0.1); reg(o);
   });
-}
-/* One way in for every note the app plays, so the instrument can be swapped
-   underneath without touching the cadence, the drill or the feedback. */
-function pluck(m,t0,dur,gain){
-  if(INST.ready && INST.id!=='synth'){ playSample(m,t0,dur,gain); return; }
-  synthPluck(m,t0,dur,gain);
 }
 function playNote(m,dur){ pluck(m, ctx().currentTime+0.02, dur||1.3); }
 function playSeq(seq,bpm,done){
@@ -1445,7 +1489,7 @@ function selfReport(gotIt){
 function playTarget(){
   if(!S.current) return;
   duckDrone(false);
-  pluck(S.current.midi, ctx().currentTime+0.05, 1.5, 0.36);
+  pluck(S.current.midi, ctx().currentTime+0.05, 1.5, 1.0);
 }
 function replay(){ stopListening(); playTarget();
   timers.push(setTimeout(function(){
@@ -1843,7 +1887,26 @@ function wireSections(){
     el.addEventListener('toggle', function(){ S.open[k]=!!el.open; save(); });
   });
 }
+var SUBS = { subTheme:'themeSum', subRange:'rangeSum', subKey:'keySum',
+             subRef:'refSum', subMic:'micSum' };
+function setSum(id, text){
+  var el=document.getElementById(id);
+  if(el) el.textContent=text;
+}
+function renderSubSummaries(){
+  setSum('themeSum', S.theme==='system' ? 'follows your system' : S.theme);
+  setSum('rangeSum', noteName(S.voiceLo)+' to '+noteName(S.voiceHi));
+  setSum('keySum', noteName(S.tonic).replace(/-?\d/,'')+' \u00b7 '+
+    (S.keyMode==='fixed' ? 'fixed' :
+     S.keyMode==='session' ? 'new each session' :
+     S.keyEvery===1 ? 'new every question' : 'new every '+S.keyEvery));
+  setSum('refSum', (S.context==='drone' ? 'drone' :
+                    S.context==='cadence' ? 'cadence' : 'cadence then drone')+
+    (S.context==='drone' ? '' : ' \u00b7 '+(S.cadMode==='mixed' ? 'mixed cadences' : 'classic cadence')));
+  setSum('micSum', micStream ? 'on' : 'off');
+}
 function renderSummaries(){
+  renderSubSummaries();
   var set=document.getElementById('setupSum');
   if(set){
     set.textContent = noteName(S.tonic).replace(/-?\d/,'') + ' \u00b7 ' +
@@ -1872,165 +1935,6 @@ function renderSummaries(){
 }
 
 /* =========================================================================
-   INSTRUMENTS
-   Each instrument is a folder of one short recording per semitone, rendered
-   from a soundfont ahead of time. A pack is fetched once, decoded, and then
-   served from the browser cache; nothing is downloaded until you pick one.
-   The drone stays synthetic -- a recording decays, a drone must not.
-   ========================================================================= */
-var INST = { id:'synth', ready:false, loading:false, lo:0, hi:0, buffers:{}, offsets:{},
-             pending:null, failed:false, got:0, want:0 };
-var MANIFEST = null;
-var SAMPLE_GAIN = 1.7;      /* recordings peak lower than the synth's stacked partials */
-
-function instUrl(id, midi){ return 'instruments/'+id+'/'+midi+'.mp3'; }
-
-function loadManifest(){
-  if(MANIFEST) return Promise.resolve(MANIFEST);
-  return fetch('instruments/manifest.json').then(function(r){
-    if(!r.ok) throw new Error('no manifest');
-    return r.json();
-  }).then(function(j){ MANIFEST=j; renderInstruments(); return j; });
-}
-/* The first audible sample of a recording, so playback starts on the attack
-   rather than on the encoder's leading silence. */
-function firstSound(buf){
-  var d=buf.getChannelData(0), n=Math.min(d.length, buf.sampleRate);
-  for(var i=0;i<n;i++) if(Math.abs(d[i])>0.004) return Math.max(0,(i-16)/buf.sampleRate);
-  return 0;
-}
-function setInstrument(id){
-  if(id===INST.id && (INST.ready || id==='synth')) return;
-  INST.pending=id;
-  S.instrument=id; save();
-  if(id==='synth'){
-    INST={ id:'synth', ready:false, loading:false, lo:0, hi:0, buffers:{}, offsets:{},
-           pending:null, failed:false, got:0, want:0 };
-    renderInstruments();
-    return;
-  }
-  loadInstrument(id);
-}
-function loadInstrument(id){
-  INST.loading=true; INST.failed=false; INST.got=0; INST.want=0;
-  renderInstruments();
-  loadManifest().then(function(man){
-    var spec=null;
-    man.instruments.forEach(function(i){ if(i.id===id) spec=i; });
-    if(!spec) throw new Error('unknown instrument');
-    var c=ctx(), buffers={}, offsets={}, notes=[];
-    for(var m=spec.lo;m<=spec.hi;m++) notes.push(m);
-    INST.want=notes.length;
-    /* a handful at a time: a phone on a slow connection should not open 42 sockets */
-    var i=0;
-    function next(){
-      if(INST.pending!==id) return Promise.resolve(null);   /* switched away mid-load */
-      if(i>=notes.length) return Promise.resolve('done');
-      var batch=notes.slice(i, i+6); i+=6;
-      return Promise.all(batch.map(function(m){
-        return fetch(instUrl(id,m))
-          .then(function(r){ if(!r.ok) throw new Error('missing '+m); return r.arrayBuffer(); })
-          .then(function(ab){
-            return new Promise(function(res, rej){
-              c.decodeAudioData(ab, function(buf){
-                buffers[m]=buf; offsets[m]=firstSound(buf); INST.got++; renderInstruments(); res();
-              }, rej);
-            });
-          });
-      })).then(next);
-    }
-    return next().then(function(r){
-      if(r!=='done') return;
-      INST={ id:id, ready:true, loading:false, lo:spec.lo, hi:spec.hi, buffers:buffers,
-             offsets:offsets, pending:null, failed:false, got:notes.length, want:notes.length };
-      renderInstruments();
-    });
-  }).catch(function(){
-    INST.loading=false; INST.failed=true; INST.ready=false; INST.id='synth';
-    renderInstruments();
-  });
-}
-/* Which recording to use for a note: the note itself, else the same note an
-   octave away, else the nearest one shifted. Out of reach, the synth covers it. */
-function sampleFor(m){
-  if(INST.buffers[m]) return { midi:m, rate:1 };
-  var o;
-  for(o=12;o<=24;o+=12){
-    if(INST.buffers[m-o]) return { midi:m-o, rate:Math.pow(2,o/12) };
-    if(INST.buffers[m+o]) return { midi:m+o, rate:Math.pow(2,-o/12) };
-  }
-  var near=null;
-  for(var k=1;k<=3;k++){
-    if(INST.buffers[m-k]){ near={midi:m-k, rate:Math.pow(2,k/12)}; break; }
-    if(INST.buffers[m+k]){ near={midi:m+k, rate:Math.pow(2,-k/12)}; break; }
-  }
-  return near;
-}
-function playSample(m,t0,dur,gain){
-  var pick=sampleFor(m);
-  if(!pick){ synthPluck(m,t0,dur,gain); return; }
-  var c=ctx(), buf=INST.buffers[pick.midi];
-  var src=c.createBufferSource();
-  src.buffer=buf; src.playbackRate.value=pick.rate;
-  var g=c.createGain();
-  var lvl=(gain||0.32)*SAMPLE_GAIN;
-  g.gain.setValueAtTime(lvl,t0);
-  var len=Math.max(dur||1.3,0.3);
-  /* let it ring for the asked length, then fade rather than cut */
-  g.gain.setValueAtTime(lvl,t0+len*0.82);
-  g.gain.exponentialRampToValueAtTime(0.0001,t0+len+0.12);
-  src.connect(g); g.connect(master);
-  src.start(t0, INST.offsets[pick.midi]||0);
-  src.stop(t0+len+0.2);
-  reg(src);
-}
-function instrumentName(id){
-  if(id==='synth') return 'Simple synth';
-  var n=id;
-  if(MANIFEST) MANIFEST.instruments.forEach(function(i){ if(i.id===id) n=i.name; });
-  return n;
-}
-function renderInstruments(){
-  var sel=document.getElementById('instSel');
-  if(sel && MANIFEST){
-    var cur=S.instrument||'synth';
-    var html='<option value="synth">Simple synth (no download)</option>';
-    var bySource={};
-    MANIFEST.instruments.forEach(function(i){
-      (bySource[i.source]=bySource[i.source]||[]).push(i);
-    });
-    Object.keys(bySource).forEach(function(src){
-      html+='<optgroup label="'+String(src).replace(/</g,'&lt;')+'">';
-      bySource[src].forEach(function(i){
-        html+='<option value="'+i.id+'">'+String(i.name).replace(/</g,'&lt;')+'</option>';
-      });
-      html+='</optgroup>';
-    });
-    sel.innerHTML=html;
-    sel.value=cur;
-  }
-  var h=document.getElementById('instHint');
-  if(h){
-    h.textContent = INST.failed
-      ? 'That instrument could not be loaded \u2014 back on the synth. If you are offline, pick it '+
-        'again once you have a connection and it will be kept for next time.'
-      : INST.loading
-        ? 'Loading '+instrumentName(S.instrument)+'\u2026 '+INST.got+' of '+(INST.want||42)+' notes.'
-        : INST.ready
-          ? instrumentName(INST.id)+' \u2014 recorded notes, kept for offline use. The drone stays '+
-            'synthetic so it can hold a pitch indefinitely.'
-          : 'The built-in synth. Other instruments are recordings, about 0.9\u00a0MB each, fetched '+
-            'once and then kept for offline use.';
-  }
-  renderSummaries();
-}
-function auditionInstrument(){
-  stopAll();
-  var t=S.tonic;
-  playSeq([[t,1],[t+4,1],[t+7,1],[t+12,1.6]],132);
-}
-
-/* =========================================================================
    SESSION PLANS
    A plan is an ordered list of blocks. A block is a length plus whatever it
    wants to change; anything left on 'keep' is left alone. Nothing is applied
@@ -2044,7 +1948,8 @@ var KEY_CHOICES = [
   ['2','every 2'], ['1','a new key every question']
 ];
 function defaultPlan(){
-  return { id:'default', name:'Daily 12 minutes', blocks:[
+  return { id:'daily-12', name:'Daily 12 minutes',
+           note:'The everyday session: wake the voice, settle the key, then the real work.', blocks:[
     { mins:1, mode:'match',    level:'keep', key:'keep',    cad:'keep', hide:'off',
       label:'Settle in', note:'Sing along with the drone, then sing back what you hear.' },
     { mins:2, mode:'both',     level:'keep', key:'session', cad:'keep', hide:'off',
@@ -2055,7 +1960,57 @@ function defaultPlan(){
       label:'Reverse it', note:'Name to sound \u2014 the direction everyone neglects.' }
   ]};
 }
-function plans(){ if(!S.plans || !S.plans.length) S.plans=[defaultPlan()]; return S.plans; }
+/* Three places a plan can come from:
+     REPO   - plans/*.json, shared and versioned with the app
+     S.edits- your edit of a repo plan, kept in this browser only
+     S.plans- plans you made here, kept in this browser only
+   An edit never touches the repo copy, so a push is a deliberate act. */
+var REPO = [];
+function localPlans(){ if(!S.plans) S.plans=[]; return S.plans; }
+function edits(){ if(!S.edits) S.edits={}; return S.edits; }
+function repoPlan(id){
+  for(var i=0;i<REPO.length;i++) if(REPO[i].id===id) return REPO[i];
+  return null;
+}
+function isRepo(id){ return !!repoPlan(id); }
+function isEdited(id){ return !!(S.edits && S.edits[id]); }
+function plans(){
+  /* Before the files load -- offline, or a first run -- the built-in plan stands
+     in for them. It is installed once, not rebuilt per call, so edits to it
+     stick the same way edits to a repo plan do. */
+  if(!REPO.length) REPO=[defaultPlan()];
+  var out=[], seen={};
+  REPO.forEach(function(p){
+    var e=edits()[p.id];
+    out.push(e || p); seen[p.id]=1;
+  });
+  /* an edit whose repo file has since gone is still your plan: keep it */
+  Object.keys(edits()).forEach(function(id){
+    if(!seen[id]){ out.push(S.edits[id]); seen[id]=1; }
+  });
+  localPlans().forEach(function(p){ if(!seen[p.id]) out.push(p); });
+  return out;
+}
+function loadRepoPlans(){
+  return fetch('plans/index.json').then(function(r){
+    if(!r.ok) throw new Error('no plan index');
+    return r.json();
+  }).then(function(idx){
+    var files=(idx && idx.plans) ? idx.plans.slice(0,30) : [];
+    return Promise.all(files.map(function(f){
+      return fetch('plans/'+f).then(function(r){ return r.ok ? r.json() : null; })
+                              .catch(function(){ return null; });
+    }));
+  }).then(function(list){
+    var clean=sanitisePlans(list.filter(Boolean));
+    REPO = clean || [];
+    if(!REPO.length) REPO=[defaultPlan()];
+    renderSession();
+  }).catch(function(){
+    /* offline on a first run, or the files are missing: the built-in plan still works */
+    if(!REPO.length){ REPO=[defaultPlan()]; renderSession(); }
+  });
+}
 /* Anything that comes back out of storage is checked before it is trusted:
    a half-written plan must not be able to stop the app loading. */
 function sanitisePlans(raw){
@@ -2093,6 +2048,43 @@ function currentPlan(){
   for(var i=0;i<ps.length;i++) if(ps[i].id===S.planId) return ps[i];
   S.planId=ps[0].id;
   return ps[0];
+}
+/* Editing a repo plan writes to your copy of it, never to the shipped file. */
+function editablePlan(){
+  var id=S.planId;
+  if(isRepo(id)){
+    if(!edits()[id]) S.edits[id]=JSON.parse(JSON.stringify(repoPlan(id)));
+    return S.edits[id];
+  }
+  return currentPlan();
+}
+function revertPlan(){
+  if(planLocked() || !isEdited(S.planId)) return;
+  delete S.edits[S.planId];
+  save(); renderSession();
+}
+function planJson(){
+  var p=currentPlan();
+  return JSON.stringify({ id:p.id, name:p.name, note:p.note||'', blocks:p.blocks }, null, 2);
+}
+function copyPlan(){
+  var text=planJson(), note=document.getElementById('planHint');
+  var done=function(){ if(note) note.textContent='Copied. Paste it into plans/'+currentPlan().id+'.json.'; };
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, function(){ showPlanJson(text); });
+      return;
+    }
+  }catch(e){}
+  showPlanJson(text);
+}
+/* No clipboard (http, or an old browser): show it to copy by hand. */
+function showPlanJson(text){
+  var box=document.getElementById('planJson');
+  if(!box) return;
+  box.value=text;
+  box.style.display='block';
+  if(box.select) box.select();
 }
 function planMinutes(p){
   return p.blocks.reduce(function(a,b){ return a+(b.mins||0); },0);
@@ -2180,7 +2172,7 @@ function startTick(){
 }
 function stopTick(){ if(RUN.tick){ clearInterval(RUN.tick); RUN.tick=null; } }
 function blockDone(){
-  chime();
+  /* no sound: the prompt is the signal, and a chime mid-practice startles */
   offerBlock(RUN.idx+1);
 }
 function skipBlock(){
@@ -2218,13 +2210,6 @@ function endRun(){
   RUN.on=false; RUN.paused=false; RUN.waiting=false; RUN.idx=-1;
   releaseWake();
   renderSession();
-}
-/* A short bell, well above the drone so it cuts without being loud. */
-function chime(){
-  /* always the synth: a block change should not sound like a question */
-  var t=ctx().currentTime+0.02;
-  synthPluck(84, t, 1.1, 0.20);
-  synthPluck(91, t+0.16, 1.4, 0.16);
 }
 /* Keep the screen awake while a session runs; phones lock mid-question otherwise. */
 function requestWake(){
@@ -2274,7 +2259,8 @@ function fmtClock(ms){
   return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2);
 }
 function renderTimer(){
-  var pill=document.getElementById('timerPill');
+  var pill=document.getElementById('timerPill'), bar=document.getElementById('topbar');
+  if(bar) bar.classList.toggle('running', !!RUN.on);
   if(!pill) return;
   if(!RUN.on){ pill.style.display='none'; return; }
   var p=currentPlan(), b=p.blocks[RUN.idx];
@@ -2284,32 +2270,56 @@ function renderTimer(){
   var left = RUN.waiting ? (b ? b.mins*60000 : 0)
            : RUN.paused ? RUN.left : (RUN.endAt-Date.now());
   document.getElementById('timerLeft').textContent =
-    RUN.waiting ? 'ready' : fmtClock(left) + (RUN.paused ? ' \u23f8' : '');
+    RUN.waiting ? 'tap to start' : fmtClock(left) + (RUN.paused ? ' \u2014 tap to resume' : '');
 }
 function renderSession(){
   renderTimer();
   var p=currentPlan();
   var sel=document.getElementById('planSel');
   if(sel){
-    sel.innerHTML = plans().map(function(pl){
-      return '<option value="'+pl.id+'"'+(pl.id===S.planId?' selected':'')+'>'+
-             String(pl.name).replace(/</g,'&lt;')+'</option>';
-    }).join('');
+    var repoOpts='', mine='';
+    plans().forEach(function(pl){
+      var o='<option value="'+pl.id+'"'+(pl.id===S.planId?' selected':'')+'>'+
+            String(pl.name).replace(/</g,'&lt;')+(isEdited(pl.id)?' \u00b7 edited':'')+'</option>';
+      if(isRepo(pl.id)) repoOpts+=o; else mine+=o;
+    });
+    sel.innerHTML = (repoOpts ? '<optgroup label="From the repo">'+repoOpts+'</optgroup>' : '')+
+                    (mine ? '<optgroup label="Made here">'+mine+'</optgroup>' : '');
     sel.value=S.planId;
   }
   var nm=document.getElementById('planName');
   if(nm && nm.value!==p.name) nm.value=p.name;
   var start=document.getElementById('startSessBtn');
   if(start) start.style.display = RUN.on ? 'none' : '';
+  var pause=document.getElementById('pauseBtn');
+  if(pause){
+    pause.style.display = RUN.on ? '' : 'none';
+    pause.textContent = RUN.waiting ? 'Start block' : (RUN.paused ? 'Resume' : 'Pause');
+  }
   var skip=document.getElementById('skipBlockBtn');
   if(skip) skip.style.display = RUN.on ? '' : 'none';
   var stop=document.getElementById('stopSessBtn');
   if(stop) stop.style.display = RUN.on ? '' : 'none';
+  var src=document.getElementById('planSource');
+  if(src){
+    src.innerHTML = isRepo(p.id)
+      ? (isEdited(p.id)
+          ? '<strong style="color:var(--amber)">Edited here</strong> \u2014 your version, not the one in '+
+            'plans/'+p.id+'.json. Revert to go back to the shared copy.'
+          : 'From the repo \u2014 plans/'+p.id+'.json' + (p.note ? '. '+p.note : ''))
+      : 'Made in this browser. Copy JSON to put it in the repo.' + (p.note ? ' '+p.note : '');
+  }
+  var rev=document.getElementById('revertBtn');
+  if(rev) rev.style.display = isEdited(p.id) ? '' : 'none';
+  var del=document.getElementById('delPlanBtn');
+  if(del) del.style.display = isRepo(p.id) ? 'none' : '';
+  var box=document.getElementById('planJson');
+  if(box && box.style.display==='block' && !RUN.on) box.value=planJson();
   var hint=document.getElementById('planHint');
   if(hint){
     hint.textContent = RUN.on
-      ? (RUN.waiting ? 'Waiting for you \u2014 tap the timer, or Start it in the prompt.'
-                     : (RUN.paused ? 'Paused. Tap the timer to carry on.'
+      ? (RUN.waiting ? 'Waiting for you. Press Start block, or tap the timer at the top.'
+                     : (RUN.paused ? 'Paused. Press Resume, or tap the timer at the top.'
                                    : 'Running block '+(RUN.idx+1)+' of '+p.blocks.length+'.'))
       : planMinutes(p)+' minutes over '+p.blocks.length+' block'+(p.blocks.length===1?'':'s')+
         '. Each one asks before it starts.';
@@ -2380,7 +2390,7 @@ function renderPlanList(){
 function planLocked(){ return RUN.on; }
 function editBlock(i, field, value){
   if(planLocked()){ renderSession(); return; }
-  var p=currentPlan(), b=p.blocks[i];
+  var p=editablePlan(), b=p.blocks[i];
   if(!b) return;
   if(field==='mins'){
     var n=Math.round(parseFloat(value));
@@ -2398,20 +2408,20 @@ function editBlock(i, field, value){
 }
 function addBlock(){
   if(planLocked()) return;
-  currentPlan().blocks.push({ mins:3, mode:'both', level:'keep', key:'keep', cad:'keep',
+  editablePlan().blocks.push({ mins:3, mode:'both', level:'keep', key:'keep', cad:'keep',
                               hide:'keep', label:'', note:'' });
   save(); renderSession();
 }
 function removeBlock(i){
   if(planLocked()) return;
-  var p=currentPlan();
+  var p=editablePlan();
   if(p.blocks.length<=1) return;
   p.blocks.splice(i,1);
   save(); renderSession();
 }
 function moveBlock(i, d){
   if(planLocked()) return;
-  var p=currentPlan(), j=i+d;
+  var p=editablePlan(), j=i+d;
   if(j<0 || j>=p.blocks.length) return;
   var t=p.blocks[i]; p.blocks[i]=p.blocks[j]; p.blocks[j]=t;
   save(); renderSession();
@@ -2425,7 +2435,7 @@ function selectPlan(id){
 }
 function renamePlan(name){
   if(planLocked()) return;
-  currentPlan().name = String(name).slice(0,28) || 'Plan';
+  editablePlan().name = String(name).slice(0,28) || 'Plan';
   save();
   var sel=document.getElementById('planSel');
   if(sel){
@@ -2435,26 +2445,31 @@ function renamePlan(name){
 }
 function newPlan(){
   if(planLocked()) return;
-  var p={ id:planIdFor(), name:'New plan', blocks:[
+  var p={ id:planIdFor(), name:'New plan', note:'', blocks:[
     { mins:10, mode:'both', level:'keep', key:'keep', cad:'keep', hide:'keep', label:'', note:'' }]};
-  plans().push(p); S.planId=p.id; save(); renderSession();
+  localPlans().push(p); S.planId=p.id; save(); renderSession();
 }
 function duplicatePlan(){
   if(planLocked()) return;
   var p=JSON.parse(JSON.stringify(currentPlan()));
   p.id=planIdFor(); p.name=(p.name+' copy').slice(0,28);
-  plans().push(p); S.planId=p.id; save(); renderSession();
+  localPlans().push(p); S.planId=p.id; save(); renderSession();
 }
+/* Only your own plans can be deleted; a repo plan is reverted instead. */
 function deletePlan(){
+  if(planLocked()) return;
+  if(isRepo(S.planId)){ revertPlan(); return; }
+  if(localPlans().length<=0) return;
+  S.plans=localPlans().filter(function(p){ return p.id!==S.planId; });
   var ps=plans();
-  if(ps.length<=1 || planLocked()) return;
-  S.plans=ps.filter(function(p){ return p.id!==S.planId; });
-  S.planId=S.plans[0].id;
+  S.planId=ps.length ? ps[0].id : 'daily-12';
   save(); renderSession();
 }
 function resetPlans(){
   if(planLocked()) return;
-  S.plans=[defaultPlan()]; S.planId='default';
+  S.plans=[]; S.edits={};
+  var ps=plans();
+  S.planId=ps[0].id;
   save(); renderSession();
 }
 
@@ -2529,8 +2544,7 @@ function save(){
       tonic:S.tonic, level:S.level, mode:S.mode, context:S.context,
       voiceLo:S.voiceLo, voiceHi:S.voiceHi, droneVol:S.droneVol, micId:S.micId, keyMode:S.keyMode, keyEvery:S.keyEvery, masterVol:S.masterVol,
       cadMode:S.cadMode, cadChange:S.cadChange, cadEvery:S.cadEvery, cadGap:S.cadGap, open:S.open,
-      instrument:S.instrument,
-      plans:S.plans, planId:S.planId, hideNotes:S.hideNotes, theme:S.theme,
+      plans:S.plans, planId:S.planId, edits:S.edits, hideNotes:S.hideNotes, theme:S.theme,
       stats:S.stats, answered:S.answered
     }));
   }catch(e){}
@@ -2551,8 +2565,14 @@ function load(){
         if(typeof o.open[k]==='boolean') S.open[k]=o.open[k];
       });
     }
-    if(typeof o.instrument==='string') S.instrument=o.instrument;
-    if(o.plans) S.plans=sanitisePlans(o.plans);
+    if(o.plans) S.plans=sanitisePlans(o.plans) || [];
+    if(o.edits && typeof o.edits==='object'){
+      S.edits={};
+      Object.keys(o.edits).forEach(function(k){
+        var one=sanitisePlans([o.edits[k]]);
+        if(one && one.length){ one[0].id=k; S.edits[k]=one[0]; }
+      });
+    }
     if(typeof o.planId==='string') S.planId=o.planId;
     if(o.cadMode==='classic'||o.cadMode==='mixed') S.cadMode=o.cadMode;
     if(o.cadChange==='question'||o.cadChange==='n'||o.cadChange==='key'||o.cadChange==='fixed') S.cadChange=o.cadChange;
@@ -2595,13 +2615,7 @@ renderCadence();
 wireSections();
 applySections();
 renderSession();
-/* the instrument list is read from disk, not hard-coded, so new packs appear
-   on their own; whichever one you chose loads quietly in the background */
-try{
-  loadManifest().then(function(){
-    if(S.instrument && S.instrument!=='synth') setInstrument(S.instrument);
-  }).catch(function(){});
-}catch(e){}
+try{ loadRepoPlans(); }catch(e){}
 renderHideNotes();
 applyTheme();
 (function(){

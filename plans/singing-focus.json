@@ -1,0 +1,13 @@
+{
+  "id": "singing-focus",
+  "name": "Singing focus",
+  "note": "Production over recognition, for when naming is solid but the voice lags behind.",
+  "blocks": [
+    { "mins": 2, "mode": "match", "level": "keep", "key": "keep", "cad": "keep", "hide": "off",
+      "label": "Match the pitch", "note": "Longer than usual: this is the warm-up and the work." },
+    { "mins": 5, "mode": "produce", "level": "keep", "key": "keep", "cad": "keep", "hide": "keep",
+      "label": "Sing named degrees", "note": "Take the time to find each one before you sing." },
+    { "mins": 4, "mode": "both", "level": "keep", "key": "keep", "cad": "keep", "hide": "on",
+      "label": "Both halves", "note": "Hear it, sing it, name it." }
+  ]
+}
