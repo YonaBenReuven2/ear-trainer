@@ -7,8 +7,9 @@
 <meta name="theme-color" content="#3d3159" id="themeColorMeta">
 <script id="theme-boot">
 try{
-  var __t=JSON.parse(localStorage.getItem('eartrain.v1')||'{}').theme;
-  if(__t==='light'||__t==='dark') document.documentElement.setAttribute('data-theme',__t);
+  var __s=JSON.parse(localStorage.getItem('eartrain.v1')||'{}');
+  if(__s.theme==='light'||__s.theme==='dark') document.documentElement.setAttribute('data-theme',__s.theme);
+  if(__s.accent && __s.accent!=='plum') document.documentElement.setAttribute('data-accent',__s.accent);
 }catch(e){}
 </script>
 <meta name="mobile-web-app-capable" content="yes">
@@ -55,6 +56,24 @@ try{
   --d1:#e0ae45; --d2:#9bb8dc; --d3:#82b3e6; --d4:#e8956a; --d5:#4cc2b5; --d6:#b9a9e6; --d7:#f08b78;
   color-scheme:dark;
 }
+/* ---------- accents ----------
+   An accent only moves the three variables the app's own furniture uses. The
+   degree colours, and the green/amber/red that mean right, close and wrong,
+   are meaning rather than decoration, so they stay put. */
+:root[data-accent="blue"]{ --plum:#1a4b8f; --fill:#1f56a0; --fill-hover:#2a67ba }
+:root[data-accent="steel"]{ --plum:#2d4a5c; --fill:#2f5468; --fill-hover:#3b6579 }
+:root[data-accent="graphite"]{ --plum:#33343a; --fill:#3a3b42; --fill-hover:#4a4b54 }
+:root[data-accent="rose"]{ --plum:#8a2a4d; --fill:#9c2f57; --fill-hover:#b03a66 }
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"])[data-accent="blue"]{ --plum:#9cc4f6; --fill:#2f6ac0; --fill-hover:#3d7bd2 }
+  :root:not([data-theme="light"])[data-accent="steel"]{ --plum:#a6c6d8; --fill:#3a6b82; --fill-hover:#497e97 }
+  :root:not([data-theme="light"])[data-accent="graphite"]{ --plum:#cfd0d8; --fill:#53555f; --fill-hover:#64666f }
+  :root:not([data-theme="light"])[data-accent="rose"]{ --plum:#f0a8c0; --fill:#a84068; --fill-hover:#bd4d78 }
+}
+:root[data-theme="dark"][data-accent="blue"]{ --plum:#9cc4f6; --fill:#2f6ac0; --fill-hover:#3d7bd2 }
+:root[data-theme="dark"][data-accent="steel"]{ --plum:#a6c6d8; --fill:#3a6b82; --fill-hover:#497e97 }
+:root[data-theme="dark"][data-accent="graphite"]{ --plum:#cfd0d8; --fill:#53555f; --fill-hover:#64666f }
+:root[data-theme="dark"][data-accent="rose"]{ --plum:#f0a8c0; --fill:#a84068; --fill-hover:#bd4d78 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;background:var(--bg)}
 body{
@@ -326,6 +345,16 @@ header.running .crosslink{display:none}
     <button class="btn sm" data-th="light"  onclick="setTheme('light')">Light</button>
     <button class="btn sm" data-th="dark"   onclick="setTheme('dark')">Dark</button>
   </div>
+  <div class="lbl" style="margin-top:14px">Colour</div>
+  <div class="row" id="accentRow">
+    <button class="btn sm" data-ac="plum"     onclick="setAccent('plum')">Plum</button>
+    <button class="btn sm" data-ac="blue"     onclick="setAccent('blue')">Blue</button>
+    <button class="btn sm" data-ac="steel"    onclick="setAccent('steel')">Steel</button>
+    <button class="btn sm" data-ac="graphite" onclick="setAccent('graphite')">Graphite</button>
+    <button class="btn sm" data-ac="rose"     onclick="setAccent('rose')">Rose</button>
+  </div>
+  <div class="hint">Only the app's own colour changes. The green, amber and red of the answers mean
+  something, so they stay as they are.</div>
 
   </div></details>
 
@@ -434,6 +463,12 @@ header.running .crosslink{display:none}
     <button class="btn teal" id="micBtn" onclick="toggleMic()">Turn on the microphone</button>
     <span class="muted" id="micStatus">Off &mdash; singing modes will ask you to grade yourself</span>
   </div>
+  <label class="row" style="margin-top:10px;cursor:pointer">
+    <input id="micAuto" type="checkbox" onchange="setMicAuto(this.checked)"
+           style="width:18px;height:18px;accent-color:var(--fill)">
+    <span class="muted">Turn the microphone on when the app opens</span>
+  </label>
+  <div class="hint">Only once you have allowed it for this site. It never asks on its own.</div>
   <div class="row" id="micPickRow" style="display:none;margin-top:10px">
     <label class="muted" for="micSel">Sing into</label>
     <select id="micSel" style="max-width:100%;flex:1 1 220px" onchange="switchMic(this.value)"></select>
@@ -441,13 +476,13 @@ header.running .crosslink{display:none}
   <div class="warn" id="btWarn" style="display:none"></div>
   <div class="hint">Running as: <span id="envLine">&mdash;</span></div>
   <div class="warn" id="micHelp" style="display:none"></div>
-  </div></details>
   <div class="warn" id="phoneWarn" style="display:none">
     <strong>Use headphones.</strong> Without them the drone leaks into the microphone and the pitch
     detection gets confused. Wired headphones are best. With Bluetooth headphones, sing into the
     phone's or laptop's own microphone (pick it above) &mdash; using the headset's mic drops the
     headphones into phone-call quality.
   </div>
+  </div></details>
 </div>
 </details>
 
@@ -731,7 +766,7 @@ var S = {
   droneVol:0.55, micId:'', keyMode:'session', keyEvery:5, inKey:0, freshKey:true,
   cadMode:'classic', cadChange:'key', cadEvery:3, cadGap:0, cadId:'classic', cadClose:0, cadBpm:96, cadCount:0,
   open:{why:false, setup:false, session:false, progress:true, guide:false},
-  plans:null, planId:'daily-12', edits:null, masterVol:1, hideNotes:false, theme:'system',
+  plans:null, planId:'daily-12', edits:null, micAuto:false, accent:'plum', masterVol:1, hideNotes:false, theme:'system',
   stats:{}, recent:[], answered:0, current:null, lastDegree:null,
   phase:'idle'     // idle | sing | name | done
 };
@@ -1743,6 +1778,15 @@ function updateKeyNote(){
         'lower your bottom note or pick a higher tonic before you get there.');
 }
 /* ---------- appearance ---------- */
+/* name -> the colour the phone's status bar should take in light mode */
+var ACCENTS = { plum:'#3d3159', blue:'#1f56a0', steel:'#2f5468',
+                graphite:'#3a3b42', rose:'#9c2f57' };
+function setAccent(a){
+  if(!ACCENTS[a]) return;
+  S.accent=a;
+  applyTheme();
+  save();
+}
 function systemDark(){
   try { return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); }
   catch(e){ return false; }
@@ -1753,10 +1797,17 @@ function applyTheme(){
   if(root && root.setAttribute){
     if(S.theme==='light'||S.theme==='dark') root.setAttribute('data-theme',S.theme);
     else if(root.removeAttribute) root.removeAttribute('data-theme');
+    if(S.accent && S.accent!=='plum') root.setAttribute('data-accent',S.accent);
+    else if(root.removeAttribute) root.removeAttribute('data-accent');
   }
   /* the phone's status bar follows the app */
   var m=document.getElementById('themeColorMeta');
-  if(m && m.setAttribute) m.setAttribute('content', isDark() ? '#121116' : '#3d3159');
+  if(m && m.setAttribute) m.setAttribute('content', isDark() ? '#121116' : (ACCENTS[S.accent]||'#3d3159'));
+  var ar=document.getElementById('accentRow');
+  if(ar && ar.querySelectorAll){
+    var as=ar.querySelectorAll('.btn');
+    for(var j=0;j<as.length;j++) as[j].classList.toggle('on', as[j].getAttribute('data-ac')===S.accent);
+  }
   var row=document.getElementById('themeRow');
   if(row && row.querySelectorAll){
     var bs=row.querySelectorAll('.btn');
@@ -1871,6 +1922,35 @@ function updateKeyNow(){
   } else if(S.keyMode==='session') tail=' \u2014 new key next time you open the app';
   el.innerHTML='Key of <strong>'+noteName(S.tonic).replace(/-?\d/,'')+'</strong>'+tail;
 }
+/* ---------- opening with the microphone on ----------
+   Only when the browser already holds the permission: asking for a microphone
+   the moment a page loads is exactly the thing people refuse. */
+function setMicAuto(on){
+  S.micAuto=!!on;
+  renderMicAuto();
+  save();
+  if(S.micAuto && !micStream) autoStartMic();
+}
+function renderMicAuto(){
+  var c=document.getElementById('micAuto');
+  if(c) c.checked=!!S.micAuto;
+}
+function autoStartMic(){
+  if(!S.micAuto || micStream) return;
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+  var go=function(){ try{ ctx(); openMic(S.micId||''); }catch(e){} };
+  try{
+    if(navigator.permissions && navigator.permissions.query){
+      navigator.permissions.query({name:'microphone'}).then(function(st){
+        if(st && st.state==='granted') go();
+      }).catch(function(){ /* some browsers refuse the query: wait to be asked */ });
+      return;
+    }
+  }catch(e){}
+  /* no Permissions API: only try if this browser has given us a mic before */
+  if(S.micId) go();
+}
+
 /* ---------- collapsing sections ----------
    Each section remembers whether you left it open, and its summary carries the
    one line you would otherwise open it to read. */
@@ -1896,7 +1976,8 @@ function setSum(id, text){
   if(el) el.textContent=text;
 }
 function renderSubSummaries(){
-  setSum('themeSum', S.theme==='system' ? 'follows your system' : S.theme);
+  setSum('themeSum', (S.theme==='system' ? 'follows your system' : S.theme)+
+                     ' \u00b7 '+(S.accent||'plum'));
   setSum('rangeSum', noteName(S.voiceLo)+' to '+noteName(S.voiceHi));
   setSum('keySum', noteName(S.tonic).replace(/-?\d/,'')+' \u00b7 '+
     (S.keyMode==='fixed' ? 'fixed' :
@@ -1922,10 +2003,11 @@ function renderSummaries(){
   var se=document.getElementById('sessSum');
   if(se){
     var pl=currentPlan();
+    /* no clock here: it would only be right at the moment it was drawn, and the
+       timer in the bar at the top ticks properly */
     se.textContent = RUN.on
       ? (RUN.waiting ? blockTitle(pl.blocks[RUN.idx])+' \u00b7 ready'
-                     : blockTitle(pl.blocks[RUN.idx])+' \u00b7 '+
-                       fmtClock(RUN.paused ? RUN.left : RUN.endAt-Date.now())+(RUN.paused?' paused':''))
+                     : blockTitle(pl.blocks[RUN.idx])+(RUN.paused ? ' \u00b7 paused' : ' \u00b7 running'))
       : pl.name+' \u00b7 '+planMinutes(pl)+' min';
   }
   var pr=document.getElementById('progSum');
@@ -2546,7 +2628,7 @@ function save(){
       tonic:S.tonic, level:S.level, mode:S.mode, context:S.context,
       voiceLo:S.voiceLo, voiceHi:S.voiceHi, droneVol:S.droneVol, micId:S.micId, keyMode:S.keyMode, keyEvery:S.keyEvery, masterVol:S.masterVol,
       cadMode:S.cadMode, cadChange:S.cadChange, cadEvery:S.cadEvery, cadGap:S.cadGap, open:S.open,
-      plans:S.plans, planId:S.planId, edits:S.edits, hideNotes:S.hideNotes, theme:S.theme,
+      plans:S.plans, planId:S.planId, edits:S.edits, micAuto:S.micAuto, accent:S.accent, hideNotes:S.hideNotes, theme:S.theme,
       stats:S.stats, answered:S.answered
     }));
   }catch(e){}
@@ -2571,6 +2653,8 @@ function load(){
         if(typeof o.open[k]==='boolean') S.open[k]=o.open[k];
       });
     }
+    if(typeof o.micAuto==='boolean') S.micAuto=o.micAuto;
+    if(ACCENTS[o.accent]) S.accent=o.accent;
     if(o.plans) S.plans=sanitisePlans(o.plans) || [];
     if(o.edits && typeof o.edits==='object'){
       S.edits={};
@@ -2618,10 +2702,12 @@ if(S.keyMode==='session') rotateKey();
 renderKeyMode();
 if(S.cadMode==='mixed') pickCadence(true, null);
 renderCadence();
+renderMicAuto();
 wireSections();
 applySections();
 renderSession();
 try{ loadRepoPlans(); }catch(e){}
+try{ autoStartMic(); }catch(e){}
 renderHideNotes();
 applyTheme();
 (function(){
