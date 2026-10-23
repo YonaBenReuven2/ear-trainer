@@ -1,0 +1,37 @@
+{
+    "id": "level-1-daily-12",
+    "name": "Level 1 - Daily 12 minutes",
+    "note": "",
+    "blocks": [
+        {
+            "mins": 1,
+            "mode": "both",
+            "level": "keep",
+            "key": "session",
+            "cad": "classic",
+            "hide": "on",
+            "label": "Warm up in one key",
+            "note": "One key, so do settles in your ear."
+        },
+        {
+            "mins": 5,
+            "mode": "both",
+            "level": "keep",
+            "key": "2",
+            "cad": "classic",
+            "hide": "on",
+            "label": "Main block",
+            "note": "Your ladder step, note names hidden. This is the one that counts."
+        },
+        {
+            "mins": 6,
+            "mode": "produce",
+            "level": "keep",
+            "key": "5",
+            "cad": "classic",
+            "hide": "on",
+            "label": "Reverse it",
+            "note": "Name to sound — the direction everyone neglects."
+        }
+    ]
+}
