@@ -13,9 +13,12 @@
 try{
   var __t=JSON.parse(localStorage.getItem('tuner.v1')||'{}').theme;
   if(__t==='light'||__t==='dark') document.documentElement.setAttribute('data-theme',__t);
+  /* the colour is chosen in the ear trainer and shared with this page */
+  var __a=JSON.parse(localStorage.getItem('eartrain.v1')||'{}').accent;
+  if(__a && __a!=='plum') document.documentElement.setAttribute('data-accent',__a);
 }catch(e){}
 </script>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233d3159'/%3E%3Ctext x='32' y='45' font-size='34' text-anchor='middle' fill='%23f5d98a' font-family='Georgia,serif'%3E%E2%99%AA%3C/text%3E%3C/svg%3E">
+<link rel="icon" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233d3159'/%3E%3Ctext x='32' y='45' font-size='34' text-anchor='middle' fill='%23f5d98a' font-family='Georgia,serif'%3E%E2%99%AA%3C/text%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#ffffff; --card:#ffffff; --soft:#f7f7fa; --line:#e2e2e8;
@@ -49,6 +52,24 @@ try{
   --header-bg:rgba(18,17,22,.94);
   color-scheme:dark;
 }
+/* ---------- accents ----------
+   Picked under Appearance in the ear trainer; the same values as there, so the
+   two pages always match. Only the page's own furniture moves; the green,
+   amber and red of in tune / close / off stay put. */
+:root[data-accent="blue"]{ --plum:#1a4b8f; --fill:#1f56a0; --fill-hover:#2a67ba }
+:root[data-accent="steel"]{ --plum:#2d4a5c; --fill:#2f5468; --fill-hover:#3b6579 }
+:root[data-accent="graphite"]{ --plum:#33343a; --fill:#3a3b42; --fill-hover:#4a4b54 }
+:root[data-accent="rose"]{ --plum:#8a2a4d; --fill:#9c2f57; --fill-hover:#b03a66 }
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"])[data-accent="blue"]{ --plum:#9cc4f6; --fill:#2f6ac0; --fill-hover:#3d7bd2 }
+  :root:not([data-theme="light"])[data-accent="steel"]{ --plum:#a6c6d8; --fill:#3a6b82; --fill-hover:#497e97 }
+  :root:not([data-theme="light"])[data-accent="graphite"]{ --plum:#cfd0d8; --fill:#53555f; --fill-hover:#64666f }
+  :root:not([data-theme="light"])[data-accent="rose"]{ --plum:#f0a8c0; --fill:#a84068; --fill-hover:#bd4d78 }
+}
+:root[data-theme="dark"][data-accent="blue"]{ --plum:#9cc4f6; --fill:#2f6ac0; --fill-hover:#3d7bd2 }
+:root[data-theme="dark"][data-accent="steel"]{ --plum:#a6c6d8; --fill:#3a6b82; --fill-hover:#497e97 }
+:root[data-theme="dark"][data-accent="graphite"]{ --plum:#cfd0d8; --fill:#53555f; --fill-hover:#64666f }
+:root[data-theme="dark"][data-accent="rose"]{ --plum:#f0a8c0; --fill:#a84068; --fill-hover:#bd4d78 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;background:var(--bg)}
 body{margin:0;background:var(--bg);color:var(--ink);
@@ -275,7 +296,7 @@ function median(a){ var b=a.slice().sort(function(x,y){return x-y;}); return b[b
 /* =========================================================================
    NAMING
    ========================================================================= */
-var S = { a4:440, acc:'mixed', holdMs:450, theme:'system', micId:'' };
+var S = { a4:440, acc:'mixed', holdMs:450, theme:'system', micId:'', accent:'plum' };
 var NAMES = {
   mixed:['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'],
   sharp:['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'],
@@ -542,11 +563,32 @@ function systemDark(){
   catch(e){ return false; }
 }
 function isDark(){ return S.theme==='dark' || (S.theme==='system' && systemDark()); }
+/* name -> the colour of the status bar and tab icon in light mode; the same
+   map as the ear trainer's */
+var ACCENTS = { plum:'#3d3159', blue:'#1f56a0', steel:'#2f5468',
+                graphite:'#3a3b42', rose:'#9c2f57' };
+function faviconFor(fill){
+  return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E" +
+    "%3Crect width='64' height='64' rx='14' fill='" + encodeURIComponent(fill) + "'/%3E" +
+    "%3Ctext x='32' y='45' font-size='34' text-anchor='middle' fill='%23f5d98a' " +
+    "font-family='Georgia,serif'%3E%E2%99%AA%3C/text%3E%3C/svg%3E";
+}
+/* the colour lives in the ear trainer's settings, not this page's */
+function readAccent(){
+  try{
+    var a=JSON.parse(localStorage.getItem('eartrain.v1')||'{}').accent;
+    S.accent = ACCENTS[a] ? a : 'plum';
+  }catch(e){ S.accent='plum'; }
+}
 function applyTheme(){
   var r=document.documentElement;
   if(S.theme==='system') r.removeAttribute('data-theme'); else r.setAttribute('data-theme',S.theme);
+  if(S.accent && S.accent!=='plum') r.setAttribute('data-accent',S.accent);
+  else r.removeAttribute('data-accent');
   var m=document.getElementById('themeColorMeta');
-  if(m) m.setAttribute('content', isDark() ? '#121116' : '#3d3159');
+  if(m) m.setAttribute('content', isDark() ? '#121116' : (ACCENTS[S.accent]||'#3d3159'));
+  var fav=document.getElementById('favicon');
+  if(fav) fav.setAttribute('href', faviconFor(ACCENTS[S.accent]||ACCENTS.plum));
   var b=document.getElementById('themeBtn');
   if(b) b.innerHTML = '<span class="wide">Theme: </span>' +
     (S.theme==='system' ? 'auto' : S.theme);
@@ -560,6 +602,13 @@ try{
     var mq=window.matchMedia('(prefers-color-scheme:dark)');
     if(mq.addEventListener) mq.addEventListener('change', applyTheme);
   }
+}catch(e){}
+/* on a computer both pages can be open in different tabs: a colour picked in
+   the ear trainer reaches this one straight away */
+try{
+  window.addEventListener('storage', function(e){
+    if(e.key==='eartrain.v1' || e.key===null){ readAccent(); applyTheme(); }
+  });
 }catch(e){}
 
 function save(){
@@ -589,6 +638,7 @@ try {
 } catch(e){}
 
 load();
+readAccent();
 applyTheme();
 (function(){
   var a=document.getElementById('a4'); if(a) a.value=S.a4;

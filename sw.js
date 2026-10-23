@@ -1,7 +1,7 @@
 /* Offline shell for the ear trainer and its note-detector page.
    Network first so a re-upload reaches you, cache fallback so a tunnel,
    a plane or no signal doesn't stop a practice session. */
-var CACHE = 'eartrainer-v17';
+var CACHE = 'eartrainer-v18';
 var SHELL = [
   './',
   './index.html',
@@ -14,7 +14,9 @@ var SHELL = [
   './plans/daily-12.json',
   './plans/short-6.json',
   './plans/key-drill.json',
-  './plans/singing-focus.json'
+  './plans/singing-focus.json',
+  './plans/level-2-daily-12.json',
+  './plans/level-1-daily-12.json'
 ];
 
 self.addEventListener('install', function (e) {
