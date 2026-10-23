@@ -1,0 +1,37 @@
+{
+    "id": "default",
+    "name": "Level 2 - Daily 12 minutes",
+    "note": "Recognition on Level 2; production finishing Level 1.",
+    "blocks": [
+        {
+            "mins": 2,
+            "mode": "both",
+            "level": "1",
+            "key": "session",
+            "cad": "classic",
+            "hide": "on",
+            "label": "Warm up: re and la in one key",
+            "note": "One key, so the two new notes settle against do."
+        },
+        {
+            "mins": 5,
+            "mode": "both",
+            "level": "1",
+            "key": "5",
+            "cad": "classic",
+            "hide": "on",
+            "label": "Main block: Level 2",
+            "note": "Re falls to do, la falls to sol. Feel which way it leans."
+        },
+        {
+            "mins": 5,
+            "mode": "produce",
+            "level": "0",
+            "key": "1",
+            "cad": "mixed",
+            "hide": "on",
+            "label": "Reverse it: Level 1",
+            "note": "A new key every question, and a cadence that doesn't hand you sol."
+        }
+    ]
+}
