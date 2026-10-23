@@ -1,7 +1,7 @@
 /* Offline shell for the ear trainer and its note-detector page.
    Network first so a re-upload reaches you, cache fallback so a tunnel,
    a plane or no signal doesn't stop a practice session. */
-var CACHE = 'eartrainer-v16';
+var CACHE = 'eartrainer-v17';
 var SHELL = [
   './',
   './index.html',
