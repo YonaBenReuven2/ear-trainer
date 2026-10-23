@@ -103,6 +103,12 @@ a.btn{text-decoration:none;display:inline-block}
 .modal .sheet{background:var(--card);border:1px solid var(--line);border-radius:14px;
   padding:20px;max-width:420px;width:100%;box-shadow:0 18px 50px rgba(0,0,0,.35)}
 .mtitle{font-size:21px;font-weight:700;color:var(--plum);margin:2px 0 8px;line-height:1.25}
+/* a two-option segmented control */
+.seg{display:flex;border:1.5px solid var(--fill);border-radius:10px;overflow:hidden}
+.segopt{flex:1 1 0;border:0;background:var(--card);color:var(--plum);font:inherit;font-size:13.5px;
+  font-weight:700;padding:9px 8px;cursor:pointer;line-height:1.25}
+.segopt+.segopt{border-left:1.5px solid var(--fill)}
+.segopt.on{background:var(--fill);color:var(--on-fill)}
 .blk{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--line)}
 .blk:first-child{border-top:0}
 .blk .n{width:20px;flex:none;color:var(--grey);font-size:12px;font-weight:700}
@@ -210,6 +216,45 @@ button{font:inherit}
 .fb.good .big{color:var(--teal)} .fb.bad .big{color:var(--red)} .fb.info .big{color:var(--amber)}
 .fb .char{font-size:14px;color:var(--ink);font-style:italic}
 
+/* ---------- practice controls ---------- */
+.modepick{position:relative;margin:0 0 12px}
+.modebtn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;
+  border:1.5px solid var(--line);border-radius:12px;background:var(--soft);color:var(--ink);
+  padding:10px 14px;font:inherit}
+.modebtn:hover,.modebtn.open{border-color:var(--plum)}
+.modebtn .mk{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--grey)}
+.modebtn .mv{flex:1 1 auto;font-weight:700;color:var(--plum);font-size:15.5px}
+.chev{width:18px;height:18px;flex:none;fill:none;stroke:var(--grey);stroke-width:2.2;
+  stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.modebtn.open .chev{transform:rotate(180deg)}
+.modemenu{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:40;background:var(--card);
+  border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 14px 34px rgba(0,0,0,.22)}
+.mopt{display:block;width:100%;text-align:left;border:0;background:transparent;color:var(--ink);
+  font:inherit;padding:10px 12px;border-radius:9px;cursor:pointer}
+.mopt:hover{background:var(--hover)}
+.mopt b{display:block;font-size:15px;color:var(--plum);margin-bottom:2px}
+.mopt span{display:block;font-size:13px;color:var(--grey);line-height:1.4}
+.mopt.on{background:var(--soft);box-shadow:inset 3px 0 0 var(--fill)}
+.bigbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
+  margin:2px 0 10px;border:1.6px solid var(--fill);border-radius:14px;padding:14px 18px;
+  font:inherit;font-size:17px;font-weight:700;background:var(--fill);color:var(--on-fill);
+  cursor:pointer;transition:background .12s}
+.bigbtn:hover{background:var(--fill-hover);border-color:var(--fill-hover)}
+.bigbtn::after{content:"\2192";font-size:19px;line-height:1}
+/* mid-question it is still there, just not asking to be pressed */
+.bigbtn.quiet{background:transparent;color:var(--grey);border-color:var(--line);
+  font-size:14.5px;padding:10px 14px}
+.bigbtn.quiet:hover{border-color:var(--plum);color:var(--plum)}
+.bigbtn.quiet::after{content:none}
+.tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 10px}
+.tool{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  padding:9px 4px 8px;border-radius:12px;border:1px solid var(--line);background:var(--soft);
+  color:var(--ink);font:inherit;font-size:12.5px;font-weight:600;line-height:1.2;cursor:pointer;
+  text-align:center;min-height:58px}
+.tool svg{width:21px;height:21px;fill:none;stroke:var(--plum);stroke-width:1.9;
+  stroke-linecap:round;stroke-linejoin:round}
+.tool:hover:not(:disabled){border-color:var(--plum)}
+.tool:disabled{opacity:.38;cursor:default}
 /* ---------- step indicator ---------- */
 .steps{display:flex;gap:6px;margin:0 0 12px}
 .step{flex:1;font-size:11.5px;font-weight:700;text-align:center;padding:5px 4px;border-radius:6px;
@@ -307,6 +352,14 @@ header.running .crosslink{display:none}
     <div class="lbl" id="modalKicker">Next block</div>
     <div class="mtitle" id="modalTitle"></div>
     <p class="muted" id="modalBody" style="margin-bottom:14px"></p>
+    <div id="modalKey" style="display:none;margin:0 0 16px">
+      <div class="lbl" style="margin-bottom:6px">Key for this block</div>
+      <div class="seg" role="radiogroup">
+        <button class="segopt" id="carryYes" role="radio" onclick="setCarry(true)"></button>
+        <button class="segopt" id="carryNo" role="radio" onclick="setCarry(false)">Start in a new key</button>
+      </div>
+      <div class="hint" id="carryHint" style="margin-bottom:0"></div>
+    </div>
     <div class="row">
       <button class="btn primary" id="modalGo" onclick="modalGoClick()">Start it</button>
       <button class="btn sm" onclick="holdSession()">Hold</button>
@@ -531,21 +584,33 @@ header.running .crosslink{display:none}
 <!-- ===================== PRACTICE ===================== -->
 <h2>Practice</h2>
 <div class="card" id="practice">
-  <div class="row" id="modeRow" style="margin-bottom:8px">
-    <button class="btn sm" data-mode="match"    onclick="setMode('match')">Match the pitch</button>
-    <button class="btn sm" data-mode="identify" onclick="setMode('identify')">Identify only</button>
-    <button class="btn sm" data-mode="produce"  onclick="setMode('produce')">Sing a named degree</button>
-    <button class="btn sm on" data-mode="both"  onclick="setMode('both')">Hear &rarr; sing &rarr; name</button>
+  <!-- what kind of question: one choice, so one control -->
+  <div class="modepick" id="modePick">
+    <button type="button" class="modebtn" id="modeBtn" aria-haspopup="listbox" aria-expanded="false"
+            onclick="toggleModeMenu()">
+      <span class="mk">Mode</span>
+      <span class="mv" id="modeName">Hear &rarr; sing &rarr; name</span>
+      <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="modemenu" id="modeMenu" role="listbox" style="display:none">
+      <button type="button" class="mopt" role="option" data-mode="match"    onclick="chooseMode('match')">Match the pitch</button>
+      <button type="button" class="mopt" role="option" data-mode="identify" onclick="chooseMode('identify')">Identify only</button>
+      <button type="button" class="mopt" role="option" data-mode="produce"  onclick="chooseMode('produce')">Sing a named degree</button>
+      <button type="button" class="mopt" role="option" data-mode="both"     onclick="chooseMode('both')">Hear &rarr; sing &rarr; name</button>
+    </div>
   </div>
-  <div class="hint" id="modeHint" style="margin-top:0"></div>
+  <div class="hint" id="modeHint" style="display:none"></div>
 
   <div class="steps" id="steps"></div>
 
-  <div class="row" style="margin-bottom:6px">
-    <button class="btn primary" id="newBtn" onclick="newQuestion()">New note</button>
-    <button class="btn sm" id="replayBtn" onclick="replay()" disabled>Replay</button>
-    <button class="btn sm" id="ctxBtn" onclick="replayContext()" disabled>Re-establish the key</button>
-    <button class="btn sm" id="inctxBtn" onclick="hearInContext()" disabled>Hear it against do</button>
+  <!-- the one thing you press every question -->
+  <button type="button" class="bigbtn" id="newBtn" onclick="newQuestion()">New note</button>
+
+  <!-- help while answering: secondary, so they look it -->
+  <div class="tools" id="tools">
+    <button type="button" class="tool" id="replayBtn" onclick="replay()" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4.5V9h4.5"/></svg><span>Replay note</span></button>
+    <button type="button" class="tool" id="ctxBtn" onclick="replayContext()" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V21"/><path d="M5 13.5a7 7 0 0 0 14 0"/><path d="M8.5 10.5h7"/></svg><span>Replay key</span></button>
+    <button type="button" class="tool" id="inctxBtn" onclick="hearInContext()" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="7" cy="17.5" rx="3" ry="2.3"/><ellipse cx="17" cy="8.5" rx="3" ry="2.3"/><path d="M9.6 15.6l4.8-5.2" stroke-dasharray="2 2.2"/></svg><span>Against do</span></button>
   </div>
 
   <div id="selfCheck" class="card" style="display:none;margin:10px 0;background:var(--info-bg);
@@ -630,7 +695,7 @@ header.running .crosslink{display:none}
   <h3>Every question</h3>
   <p class="muted" style="margin-bottom:10px">
   <strong>After a key change, find <em>do</em> before you answer.</strong> Hum it quietly the moment the
-  cadence ends. If you can&rsquo;t, press <em>Re-establish the key</em> &mdash; that isn&rsquo;t cheating,
+  cadence ends. If you can&rsquo;t, press <em>Replay key</em> &mdash; that isn&rsquo;t cheating,
   it&rsquo;s the skill.<br>
   <strong>Sing the note before you name it.</strong> Then feel which way it wants to move &mdash; up to
   <em>do</em>, down to <em>sol</em>, nowhere at all. The pull tells you the degree.<br>
@@ -766,7 +831,7 @@ var S = {
   droneVol:0.55, micId:'', keyMode:'session', keyEvery:5, inKey:0, freshKey:true,
   cadMode:'classic', cadChange:'key', cadEvery:3, cadGap:0, cadId:'classic', cadClose:0, cadBpm:96, cadCount:0,
   open:{why:false, setup:false, session:false, progress:true, guide:false},
-  plans:null, planId:'daily-12', edits:null, micAuto:false, accent:'plum', masterVol:1, hideNotes:false, theme:'system',
+  plans:null, planId:'daily-12', edits:null, micAuto:false, accent:'plum', carryKey:true, masterVol:1, hideNotes:false, theme:'system',
   stats:{}, recent:[], answered:0, current:null, lastDegree:null,
   phase:'idle'     // idle | sing | name | done
 };
@@ -791,13 +856,74 @@ function rangeFor(level,tonic){
   if(LEVELS[level].wide){ lo=tonic-5; hi=tonic+12; }
   return {lo:lo,hi:hi};
 }
+/* ---------- fair randomness ----------
+   Independent random draws clump. Measured over 5000 questions: with do-mi-sol
+   one note went missing for 13 questions running, and with all seven degrees,
+   for 51. So notes come out of a shuffled bag instead -- everything in the bag
+   comes out once before anything comes out twice -- and a degree you keep
+   missing gets an extra ticket in the bag, so it still comes up more often. */
+function shuffle(a){
+  for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
+/* Order a fresh bag at random, within limits: no two neighbours match, and
+   nothing returns sooner than minGap or waits longer than maxGap since it was
+   last used -- which is what stops the seam between one bag and the next from
+   bunching notes up or leaving one out. `recent` is what came out lately,
+   oldest first. A second copy of a weak degree only has to avoid its twin. If
+   no random order passes, oldest-first always does. */
+var FAIR_FALLBACKS = 0;
+function fairOrder(items, recent, minGap, maxGap){
+  minGap=minGap||0; maxGap=maxGap||Infinity;
+  var age=function(x){ var i=recent.lastIndexOf(x); return i<0 ? Infinity : recent.length-i; };
+  var last=recent.length ? recent[recent.length-1] : null;
+  var passes=function(out){
+    if(out.length>1 && out[0]===last) return false;
+    var seen={};
+    for(var i=0;i<out.length;i++){
+      if(i>0 && out[i]===out[i-1]) return false;
+      if(seen[out[i]]) continue;
+      seen[out[i]]=1;
+      var g=age(out[i])+i;
+      if(g<minGap) return false;
+      if(g>maxGap && age(out[i])!==Infinity) return false;
+    }
+    return true;
+  };
+  var out=items.slice();
+  for(var tries=0; tries<600; tries++){
+    shuffle(out);
+    if(passes(out)) return out;
+  }
+  FAIR_FALLBACKS++;
+  return shuffle(items.slice()).sort(function(a,b){ return age(b)-age(a); });
+}
+function remember(list, x, keep){
+  list.push(x);
+  while(list.length>keep) list.shift();
+  return list;
+}
+function buildDegreeBag(){
+  var act=activeDegrees(), w={}, least=Infinity;
+  act.forEach(function(n){ w[n]=weightFor(n); least=Math.min(least,w[n]); });
+  /* A weak degree gets one extra ticket -- twice as likely, never more -- and
+     only the weakest half of the level get one, so the solid ones are never
+     crowded out. Only the difference matters: if everything is equally shaky,
+     nobody needs extra. */
+  var weak=act.filter(function(n){ return w[n]-least>=0.5; })
+              .sort(function(a,b){ return w[b]-w[a]; })
+              .slice(0, Math.ceil(act.length/2));
+  var bag=act.slice().concat(weak);
+  return fairOrder(bag, (S.degHist||[]).slice(-12), Math.min(3, act.length-1), bag.length+3);
+}
 function pickQuestion(){
   var act=activeDegrees();
-  var pool=act.filter(function(n){ return act.length<=1 || n!==S.lastDegree; });
-  if(!pool.length) pool=act;
-  var w=pool.map(weightFor), tot=w.reduce(function(a,b){return a+b;},0);
-  var r=Math.random()*tot, pick=pool[pool.length-1];
-  for(var i=0;i<pool.length;i++){ r-=w[i]; if(r<=0){ pick=pool[i]; break; } }
+  var stale = !S.degBag || S.degBag.some(function(n){ return act.indexOf(n)<0; }) ||
+              S.degBagLevel!==S.level;
+  if(stale){ S.degBag=[]; S.degBagLevel=S.level; }
+  if(!S.degBag.length) S.degBag=buildDegreeBag();
+  var pick=S.degBag.shift();
+  S.degHist=remember(S.degHist||[], pick, 12);
   var deg=degByN(pick), offs=offsetsFor(deg);
   var off=offs[Math.floor(Math.random()*offs.length)];
   S.lastDegree=pick;
@@ -1394,10 +1520,10 @@ function noteName(m){ return NOTE_NAMES[((m%12)+12)%12] + (Math.floor(m/12)-1); 
    UI
    ========================================================================= */
 var MODE_HINTS = {
-  match:    'Hear a note, sing it back. No naming at all — this is the warm-up that builds the link between hearing and producing.',
-  identify: 'Hear a note, click which degree it was. No microphone needed.',
-  produce:  'You are given a degree name; sing it, and the microphone checks you. This trains the direction most people neglect — name to sound.',
-  both:     'Hear a note, sing it back (checked), then name it (checked). Trains recognition and production together.'
+  match:    'Hear a note and sing it back. No naming \u2014 the warm-up that links hearing to singing.',
+  identify: 'Hear a note and pick its degree. No singing, no microphone.',
+  produce:  'You\u2019re given a degree and sing it. Name to sound \u2014 the direction most people neglect.',
+  both:     'Hear a note, sing it back, then name it. Recognition and production together.'
 };
 function isSingMode(m){ return m==='match'||m==='produce'||m==='both'; }
 /* Sing modes work without a microphone too -- you just grade yourself. */
@@ -1411,17 +1537,50 @@ function setMode(m){
 }
 function scoredKind(){ return (S.mode==='match'||S.mode==='produce') ? 'sing' : 'id'; }
 function renderMode(){
-  document.querySelectorAll('#modeRow .btn').forEach(function(b){
-    b.classList.toggle('on', b.getAttribute('data-mode')===S.mode);
-    b.disabled = false;
-    b.title = isSingMode(b.getAttribute('data-mode')) && !analyser
-      ? 'Works without a microphone — you grade yourself' : '';
+  var nm=document.getElementById('modeName');
+  if(nm) nm.textContent=MODE_NAMES[S.mode];
+  /* the descriptions live in the menu, beside the choice they describe */
+  document.querySelectorAll('#modeMenu .mopt').forEach(function(b){
+    var m=b.getAttribute('data-mode'), on=(m===S.mode);
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-selected', String(on));
+    b.innerHTML='<b>'+MODE_NAMES[m]+'</b><span>'+MODE_HINTS[m]+'</span>';
   });
-  var h=MODE_HINTS[S.mode];
-  if(usingSelfCheck()) h += '  —  no microphone here, so you will grade yourself. ' +
-                            'Less reliable, but it still trains production.';
-  document.getElementById('modeHint').textContent=h;
+  /* the one thing worth saying outside the menu: you are grading yourself */
+  var h=document.getElementById('modeHint');
+  if(h){
+    var t = usingSelfCheck() ? 'No microphone on \u2014 you will grade your singing yourself.' : '';
+    h.textContent=t; h.style.display = t ? '' : 'none';
+  }
   renderSteps();
+}
+function toggleModeMenu(force){
+  var m=document.getElementById('modeMenu'), b=document.getElementById('modeBtn');
+  if(!m || !b) return;
+  /* closed unless explicitly shown, whatever the stylesheet says */
+  var open = force!==undefined ? !!force : m.style.display!=='block';
+  m.style.display = open ? 'block' : 'none';
+  b.setAttribute('aria-expanded', String(open));
+  b.classList.toggle('open', open);
+}
+function chooseMode(m){
+  toggleModeMenu(false);
+  if(m!==S.mode) setMode(m);
+}
+try{
+  document.addEventListener('click', function(e){
+    var pick=document.getElementById('modePick');
+    if(pick && pick.contains && !pick.contains(e.target)) toggleModeMenu(false);
+  });
+}catch(e){}
+/* The big button says what pressing it would do right now. */
+function renderNextBtn(){
+  var b=document.getElementById('newBtn');
+  if(!b) return;
+  var mid = !!S.current && S.phase!=='idle' && S.phase!=='done';
+  b.textContent = !S.current || S.phase==='idle' ? 'New note'
+                : S.phase==='done' ? 'Next note' : 'Skip this one';
+  b.classList.toggle('quiet', mid);
 }
 /* Explicit map -- building these ids by string surgery is how they drift apart. */
 var CTX_BTN = { drone:'ctxDrone', cadence:'ctxCad', both:'ctxBoth' };
@@ -1440,13 +1599,14 @@ function renderSteps(){
           : S.mode==='produce' ? ['Read the name','Sing it']
           : ['Hear it','Name it'];
   var idx = S.phase==='idle' ? -1
-          : S.phase==='sing' ? (S.mode==='produce'?1:1)
+          : S.phase==='hear' ? 0
+          : S.phase==='sing' ? 1
           : S.phase==='name' ? seq.length-1 : seq.length;
-  if(S.phase!=='idle' && S.mode==='identify') idx = 1;
   el.innerHTML = seq.map(function(s,i){
     var cls = i<idx ? 'step done' : (i===idx ? 'step active' : 'step');
     return '<div class="'+cls+'">'+s+'</div>';
   }).join('');
+  renderNextBtn();
 }
 function resetQuestionUI(){
   S.phase='idle'; S.current=null;
@@ -1457,7 +1617,6 @@ function resetQuestionUI(){
   ['replayBtn','ctxBtn','inctxBtn'].forEach(function(id){
     document.getElementById(id).disabled=true;
   });
-  document.getElementById('newBtn').textContent='New note';
   stopListening();
   renderSteps();
 }
@@ -1476,7 +1635,8 @@ function newQuestion(){
   ['replayBtn','ctxBtn','inctxBtn'].forEach(function(id){
     document.getElementById(id).disabled=false;
   });
-  document.getElementById('newBtn').textContent='Skip to next';
+  /* a question has started: the first step lights up and the big button steps back */
+  S.phase='hear'; renderSteps();
 
   if(S.mode==='produce'){
     // name is given; she sings it
@@ -1868,10 +2028,21 @@ function rotationKeys(){
   }
   return all.length>1 ? all : cur;
 }
+/* Keys come out of a bag too: every key that fits your range is used once
+   before any comes back. The bag is saved, so "a new key each session" walks
+   through all of them across days instead of drawing afresh each morning. */
 function rotateKey(){
-  var keys=rotationKeys().filter(function(t){ return t!==S.tonic; });
-  if(!keys.length) return false;
-  S.tonic=keys[Math.floor(Math.random()*keys.length)];
+  var keys=rotationKeys(), others=keys.filter(function(t){ return t!==S.tonic; });
+  if(!others.length) return false;
+  var bag=(S.keyBag||[]).filter(function(t){ return others.indexOf(t)>=0; });
+  if(!bag.length){
+    var hist=(S.keyHist||[]).concat([S.tonic]);
+    /* with eight keys, none returns within six changes */
+    bag=fairOrder(others.slice(), hist, Math.max(2, keys.length-2), keys.length+2);
+  }
+  S.keyHist=remember(S.keyHist||[], S.tonic, 12);
+  S.tonic=bag.shift();
+  S.keyBag=bag;
   var sel=document.getElementById('tonicSel');
   if(sel) sel.value=S.tonic;
   updateKeyNote();
@@ -2210,7 +2381,34 @@ function offerBlock(i){
   var b=p.blocks[i];
   showModal('Block '+(i+1)+' of '+p.blocks.length, blockTitle(b),
             blockSummary(b) + (b.note ? ' \u2014 ' + b.note : ''), 'Start it');
+  renderCarry(b);
   renderSession();
+}
+/* When a block starts moving keys every few questions, you choose whether it
+   opens in the key you are already in or in a fresh one. Only then: a block
+   that keeps one key for the session has nothing to decide. */
+function blockMovesKeys(b){ return !!b && /^\d+$/.test(String(b.key)); }
+function setCarry(on){
+  S.carryKey=!!on;
+  var b=RUN.on ? currentPlan().blocks[RUN.idx] : null;
+  renderCarry(b);
+  save();
+}
+function renderCarry(b){
+  var box=document.getElementById('modalKey');
+  if(!box) return;
+  if(!RUN.on || !blockMovesKeys(b)){ box.style.display='none'; return; }
+  box.style.display='block';
+  var k=noteName(S.tonic).replace(/-?\d/,''), n=parseInt(b.key,10);
+  var yes=document.getElementById('carryYes'), no=document.getElementById('carryNo');
+  yes.textContent='Stay in '+k;
+  yes.classList.toggle('on', S.carryKey!==false); yes.setAttribute('aria-checked', String(S.carryKey!==false));
+  no.classList.toggle('on', S.carryKey===false);  no.setAttribute('aria-checked', String(S.carryKey===false));
+  var h=document.getElementById('carryHint');
+  if(h) h.textContent = S.carryKey===false
+    ? 'A new key straight away, then a new one every '+(n===1?'question':n+' questions')+'.'
+    : (n===1 ? 'The first question stays in '+k+', then every question moves.'
+             : 'The first '+n+' questions stay in '+k+', then the key moves every '+n+'.');
 }
 function confirmBlock(){
   if(!RUN.waiting) return;
@@ -2218,6 +2416,7 @@ function confirmBlock(){
   hideModal();
   RUN.waiting=false; RUN.paused=false;
   applyBlock(b);
+  if(blockMovesKeys(b) && S.carryKey===false){ rotateKey(); S.inKey=0; updateKeyNow(); }
   RUN.endAt=Date.now()+b.mins*60000;
   startTick();
   renderSession();
@@ -2276,11 +2475,13 @@ function showModalForCurrent(){
   if(!b) return;
   showModal('Held \u2014 block '+(RUN.idx+1), blockTitle(b),
             blockSummary(b) + (b.note ? ' \u2014 ' + b.note : ''), 'Start it');
+  renderCarry(b);
 }
 function finishSession(){
   var mins=Math.round((Date.now()-RUN.startedAt)/60000);
   var n=S.answered-RUN.answered0, c=sessCorrect-RUN.correct0;
   endRun();
+  renderCarry(null);
   showModal('Session finished', mins+' minute'+(mins===1?'':'s')+' of practice',
             n ? n+' question'+(n===1?'':'s')+', '+Math.round(100*c/n)+'% right. Same again tomorrow.'
               : 'No questions answered this time.', 'Done', true);
@@ -2628,7 +2829,8 @@ function save(){
       tonic:S.tonic, level:S.level, mode:S.mode, context:S.context,
       voiceLo:S.voiceLo, voiceHi:S.voiceHi, droneVol:S.droneVol, micId:S.micId, keyMode:S.keyMode, keyEvery:S.keyEvery, masterVol:S.masterVol,
       cadMode:S.cadMode, cadChange:S.cadChange, cadEvery:S.cadEvery, cadGap:S.cadGap, open:S.open,
-      plans:S.plans, planId:S.planId, edits:S.edits, micAuto:S.micAuto, accent:S.accent, hideNotes:S.hideNotes, theme:S.theme,
+      plans:S.plans, planId:S.planId, edits:S.edits, micAuto:S.micAuto, accent:S.accent,
+      keyBag:S.keyBag, keyHist:S.keyHist, carryKey:S.carryKey, hideNotes:S.hideNotes, theme:S.theme,
       stats:S.stats, answered:S.answered
     }));
   }catch(e){}
@@ -2654,6 +2856,9 @@ function load(){
       });
     }
     if(typeof o.micAuto==='boolean') S.micAuto=o.micAuto;
+    if(typeof o.carryKey==='boolean') S.carryKey=o.carryKey;
+    if(o.keyBag && o.keyBag.length) S.keyBag=o.keyBag.filter(function(t){ return typeof t==='number'; }).slice(0,24);
+    if(o.keyHist && o.keyHist.length) S.keyHist=o.keyHist.filter(function(t){ return typeof t==='number'; }).slice(-12);
     if(ACCENTS[o.accent]) S.accent=o.accent;
     if(o.plans) S.plans=sanitisePlans(o.plans) || [];
     if(o.edits && typeof o.edits==='object'){
@@ -2724,6 +2929,7 @@ renderMode();
 resetQuestionUI();
 updateProgress();
 window.addEventListener('keydown', function(e){
+  if(e.key==='Escape'){ toggleModeMenu(false); return; }
   if(e.key===' '){ e.preventDefault(); newQuestion(); return; }
   if(S.phase==='name'){
     var n=parseInt(e.key,10);
