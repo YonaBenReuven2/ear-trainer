@@ -282,6 +282,8 @@ button{font:inherit}
   text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
 .textbtn:hover{color:var(--plum);text-decoration-color:currentColor}
 .textbtn.danger:hover,.textbtn.armed{color:var(--red);text-decoration-color:currentColor}
+.btn.armed{border-color:var(--red);color:var(--red)}
+.sndnow{margin:2px 0 4px;font-size:14px}
 .switch{display:flex;align-items:center;gap:10px;margin-top:12px;cursor:pointer;font-size:14px;
   user-select:none}
 .switch input{position:absolute;opacity:0;width:1px;height:1px}
@@ -602,6 +604,27 @@ bdi{white-space:nowrap}
     <button class="btn sm" onclick="auditionDrone()" data-t="ref.hear">Hear the drone</button>
   </div>
 
+  </div></details>
+
+  <details class="sub" id="subSound"><summary><span data-t="snd.title">Instrument</span> <span class="sum" id="soundSum"></span></summary>
+  <div class="subbody">
+  <p class="sndnow" id="sndNow"></p>
+  <div class="lbl" style="margin-top:12px" data-t="snd.without">Without the piano</div>
+  <div class="row" id="instRow">
+    <button class="btn sm" data-inst="synth" onclick="setInstrument('synth')" data-t="snd.synth">App synth</button>
+    <button class="btn sm" data-inst="p225" onclick="setInstrument('p225')" style="display:none">Yamaha P-225</button>
+    <button class="btn sm" onclick="auditionInstrument()" data-t="btn.hearit">Hear it</button>
+  </div>
+  <div class="hint" id="sampleState"></div>
+  <div class="row">
+    <button class="btn sm" id="importBtn" onclick="pickSampleFile()">Import p225-samples.zip</button>
+    <button class="btn sm" id="removeSamplesBtn" style="display:none" onclick="askRemoveSamples()">Remove imported samples</button>
+    <input type="file" id="sampleFile" accept=".zip,application/zip" style="display:none"
+           onchange="importSamples(this.files[0]); this.value='';">
+  </div>
+  <div class="lbl" style="margin-top:14px" data-t="snd.piano">Your piano</div>
+  <div class="row"><button class="btn sm" id="midiBtn" onclick="connectMidi()" data-t="snd.connect">Connect the piano (MIDI)</button></div>
+  <div class="hint" id="midiHint"></div>
   </div></details>
 
   <details class="sub" id="subMic"><summary><span data-t="mic.title">Microphone</span> <span class="sum" id="micSum"></span></summary>
@@ -942,7 +965,7 @@ var S = {
   cadMode:'classic', cadChange:'key', cadEvery:3, cadGap:0, cadId:'classic', cadClose:0, cadBpm:96, cadCount:0,
   open:{why:false, setup:false, session:false, progress:true, guide:false},
   plans:null, planId:'daily-12', edits:null, micAuto:false, accent:'plum', carryKey:true, masterVol:1, hideNotes:false, theme:'system',
-  lang:'en',
+  lang:'en', instrument:'synth', midiOk:false,
   stats:{}, recent:[], answered:0, current:null, lastDegree:null,
   phase:'idle'     // idle | sing | name | done
 };
@@ -1116,6 +1139,7 @@ function stopNotes(){
   live.forEach(function(n){ try{n.stop(0);}catch(e){} });
   live=[];
   timers.forEach(clearTimeout); timers=[];
+  midiSilence();             /* the note-offs just cancelled must not leave keys down */
 }
 function stopAll(){ stopNotes(); stopDrone(); }
 /* Levels are set loud on purpose: a phone speaker at full volume is the worst
@@ -1133,16 +1157,427 @@ function pluck(m,t0,dur,gain){
     o.start(t0); o.stop(t0+Math.max(dur,0.3)+0.1); reg(o);
   });
 }
-function playNote(m,dur){ pluck(m, ctx().currentTime+0.02, dur||1.3); }
+function playNote(m,dur){ tone(m, ctx().currentTime+0.02, dur||1.3, dur||1.3); }
+/* seq is a list of [note, beats until the next one, beats held]. The synth dies
+   away over the same length as it always did; a piano key -- real or recorded --
+   is held for the third number when there is one, so a chord's lower notes last
+   the whole chord instead of being let go after half a beat. */
 function playSeq(seq,bpm,done){
   var c=ctx(), spb=60/(bpm||80), t0=c.currentTime+0.12, pos=0;
   seq.forEach(function(n){
-    if(n[0]!==null) pluck(n[0], t0+pos*spb, Math.max(n[1],0.5)*spb*0.95);
+    if(n[0]!==null) tone(n[0], t0+pos*spb, Math.max(n[1],0.5)*spb*0.95,
+                         (n[2]!==undefined ? n[2] : Math.max(n[1],0.5))*spb*0.95);
     pos+=n[1];
   });
   if(done) timers.push(setTimeout(done,(0.12+pos*spb)*1000));
   return (0.12+pos*spb)*1000;
 }
+/* =========================================================================
+   INSTRUMENTS
+   What plays the notes and the cadences. A piano connected over MIDI always
+   wins; without one, the instrument picked in Setup -- the app's own synth, or
+   the Yamaha P-225 recordings imported on this device. The drone stays in the
+   app whatever plays the notes: a piano note can't be held forever.
+   ========================================================================= */
+function soundSource(){
+  if(midiOut) return 'midi';
+  if(S.instrument==='p225' && SAMPLES) return 'p225';
+  return 'synth';
+}
+/* One note, m, at audio-clock time t. synthDur is how long the synth's pluck
+   takes to die away; hold is how long a key is held down, which only the piano
+   and the recordings care about. */
+function tone(m, t, synthDur, hold, gain){
+  var src=soundSource();
+  if(src==='midi'){ midiNote(m, t, hold); return; }
+  if(src==='p225' && sampleNote(m, t, hold, gain)) return;
+  pluck(m, t, synthDur, gain);
+}
+function setInstrument(i){
+  if(i!=='synth' && i!=='p225') return;
+  if(i==='p225' && !sampleMeta) return;
+  S.instrument=i;
+  save();
+  if(i==='p225') loadSamples();
+  renderSound();
+}
+/* do-mi-sol-do, then the chord, on whatever is playing right now */
+function auditionInstrument(){
+  stopNotes();
+  var t=S.tonic;
+  playSeq([[t,0.5],[t+4,0.5],[t+7,0.5],[t+12,1],
+           [t,0,1.8],[t+4,0,1.8],[t+7,0,1.8],[t+12,1.8,1.8]],100);
+}
+
+/* ---------- your piano, over MIDI ----------
+   Allowed once, through the browser's own prompt; after that it is automatic.
+   Every start reconnects by itself, and a piano plugged in or unplugged while
+   the app runs takes over or hands back on its own. */
+var midiAccess=null, midiOut=null, midiErr=null;
+var MIDI_VEL=80;                       /* the velocity the P-225 recordings were made at */
+var PIANO_PORT=/p-?225|p-?series|digital ?piano|yamaha/i;
+/* ports a computer has whether or not anything is plugged in */
+var SOFT_PORT=/wavetable|microsoft gs|midi through|through port|iac driver/i;
+function midiSend(bytes){ try{ if(midiOut) midiOut.send(bytes); }catch(e){} }
+function midiNote(m, t, hold){
+  if(!(m>=0 && m<=127)) return;
+  var wait=Math.max(0, (t-ctx().currentTime)*1000);
+  timers.push(setTimeout(function(){ midiSend([0x90, m, MIDI_VEL]); }, wait));
+  timers.push(setTimeout(function(){ midiSend([0x80, m, 0]); }, wait+hold*1000));
+}
+/* pedal up, every key let go */
+function midiSilence(){ if(midiOut){ midiSend([0xB0,64,0]); midiSend([0xB0,123,0]); } }
+function pickMidiOut(){
+  var outs=[], name=function(o){ return (o.name||'')+' '+(o.manufacturer||''); };
+  if(midiAccess && midiAccess.outputs) midiAccess.outputs.forEach(function(o){
+    if(o.state!=='disconnected' && !SOFT_PORT.test(name(o))) outs.push(o);
+  });
+  return outs.filter(function(o){ return PIANO_PORT.test(name(o)); })[0] || outs[0] || null;
+}
+function updateMidiOut(){
+  var was=midiOut;
+  midiOut=pickMidiOut();
+  if(was && was!==midiOut){ try{ was.send([0xB0,123,0]); }catch(e){} }
+  renderSound();
+}
+function connectMidi(){
+  if(!navigator.requestMIDIAccess){ renderSound(); return; }
+  try{
+    navigator.requestMIDIAccess().then(function(acc){
+      midiAccess=acc; midiErr=null;
+      if(!S.midiOk){ S.midiOk=true; save(); }
+      acc.onstatechange=updateMidiOut;
+      updateMidiOut();
+    }, function(e){ midiErr=e||{}; renderSound(); });
+  }catch(e){ midiErr=e; renderSound(); }
+}
+/* At start, only where this browser has already said yes: never a prompt on load. */
+function autoConnectMidi(){
+  if(!navigator.requestMIDIAccess) return;
+  try{
+    if(navigator.permissions && navigator.permissions.query){
+      navigator.permissions.query({name:'midi'}).then(function(st){
+        if(st && st.state==='granted') connectMidi();
+      }).catch(function(){ if(S.midiOk) connectMidi(); });
+      return;
+    }
+  }catch(e){}
+  if(S.midiOk) connectMidi();
+}
+
+/* ---------- the Yamaha P-225, recorded ----------
+   The recordings are Yamaha's sound, so they never go into the repo or onto the
+   website. Each device imports p225-samples.zip once; the notes then live in
+   that browser's IndexedDB, which the service worker's cache clean-up never
+   touches. Each note is kept from its onset, as 16-bit stereo. */
+var SAMPLES=null;          /* {meta, keys, bufs} once loaded into memory */
+var sampleMeta=null;       /* what this device has imported, known before it is loaded */
+var sampleBusy='';         /* '' | 'loading' | 'importing' */
+var sampleMsg='';          /* progress or a failure, shown instead of the description */
+var SAMPLE_DB='eartrainer-instruments', RELEASE=0.3, SAMPLE_PEAK=0.7;
+var SAMPLE_RX=/(?:^|\/)m(\d{2,3})_[^\/]*_v(\d{2,3})\.wav$/i;
+
+function idbOpen(){
+  return new Promise(function(res, rej){
+    if(!window.indexedDB){ rej(new Error('no IndexedDB')); return; }
+    var r=window.indexedDB.open(SAMPLE_DB, 1);
+    r.onupgradeneeded=function(){ r.result.createObjectStore('p225'); };
+    r.onsuccess=function(){ res(r.result); };
+    r.onerror=function(){ rej(r.error); };
+  });
+}
+/* run fn(store) in one transaction; resolves with the last request's result */
+function idbDo(mode, fn){
+  return idbOpen().then(function(db){
+    return new Promise(function(res, rej){
+      var tx=db.transaction('p225', mode), out, q=fn(tx.objectStore('p225'));
+      if(q) q.onsuccess=function(){ out=q.result; };
+      tx.oncomplete=function(){ db.close(); res(out); };
+      tx.onerror=tx.onabort=function(){ db.close(); rej(tx.error); };
+    });
+  });
+}
+function idbAll(){
+  return idbOpen().then(function(db){
+    return new Promise(function(res, rej){
+      var tx=db.transaction('p225','readonly'), st=tx.objectStore('p225'), keys=[], vals=[];
+      st.getAllKeys().onsuccess=function(e){ keys=e.target.result; };
+      st.getAll().onsuccess=function(e){ vals=e.target.result; };
+      tx.oncomplete=function(){ db.close(); var o={}; keys.forEach(function(k,i){ o[k]=vals[i]; }); res(o); };
+      tx.onerror=function(){ db.close(); rej(tx.error); };
+    });
+  });
+}
+
+/* A zip's entries, stored or deflated. */
+function readZip(buf){
+  var u8=new Uint8Array(buf), dv=new DataView(u8.buffer, u8.byteOffset, u8.byteLength), e=-1, i;
+  for(i=u8.length-22; i>=Math.max(0, u8.length-65557); i--){ if(dv.getUint32(i,true)===0x06054b50){ e=i; break; } }
+  if(e<0) throw new Error('this is not a zip file');
+  var count=dv.getUint16(e+10,true), p=dv.getUint32(e+16,true), td=new TextDecoder(), entries=[];
+  for(var k=0;k<count;k++){
+    if(dv.getUint32(p,true)!==0x02014b50) throw new Error('the zip directory is damaged');
+    var nlen=dv.getUint16(p+28,true), xlen=dv.getUint16(p+30,true), clen=dv.getUint16(p+32,true);
+    entries.push({ name:td.decode(u8.subarray(p+46, p+46+nlen)), method:dv.getUint16(p+10,true),
+                   csize:dv.getUint32(p+20,true), lho:dv.getUint32(p+42,true) });
+    p+=46+nlen+xlen+clen;
+  }
+  function read(en){
+    var start=en.lho+30+dv.getUint16(en.lho+26,true)+dv.getUint16(en.lho+28,true);
+    var data=u8.subarray(start, start+en.csize);
+    if(en.method===0) return Promise.resolve(data);
+    if(en.method===8 && typeof DecompressionStream!=='undefined'){
+      var s=new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+      return new Response(s).arrayBuffer().then(function(b){ return new Uint8Array(b); });
+    }
+    return Promise.reject(new Error('unsupported compression in '+en.name));
+  }
+  return {entries:entries, read:read};
+}
+/* A WAV file: PCM 8/16/24/32-bit or 32-bit float, any channel count. */
+function parseWav(u8){
+  var dv=new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  var str=function(o,n){ return String.fromCharCode.apply(null, u8.subarray(o,o+n)); };
+  if(str(0,4)!=='RIFF' || str(8,4)!=='WAVE') throw new Error('not a WAV file');
+  var p=12, fmt=null, data=null;
+  while(p+8<=u8.length){
+    var id=str(p,4), size=dv.getUint32(p+4,true);
+    if(id==='fmt '){
+      var tag=dv.getUint16(p+8,true);
+      if(tag===0xFFFE) tag=dv.getUint16(p+8+24,true);
+      fmt={tag:tag, ch:dv.getUint16(p+10,true), sr:dv.getUint32(p+12,true), bits:dv.getUint16(p+22,true)};
+    } else if(id==='data'){
+      data={off:p+8, size:Math.min(size, u8.length-p-8)};
+    }
+    p+=8+size+(size&1);
+  }
+  if(!fmt || !data) throw new Error('a WAV file is missing its fmt or data chunk');
+  var bps=fmt.bits/8, frames=Math.floor(data.size/(bps*fmt.ch)), chans=[], c, i;
+  for(c=0;c<fmt.ch;c++) chans.push(new Float32Array(frames));
+  for(i=0;i<frames;i++){
+    for(c=0;c<fmt.ch;c++){
+      var o=data.off+(i*fmt.ch+c)*bps, x;
+      if(fmt.tag===3 && fmt.bits===32) x=dv.getFloat32(o,true);
+      else if(fmt.bits===16) x=dv.getInt16(o,true)/32768;
+      else if(fmt.bits===24) x=((u8[o]|(u8[o+1]<<8)|(u8[o+2]<<16))<<8>>8)/8388608;
+      else if(fmt.bits===32) x=dv.getInt32(o,true)/2147483648;
+      else if(fmt.bits===8) x=(u8[o]-128)/128;
+      else throw new Error(fmt.bits+'-bit WAV is not supported');
+      chans[c][i]=x;
+    }
+  }
+  return {sr:fmt.sr, bits:fmt.bits, chans:chans};
+}
+/* Cut the silence before the note -- from the first sample above 5% of its
+   peak, less 4 ms -- and keep the rest as 16-bit, two channels at most. */
+function trimNote(w){
+  var L=w.chans[0], R=w.chans[1]||L, n=L.length, peak=0, on=0, i, c;
+  for(i=0;i<n;i++){ var a=Math.max(Math.abs(L[i]),Math.abs(R[i])); if(a>peak) peak=a; }
+  for(i=0;i<n;i++){ if(Math.max(Math.abs(L[i]),Math.abs(R[i]))>peak*0.05){ on=i; break; } }
+  on=Math.max(0, on-Math.round(0.004*w.sr));
+  var ch=w.chans.length>1 ? 2 : 1, frames=n-on, out=new Int16Array(frames*ch);
+  for(i=0;i<frames;i++) for(c=0;c<ch;c++){
+    var x=w.chans[c][on+i];
+    out[i*ch+c] = x>=1 ? 32767 : x<=-1 ? -32768 : Math.round(x*32767);
+  }
+  return {pcm:out.buffer, peak:peak, ch:ch};
+}
+/* The recorder's zip, as it is, into {meta, notes}. One velocity is kept: 80,
+   or the nearest to it. */
+function decodeSampleZip(buf, progress){
+  var z;
+  try{ z=readZip(buf); }catch(e){ return Promise.reject(e); }
+  var by={};
+  z.entries.forEach(function(en){
+    if(/(^|\/)(__MACOSX|\._)/.test(en.name)) return;
+    var mm=en.name.match(SAMPLE_RX);
+    if(mm) (by[+mm[2]]=by[+mm[2]]||[]).push({en:en, m:+mm[1]});
+  });
+  var vels=Object.keys(by).map(Number).sort(function(a,b){ return Math.abs(a-80)-Math.abs(b-80) || b-a; });
+  if(!vels.length) return Promise.reject(new Error('no notes named like m060_C4_v080.wav in it'));
+  var list=by[vels[0]].sort(function(a,b){ return a.m-b.m; });
+  var infoEn=z.entries.filter(function(en){ return /(^|\/)info\.json$/i.test(en.name); })[0];
+  var info=null, notes={}, peaks=[], meta={name:'Yamaha P-225', vel:vels[0], notes:[], sr:44100, ch:2};
+  var chain = infoEn ? z.read(infoEn).then(function(u){
+    try{ info=JSON.parse(new TextDecoder().decode(u)); }catch(e){}
+  }) : Promise.resolve();
+  list.forEach(function(it, i){
+    chain=chain.then(function(){ return z.read(it.en); }).then(function(u8){
+      var w=parseWav(u8), t=trimNote(w);
+      notes[it.m]=t.pcm; peaks.push(t.peak); meta.notes.push(it.m);
+      meta.sr=w.sr; meta.ch=t.ch;
+      if(progress) progress(i+1, list.length);
+      return new Promise(function(r){ setTimeout(r, 0); });      /* let the page draw */
+    });
+  });
+  return chain.then(function(){
+    var sorted=peaks.slice().sort(function(a,b){ return a-b; }), mid=sorted[sorted.length>>1]||1;
+    /* one level for the whole instrument, so a typical note lands about as loud as the synth */
+    meta.gain=Math.max(0.25, Math.min(8, SAMPLE_PEAK/mid));
+    meta.hold=(info && info.hold_s) || 3;
+    meta.flagged=(info && info.takes) ? info.takes.filter(function(t){ return t.status && t.status!=='ok'; }).length : 0;
+    meta.imported=Date.now();
+    return {meta:meta, notes:notes};
+  });
+}
+function makeBuffer(ch, frames, sr){
+  try{ return new AudioBuffer({numberOfChannels:ch, length:frames, sampleRate:sr}); }
+  catch(e){ return ctx().createBuffer(ch, frames, sr); }
+}
+function buildSamples(meta, notes){
+  var bufs={}, keys=[];
+  meta.notes.forEach(function(m){
+    var raw=notes[m] || notes['m'+m];
+    if(!raw) return;
+    var pcm=new Int16Array(raw), ch=meta.ch, frames=Math.floor(pcm.length/ch), b=makeBuffer(ch, frames, meta.sr);
+    for(var c=0;c<ch;c++){
+      var dst=b.getChannelData(c);
+      for(var i=0;i<frames;i++) dst[i]=pcm[i*ch+c]/32768;
+    }
+    bufs[m]=b; keys.push(m);
+  });
+  keys.sort(function(a,b){ return a-b; });
+  return keys.length ? {meta:meta, keys:keys, bufs:bufs} : null;
+}
+function storeSamples(set){
+  return idbDo('readwrite', function(st){
+    st.clear();
+    Object.keys(set.notes).forEach(function(m){ st.put(set.notes[m], 'm'+m); });
+    return st.put(set.meta, 'meta');
+  });
+}
+/* what this device has, at start; the notes themselves only when they are wanted */
+function initSamples(){
+  idbDo('readonly', function(st){ return st.get('meta'); }).then(function(meta){
+    sampleMeta=meta||null;
+    if(sampleMeta && S.instrument==='p225') loadSamples();
+    else renderSound();
+  }).catch(function(){ renderSound(); });
+}
+function loadSamples(){
+  if(SAMPLES || !sampleMeta || sampleBusy) return;
+  sampleBusy='loading'; renderSound();
+  idbAll().then(function(all){
+    SAMPLES=buildSamples(sampleMeta, all);
+    sampleBusy=''; renderSound();
+  }).catch(function(e){
+    sampleBusy=''; sampleMsg=_('Could not load the recordings: {e}', {e:(e&&e.message)||e}); renderSound();
+  });
+}
+function pickSampleFile(){ var f=document.getElementById('sampleFile'); if(f && f.click) f.click(); }
+function importSamples(file){
+  if(!file || sampleBusy) return;
+  sampleBusy='importing';
+  sampleMsg=_('Reading {f}…', {f:file.name}); renderSound();
+  file.arrayBuffer().then(function(buf){
+    return decodeSampleZip(buf, function(i, n){ sampleMsg=_('Reading note {i} of {n}…', {i:i, n:n}); renderSound(); });
+  }).then(function(set){
+    sampleMsg=_('Saving them on this device…'); renderSound();
+    return storeSamples(set).then(function(){
+      /* ask the browser never to clear them to make room */
+      try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+      sampleMeta=set.meta;
+      SAMPLES=buildSamples(set.meta, set.notes);
+      sampleBusy=''; sampleMsg='';
+      S.instrument='p225'; save();
+      renderSound();
+    });
+  }).catch(function(e){
+    sampleBusy='';
+    sampleMsg=_('Could not import that file: {e}', {e:(e&&e.message)||e});
+    renderSound();
+  });
+}
+/* removing asks twice, inline, like resetting progress */
+var removeArmed=null;
+function askRemoveSamples(){
+  var b=document.getElementById('removeSamplesBtn');
+  if(removeArmed){ clearTimeout(removeArmed); removeArmed=null; removeSamples(); return; }
+  if(b){ b.textContent=_('Tap again to remove them'); b.classList.add('armed'); }
+  removeArmed=setTimeout(function(){ removeArmed=null; renderSound(); }, 4000);
+}
+function removeSamples(){
+  idbDo('readwrite', function(st){ return st.clear(); }).catch(function(){}).then(function(){
+    SAMPLES=null; sampleMeta=null; sampleMsg='';
+    if(S.instrument==='p225'){ S.instrument='synth'; save(); }
+    renderSound();
+  });
+}
+/* the nearest recorded note; outside the recorded range it is retuned */
+function sampleNote(m, t, hold, gain){
+  if(!SAMPLES) return false;
+  var ks=SAMPLES.keys, k=ks[0];
+  for(var i=1;i<ks.length;i++) if(Math.abs(ks[i]-m)<Math.abs(k-m)) k=ks[i];
+  var c=ctx(), src=c.createBufferSource(), g=c.createGain();
+  var level=SAMPLES.meta.gain*((gain||0.85)/0.85);
+  src.buffer=SAMPLES.bufs[k];
+  if(k!==m) src.playbackRate.value=Math.pow(2,(m-k)/12);
+  g.gain.value=level;
+  src.connect(g); g.connect(master);
+  src.start(t);
+  /* let go like a damper landing; held past the recording's own hold, the
+     real key-off is already in the file */
+  if(hold < (SAMPLES.meta.hold||3)){
+    g.gain.setValueAtTime(level, t+hold);
+    g.gain.setTargetAtTime(0, t+hold, RELEASE/4);
+    src.stop(t+hold+RELEASE*1.5);
+  }
+  /* cut short by a new question or Stop: a quick fade, never a click */
+  reg({stop:function(){
+    try{ var now=c.currentTime; g.gain.cancelScheduledValues(now); g.gain.setTargetAtTime(0, now, 0.015); src.stop(now+0.1); }catch(e){}
+  }});
+  return true;
+}
+function renderSound(){
+  var src=soundSource(), esc=function(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); };
+  var now=document.getElementById('sndNow');
+  if(now) now.innerHTML =
+      src==='midi' ? _('<strong>Playing on your piano</strong> ({p}). The drone still comes from here; '+
+                       'the piano’s own volume sets how loud the notes are.', {p:iso(esc(midiOut.name||'MIDI'))})
+    : src==='p225' ? _('<strong>Playing the Yamaha P-225 recordings.</strong> Connect the piano and it takes over by itself.')
+    : (S.instrument==='p225' && sampleBusy==='loading') ? _('Loading the P-225 recordings…')
+    : _('<strong>Playing the app’s synth.</strong> Connect the piano and it takes over by itself.');
+  var row=document.getElementById('instRow');
+  if(row && row.querySelectorAll){
+    var bs=row.querySelectorAll('.btn');
+    for(var i=0;i<bs.length;i++){
+      var k=bs[i].getAttribute('data-inst');
+      if(!k) continue;
+      bs[i].classList.toggle('on', k===S.instrument);
+      if(k==='p225') bs[i].style.display = sampleMeta ? '' : 'none';
+    }
+  }
+  var st=document.getElementById('sampleState');
+  if(st) st.textContent = sampleMsg ||
+    (sampleMeta ? _('Yamaha P-225: {n} notes, {lo}–{hi}, kept in this browser only. Notes outside that range are retuned from the nearest one.',
+                    {n:sampleMeta.notes.length, lo:noteName(Math.min.apply(null, sampleMeta.notes)),
+                     hi:noteName(Math.max.apply(null, sampleMeta.notes))}) +
+                  (sampleMeta.flagged ? _(' The recorder flagged {n} of the takes.', {n:sampleMeta.flagged}) : '')
+                : _('The P-225 recordings aren’t on this device yet. Import p225-samples.zip once; it stays in this browser and never goes online.'));
+  var ib=document.getElementById('importBtn');
+  if(ib){ ib.textContent = sampleMeta ? _('Import again') : _('Import p225-samples.zip'); ib.disabled=!!sampleBusy; }
+  var rb=document.getElementById('removeSamplesBtn');
+  if(rb){
+    rb.style.display = sampleMeta ? '' : 'none';
+    if(!removeArmed){ rb.textContent=_('Remove imported samples'); rb.classList.remove('armed'); }
+  }
+  var mb=document.getElementById('midiBtn'), mh=document.getElementById('midiHint');
+  if(mb) mb.style.display = (navigator.requestMIDIAccess && !midiAccess) ? '' : 'none';
+  if(mh) mh.innerHTML =
+      !navigator.requestMIDIAccess
+        ? _('This browser can’t reach a piano over MIDI. Chrome and Edge can, on a computer or on Android with a USB cable; an iPhone can’t.')
+    : !midiAccess
+        ? (midiErr ? _('MIDI access was refused. Allow it in the site settings (the icon left of the address), then connect again.')
+                   : _('Plug the piano in with USB (its USB TO HOST port) and connect once. After that the app finds it by itself.'))
+    : midiOut ? _('Connected: {p}. Unplug it and the app goes back to the instrument above.', {p:iso(esc(midiOut.name||'MIDI'))})
+              : _('No piano connected. Plug in the USB cable and it takes over by itself.');
+  renderSummaries();
+}
+function instrumentWords(){
+  var src=soundSource();
+  return src==='midi' ? _('your piano (MIDI)') : src==='p225' ? 'Yamaha P-225' : _('app synth');
+}
+
 /* Where the drone sits. An octave below the tonic, nudged up by octaves until it
    clears the sub-bass -- below about 60Hz a phone reproduces no fundamental at
    all, so you hear only harmonics, which is what made the old one sound hollow. */
@@ -1275,7 +1710,8 @@ function cadenceById(id){
   return CADENCES[0];
 }
 /* Build the chord sequence for playSeq: every note of a chord starts together,
-   so all but the last carry a duration of zero. */
+   so all but the last move on by zero beats -- and every one is held for the
+   whole chord. */
 function cadenceSeq(cadId, closeIdx){
   var t=S.tonic, cad=cadenceById(cadId||S.cadId), close=CLOSES[closeIdx||0] || CLOSES[0];
   var seq=[];
@@ -1284,7 +1720,7 @@ function cadenceSeq(cadId, closeIdx){
     var notes = name==='I*' ? close.notes : CHORDS[name];
     var beats = last ? 1.6 : 1;
     notes.forEach(function(off, j){
-      seq.push([t+off, j===notes.length-1 ? beats : 0]);
+      seq.push([t+off, j===notes.length-1 ? beats : 0, beats]);
     });
   });
   return seq;
@@ -1824,7 +2260,7 @@ function selfReport(gotIt){
 function playTarget(){
   if(!S.current) return;
   duckDrone(false);
-  pluck(S.current.midi, ctx().currentTime+0.05, 1.5, 1.0);
+  tone(S.current.midi, ctx().currentTime+0.05, 1.5, 1.5, 1.0);
 }
 function replay(){ stopListening(); playTarget();
   timers.push(setTimeout(function(){
@@ -2205,7 +2641,7 @@ function setLang(l){
 function redrawText(){
   if(S.phase!=='idle') resetQuestionUI();
   renderMode(); updateProgress(); buildTonicSelect(); renderKeyMode(); renderCadence();
-  renderSession(); renderHideNotes(); setListenLabel(listening); renderMicText();
+  renderSession(); renderHideNotes(); setListenLabel(listening); renderMicText(); renderSound();
   checkEnvironment();
   if(micErr && !micStream) micFailed(micErr);
   renderSummaries();
@@ -2375,7 +2811,7 @@ function wireSections(){
     el.addEventListener('toggle', function(){ S.open[k]=!!el.open; save(); });
   });
 }
-var SUBS = { subTheme:'themeSum', subRange:'rangeSum', subKey:'keySum',
+var SUBS = { subTheme:'themeSum', subRange:'rangeSum', subKey:'keySum', subSound:'soundSum',
              subRef:'refSum', subMic:'micSum' };
 function setSum(id, text){
   var el=document.getElementById(id);
@@ -2396,6 +2832,7 @@ function renderSubSummaries(){
   setSum('refSum', refWords()+
     (S.context==='drone' ? '' : ' \u00b7 '+(S.cadMode==='mixed' ? _('mixed cadences') : _('classic cadence'))));
   setSum('micSum', micStream ? _('on') : _('off'));
+  setSum('soundSum', instrumentWords());
 }
 function renderSummaries(){
   renderSubSummaries();
@@ -2407,7 +2844,8 @@ function renderSummaries(){
        S.keyEvery===1 ? _('key every question') : _('key every {n}', {n:S.keyEvery})) + ' \u00b7 ' +
       refWords() +
       (S.context!=='drone' && S.cadMode==='mixed' ? _(' (mixed)') : '') +
-      (micStream ? _(' \u00b7 mic on') : '');
+      (micStream ? _(' \u00b7 mic on') : '') +
+      (soundSource()==='synth' ? '' : ' \u00b7 '+instrumentWords());
   }
   var se=document.getElementById('sessSum');
   if(se){
@@ -2754,7 +3192,10 @@ try{
   if(document.addEventListener){
     document.addEventListener('visibilitychange', function(){
       if(RUN.on && !document.hidden && !wakeLock) requestWake();
+      /* timers sleep in the background: a note-off that never comes would hold a key down */
+      if(document.hidden && midiOut) stopNotes();
     });
+    window.addEventListener('pagehide', function(){ midiSilence(); });
   }
 }catch(e){}
 
@@ -3074,6 +3515,7 @@ function save(){
       cadMode:S.cadMode, cadChange:S.cadChange, cadEvery:S.cadEvery, cadGap:S.cadGap, open:S.open,
       plans:S.plans, planId:S.planId, edits:S.edits, micAuto:S.micAuto, accent:S.accent,
       keyBag:S.keyBag, keyHist:S.keyHist, carryKey:S.carryKey, hideNotes:S.hideNotes, theme:S.theme, lang:S.lang,
+      instrument:S.instrument, midiOk:S.midiOk,
       stats:S.stats, answered:S.answered
     }));
   }catch(e){}
@@ -3122,6 +3564,8 @@ function load(){
     if(typeof o.hideNotes==='boolean') S.hideNotes=o.hideNotes;
     if(o.theme==='system'||o.theme==='light'||o.theme==='dark') S.theme=o.theme;
     if(o.lang==='en'||o.lang==='he') S.lang=o.lang;
+    if(o.instrument==='synth'||o.instrument==='p225') S.instrument=o.instrument;
+    if(typeof o.midiOk==='boolean') S.midiOk=o.midiOk;
     if(typeof o.level==='number') S.level=o.level;
     if(o.mode) S.mode=o.mode;
     if(o.context) S.context=o.context;
@@ -3159,6 +3603,9 @@ applySections();
 renderSession();
 try{ loadRepoPlans(); }catch(e){}
 try{ autoStartMic(); }catch(e){}
+renderSound();
+try{ autoConnectMidi(); }catch(e){}
+try{ initSamples(); }catch(e){}
 renderHideNotes();
 applyTheme();
 (function(){
