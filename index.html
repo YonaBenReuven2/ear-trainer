@@ -283,7 +283,6 @@ button{font:inherit}
 .textbtn:hover{color:var(--plum);text-decoration-color:currentColor}
 .textbtn.danger:hover,.textbtn.armed{color:var(--red);text-decoration-color:currentColor}
 .btn.armed{border-color:var(--red);color:var(--red)}
-.sndnow{margin:2px 0 4px;font-size:14px}
 .switch{display:flex;align-items:center;gap:10px;margin-top:12px;cursor:pointer;font-size:14px;
   user-select:none}
 .switch input{position:absolute;opacity:0;width:1px;height:1px}
@@ -608,23 +607,22 @@ bdi{white-space:nowrap}
 
   <details class="sub" id="subSound"><summary><span data-t="snd.title">Instrument</span> <span class="sum" id="soundSum"></span></summary>
   <div class="subbody">
-  <p class="sndnow" id="sndNow"></p>
-  <div class="lbl" style="margin-top:12px" data-t="snd.without">Without the piano</div>
   <div class="row" id="instRow">
+    <button class="btn sm" data-inst="midi" onclick="setInstrument('midi')" data-t="snd.midi">Piano (MIDI)</button>
     <button class="btn sm" data-inst="synth" onclick="setInstrument('synth')" data-t="snd.synth">App synth</button>
-    <button class="btn sm" data-inst="p225" onclick="setInstrument('p225')" style="display:none">Yamaha P-225</button>
-    <button class="btn sm" onclick="auditionInstrument()" data-t="btn.hearit">Hear it</button>
+    <button class="btn sm" data-inst="samples" onclick="setInstrument('samples')" data-t="snd.samples">Samples</button>
   </div>
+  <div class="hint" id="sndNow"></div>
+  <div class="hint" id="midiHint"></div>
+  <div class="row"><button class="btn sm" onclick="auditionInstrument()" data-t="btn.hearit">Hear it</button></div>
+  <div class="lbl" style="margin-top:16px" data-t="snd.samples">Samples</div>
   <div class="hint" id="sampleState"></div>
   <div class="row">
-    <button class="btn sm" id="importBtn" onclick="pickSampleFile()">Import p225-samples.zip</button>
-    <button class="btn sm" id="removeSamplesBtn" style="display:none" onclick="askRemoveSamples()">Remove imported samples</button>
+    <button class="btn sm" id="importBtn" onclick="pickSampleFile()">Import a samples zip</button>
+    <button class="btn sm" id="removeSamplesBtn" style="display:none" onclick="askRemoveSamples()">Remove the samples</button>
     <input type="file" id="sampleFile" accept=".zip,application/zip" style="display:none"
            onchange="importSamples(this.files[0]); this.value='';">
   </div>
-  <div class="lbl" style="margin-top:14px" data-t="snd.piano">Your piano</div>
-  <div class="row"><button class="btn sm" id="midiBtn" onclick="connectMidi()" data-t="snd.connect">Connect the piano (MIDI)</button></div>
-  <div class="hint" id="midiHint"></div>
   </div></details>
 
   <details class="sub" id="subMic"><summary><span data-t="mic.title">Microphone</span> <span class="sum" id="micSum"></span></summary>
@@ -965,7 +963,7 @@ var S = {
   cadMode:'classic', cadChange:'key', cadEvery:3, cadGap:0, cadId:'classic', cadClose:0, cadBpm:96, cadCount:0,
   open:{why:false, setup:false, session:false, progress:true, guide:false},
   plans:null, planId:'daily-12', edits:null, micAuto:false, accent:'plum', carryKey:true, masterVol:1, hideNotes:false, theme:'system',
-  lang:'en', instrument:'synth', midiOk:false,
+  lang:'en', instrument:'synth', localInst:'synth', midiOk:false,
   stats:{}, recent:[], answered:0, current:null, lastDegree:null,
   phase:'idle'     // idle | sing | name | done
 };
@@ -1174,31 +1172,40 @@ function playSeq(seq,bpm,done){
 }
 /* =========================================================================
    INSTRUMENTS
-   What plays the notes and the cadences. A piano connected over MIDI always
-   wins; without one, the instrument picked in Setup -- the app's own synth, or
-   the Yamaha P-225 recordings imported on this device. The drone stays in the
-   app whatever plays the notes: a piano note can't be held forever.
+   What plays the notes and the cadences: a piano over MIDI, the app's own synth,
+   or a set of samples imported on this device. A piano that connects takes over
+   by itself, and you can still switch away from it while it stays plugged in;
+   when it goes, the app goes back to whichever of the other two you used last.
+   The drone stays in the app whatever plays the notes: a piano note can't be
+   held forever.
    ========================================================================= */
+/* the choice without the piano: synth or samples */
+function localChoice(){ return S.instrument==='midi' ? S.localInst : S.instrument; }
 function soundSource(){
-  if(midiOut) return 'midi';
-  if(S.instrument==='p225' && SAMPLES) return 'p225';
+  if(S.instrument==='midi' && midiOut) return 'midi';
+  if(localChoice()==='samples' && SAMPLES) return 'samples';
   return 'synth';
 }
 /* One note, m, at audio-clock time t. synthDur is how long the synth's pluck
    takes to die away; hold is how long a key is held down, which only the piano
-   and the recordings care about. */
+   and the samples care about. */
 function tone(m, t, synthDur, hold, gain){
   var src=soundSource();
   if(src==='midi'){ midiNote(m, t, hold); return; }
-  if(src==='p225' && sampleNote(m, t, hold, gain)) return;
+  if(src==='samples' && sampleNote(m, t, hold, gain)) return;
   pluck(m, t, synthDur, gain);
 }
 function setInstrument(i){
-  if(i!=='synth' && i!=='p225') return;
-  if(i==='p225' && !sampleMeta) return;
+  if(i==='midi'){
+    if(!midiAccess){ connectMidi(); return; }   /* the browser asks once; a piano it finds takes over */
+    if(!midiOut) return;
+  } else if(i==='samples'){
+    if(!sampleMeta){ pickSampleFile(); return; }
+  } else if(i!=='synth') return;
   S.instrument=i;
+  if(i!=='midi') S.localInst=i;
   save();
-  if(i==='p225') loadSamples();
+  if(i==='samples') loadSamples();
   renderSound();
 }
 /* do-mi-sol-do, then the chord, on whatever is playing right now */
@@ -1211,10 +1218,10 @@ function auditionInstrument(){
 
 /* ---------- your piano, over MIDI ----------
    Allowed once, through the browser's own prompt; after that it is automatic.
-   Every start reconnects by itself, and a piano plugged in or unplugged while
-   the app runs takes over or hands back on its own. */
+   Every start reconnects by itself, and a piano plugged in while the app runs
+   takes over on its own; unplugged, it hands back. */
 var midiAccess=null, midiOut=null, midiErr=null;
-var MIDI_VEL=80;                       /* the velocity the P-225 recordings were made at */
+var MIDI_VEL=80;                       /* moderate, and what the sample recorder plays at */
 var PIANO_PORT=/p-?225|p-?series|digital ?piano|yamaha/i;
 /* ports a computer has whether or not anything is plugged in */
 var SOFT_PORT=/wavetable|microsoft gs|midi through|through port|iac driver/i;
@@ -1238,6 +1245,10 @@ function updateMidiOut(){
   var was=midiOut;
   midiOut=pickMidiOut();
   if(was && was!==midiOut){ try{ was.send([0xB0,123,0]); }catch(e){} }
+  /* a piano that has just appeared takes over -- once: switch away and it stays
+     switched until it is next connected. One that has gone hands back. */
+  if(midiOut && !was && S.instrument!=='midi'){ S.instrument='midi'; save(); }
+  else if(!midiOut && S.instrument==='midi'){ S.instrument=S.localInst||'synth'; save(); }
   renderSound();
 }
 function connectMidi(){
@@ -1265,23 +1276,39 @@ function autoConnectMidi(){
   if(S.midiOk) connectMidi();
 }
 
-/* ---------- the Yamaha P-225, recorded ----------
-   The recordings are Yamaha's sound, so they never go into the repo or onto the
-   website. Each device imports p225-samples.zip once; the notes then live in
-   that browser's IndexedDB, which the service worker's cache clean-up never
-   touches. Each note is kept from its onset, as 16-bit stereo. */
+/* ---------- samples ----------
+   Any set of recordings, one WAV per note, imported from a zip on each device.
+   A set can be someone's commercial sound, so samples never go into the repo or
+   onto the website: they live in this browser's IndexedDB, which the service
+   worker's cache clean-up never touches. Each note is kept from its onset, as
+   16-bit stereo. */
 var SAMPLES=null;          /* {meta, keys, bufs} once loaded into memory */
 var sampleMeta=null;       /* what this device has imported, known before it is loaded */
 var sampleBusy='';         /* '' | 'loading' | 'importing' */
 var sampleMsg='';          /* progress or a failure, shown instead of the description */
-var SAMPLE_DB='eartrainer-instruments', RELEASE=0.3, SAMPLE_PEAK=0.7;
+var SAMPLE_DB='eartrainer-instruments', SAMPLE_STORE='samples', RELEASE=0.3, SAMPLE_PEAK=0.7;
 var SAMPLE_RX=/(?:^|\/)m(\d{2,3})_[^\/]*_v(\d{2,3})\.wav$/i;
 
 function idbOpen(){
   return new Promise(function(res, rej){
     if(!window.indexedDB){ rej(new Error('no IndexedDB')); return; }
-    var r=window.indexedDB.open(SAMPLE_DB, 1);
-    r.onupgradeneeded=function(){ r.result.createObjectStore('p225'); };
+    var r=window.indexedDB.open(SAMPLE_DB, 2);
+    r.onupgradeneeded=function(){
+      var db=r.result, tx=r.transaction;
+      if(!db.objectStoreNames.contains(SAMPLE_STORE)) db.createObjectStore(SAMPLE_STORE);
+      /* v20 kept them under the name of the first set: move them across */
+      if(db.objectStoreNames.contains('p225')){
+        var to=tx.objectStore(SAMPLE_STORE);
+        tx.objectStore('p225').openCursor().onsuccess=function(e){
+          var c=e.target.result;
+          if(c){
+            var v=c.value;
+            if(c.key==='meta' && v && /^Yamaha/.test(v.name||'')) v.name='';   /* v20's fixed label, not a file name */
+            to.put(v, c.key); c.continue();
+          } else db.deleteObjectStore('p225');
+        };
+      }
+    };
     r.onsuccess=function(){ res(r.result); };
     r.onerror=function(){ rej(r.error); };
   });
@@ -1290,7 +1317,7 @@ function idbOpen(){
 function idbDo(mode, fn){
   return idbOpen().then(function(db){
     return new Promise(function(res, rej){
-      var tx=db.transaction('p225', mode), out, q=fn(tx.objectStore('p225'));
+      var tx=db.transaction(SAMPLE_STORE, mode), out, q=fn(tx.objectStore(SAMPLE_STORE));
       if(q) q.onsuccess=function(){ out=q.result; };
       tx.oncomplete=function(){ db.close(); res(out); };
       tx.onerror=tx.onabort=function(){ db.close(); rej(tx.error); };
@@ -1300,7 +1327,7 @@ function idbDo(mode, fn){
 function idbAll(){
   return idbOpen().then(function(db){
     return new Promise(function(res, rej){
-      var tx=db.transaction('p225','readonly'), st=tx.objectStore('p225'), keys=[], vals=[];
+      var tx=db.transaction(SAMPLE_STORE,'readonly'), st=tx.objectStore(SAMPLE_STORE), keys=[], vals=[];
       st.getAllKeys().onsuccess=function(e){ keys=e.target.result; };
       st.getAll().onsuccess=function(e){ vals=e.target.result; };
       tx.oncomplete=function(){ db.close(); var o={}; keys.forEach(function(k,i){ o[k]=vals[i]; }); res(o); };
@@ -1382,9 +1409,10 @@ function trimNote(w){
   }
   return {pcm:out.buffer, peak:peak, ch:ch};
 }
-/* The recorder's zip, as it is, into {meta, notes}. One velocity is kept: 80,
-   or the nearest to it. */
-function decodeSampleZip(buf, progress){
+/* A zip of notes named like m060_C4_v080.wav (MIDI note, any name, velocity),
+   plus an optional info.json, into {meta, notes}. One velocity is kept: 80, or
+   the nearest to it. The set is called by its file name. */
+function decodeSampleZip(buf, progress, name){
   var z;
   try{ z=readZip(buf); }catch(e){ return Promise.reject(e); }
   var by={};
@@ -1397,7 +1425,7 @@ function decodeSampleZip(buf, progress){
   if(!vels.length) return Promise.reject(new Error('no notes named like m060_C4_v080.wav in it'));
   var list=by[vels[0]].sort(function(a,b){ return a.m-b.m; });
   var infoEn=z.entries.filter(function(en){ return /(^|\/)info\.json$/i.test(en.name); })[0];
-  var info=null, notes={}, peaks=[], meta={name:'Yamaha P-225', vel:vels[0], notes:[], sr:44100, ch:2};
+  var info=null, notes={}, peaks=[], meta={name:name||'samples', vel:vels[0], notes:[], sr:44100, ch:2};
   var chain = infoEn ? z.read(infoEn).then(function(u){
     try{ info=JSON.parse(new TextDecoder().decode(u)); }catch(e){}
   }) : Promise.resolve();
@@ -1450,7 +1478,7 @@ function storeSamples(set){
 function initSamples(){
   idbDo('readonly', function(st){ return st.get('meta'); }).then(function(meta){
     sampleMeta=meta||null;
-    if(sampleMeta && S.instrument==='p225') loadSamples();
+    if(sampleMeta && localChoice()==='samples') loadSamples();
     else renderSound();
   }).catch(function(){ renderSound(); });
 }
@@ -1461,7 +1489,7 @@ function loadSamples(){
     SAMPLES=buildSamples(sampleMeta, all);
     sampleBusy=''; renderSound();
   }).catch(function(e){
-    sampleBusy=''; sampleMsg=_('Could not load the recordings: {e}', {e:(e&&e.message)||e}); renderSound();
+    sampleBusy=''; sampleMsg=_('Could not load the samples: {e}', {e:(e&&e.message)||e}); renderSound();
   });
 }
 function pickSampleFile(){ var f=document.getElementById('sampleFile'); if(f && f.click) f.click(); }
@@ -1470,7 +1498,8 @@ function importSamples(file){
   sampleBusy='importing';
   sampleMsg=_('Reading {f}…', {f:file.name}); renderSound();
   file.arrayBuffer().then(function(buf){
-    return decodeSampleZip(buf, function(i, n){ sampleMsg=_('Reading note {i} of {n}…', {i:i, n:n}); renderSound(); });
+    return decodeSampleZip(buf, function(i, n){ sampleMsg=_('Reading note {i} of {n}…', {i:i, n:n}); renderSound(); },
+                           String(file.name||'').replace(/\.zip$/i, ''));
   }).then(function(set){
     sampleMsg=_('Saving them on this device…'); renderSound();
     return storeSamples(set).then(function(){
@@ -1479,7 +1508,7 @@ function importSamples(file){
       sampleMeta=set.meta;
       SAMPLES=buildSamples(set.meta, set.notes);
       sampleBusy=''; sampleMsg='';
-      S.instrument='p225'; save();
+      S.instrument='samples'; S.localInst='samples'; save();
       renderSound();
     });
   }).catch(function(e){
@@ -1499,7 +1528,9 @@ function askRemoveSamples(){
 function removeSamples(){
   idbDo('readwrite', function(st){ return st.clear(); }).catch(function(){}).then(function(){
     SAMPLES=null; sampleMeta=null; sampleMsg='';
-    if(S.instrument==='p225'){ S.instrument='synth'; save(); }
+    if(S.localInst==='samples') S.localInst='synth';
+    if(S.instrument==='samples') S.instrument='synth';
+    save();
     renderSound();
   });
 }
@@ -1530,52 +1561,60 @@ function sampleNote(m, t, hold, gain){
 }
 function renderSound(){
   var src=soundSource(), esc=function(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); };
-  var now=document.getElementById('sndNow');
-  if(now) now.innerHTML =
-      src==='midi' ? _('<strong>Playing on your piano</strong> ({p}). The drone still comes from here; '+
-                       'the piano’s own volume sets how loud the notes are.', {p:iso(esc(midiOut.name||'MIDI'))})
-    : src==='p225' ? _('<strong>Playing the Yamaha P-225 recordings.</strong> Connect the piano and it takes over by itself.')
-    : (S.instrument==='p225' && sampleBusy==='loading') ? _('Loading the P-225 recordings…')
-    : _('<strong>Playing the app’s synth.</strong> Connect the piano and it takes over by itself.');
+  var piano=midiOut ? iso(esc(midiOut.name||'MIDI')) : '';
+  /* samples picked but still loading from storage: show the choice, not the stand-in */
+  var loading=(src==='synth' && localChoice()==='samples' && S.instrument!=='midi' && sampleBusy==='loading');
   var row=document.getElementById('instRow');
   if(row && row.querySelectorAll){
     var bs=row.querySelectorAll('.btn');
     for(var i=0;i<bs.length;i++){
       var k=bs[i].getAttribute('data-inst');
       if(!k) continue;
-      bs[i].classList.toggle('on', k===S.instrument);
-      if(k==='p225') bs[i].style.display = sampleMeta ? '' : 'none';
+      bs[i].classList.toggle('on', k===(loading ? 'samples' : src));
+      if(k==='midi'){
+        bs[i].style.display = navigator.requestMIDIAccess ? '' : 'none';
+        bs[i].disabled = !!midiAccess && !midiOut;       /* allowed, but nothing plugged in */
+      }
     }
   }
-  var st=document.getElementById('sampleState');
-  if(st) st.textContent = sampleMsg ||
-    (sampleMeta ? _('Yamaha P-225: {n} notes, {lo}–{hi}, kept in this browser only. Notes outside that range are retuned from the nearest one.',
-                    {n:sampleMeta.notes.length, lo:noteName(Math.min.apply(null, sampleMeta.notes)),
-                     hi:noteName(Math.max.apply(null, sampleMeta.notes))}) +
-                  (sampleMeta.flagged ? _(' The recorder flagged {n} of the takes.', {n:sampleMeta.flagged}) : '')
-                : _('The P-225 recordings aren’t on this device yet. Import p225-samples.zip once; it stays in this browser and never goes online.'));
-  var ib=document.getElementById('importBtn');
-  if(ib){ ib.textContent = sampleMeta ? _('Import again') : _('Import p225-samples.zip'); ib.disabled=!!sampleBusy; }
-  var rb=document.getElementById('removeSamplesBtn');
-  if(rb){
-    rb.style.display = sampleMeta ? '' : 'none';
-    if(!removeArmed){ rb.textContent=_('Remove imported samples'); rb.classList.remove('armed'); }
-  }
-  var mb=document.getElementById('midiBtn'), mh=document.getElementById('midiHint');
-  if(mb) mb.style.display = (navigator.requestMIDIAccess && !midiAccess) ? '' : 'none';
+  var now=document.getElementById('sndNow');
+  if(now) now.innerHTML =
+      src==='midi' ? _('<strong>Playing on your piano</strong> ({p}). The drone still plays here; the piano’s own volume sets how loud the notes are.', {p:piano})
+    : loading ? _('Loading the samples…')
+    : src==='samples' ? (SAMPLES.meta.name ? _('<strong>Playing the samples</strong> ({name}).', {name:iso(esc(SAMPLES.meta.name))})
+                                           : _('<strong>Playing the samples.</strong>'))
+    : _('<strong>Playing the app’s synth.</strong>');
+  var mh=document.getElementById('midiHint');
   if(mh) mh.innerHTML =
       !navigator.requestMIDIAccess
         ? _('This browser can’t reach a piano over MIDI. Chrome and Edge can, on a computer or on Android with a USB cable; an iPhone can’t.')
     : !midiAccess
-        ? (midiErr ? _('MIDI access was refused. Allow it in the site settings (the icon left of the address), then connect again.')
-                   : _('Plug the piano in with USB (its USB TO HOST port) and connect once. After that the app finds it by itself.'))
-    : midiOut ? _('Connected: {p}. Unplug it and the app goes back to the instrument above.', {p:iso(esc(midiOut.name||'MIDI'))})
-              : _('No piano connected. Plug in the USB cable and it takes over by itself.');
+        ? (midiErr ? _('MIDI access was refused. Allow it in the site settings (the icon left of the address), then press Piano again.')
+                   : _('To play on your piano, plug it in with USB and press Piano once to allow it. After that it switches over by itself whenever it is connected.'))
+    : !midiOut ? _('No piano connected. Plug one in and the app switches to it by itself.')
+    : src==='midi' ? _('Unplug it and the app goes back to {back}.',
+                       {back: S.localInst==='samples' && sampleMeta ? _('the samples') : _('the app synth')})
+    : _('Your piano ({p}) is connected; press Piano to play on it.', {p:piano});
+  var st=document.getElementById('sampleState');
+  if(st) st.textContent = sampleMsg ||
+    (sampleMeta ? (sampleMeta.name ? _('{name}: ', {name:sampleMeta.name}) : '') +
+                  _('{n} notes, {lo}–{hi}, kept in this browser only. Notes outside that range are retuned from the nearest one.',
+                    {n:sampleMeta.notes.length, lo:noteName(Math.min.apply(null, sampleMeta.notes)),
+                     hi:noteName(Math.max.apply(null, sampleMeta.notes))}) +
+                  (sampleMeta.flagged ? _(' The recorder flagged {n} of the takes.', {n:sampleMeta.flagged}) : '')
+                : _('None on this device yet. Import a zip of WAV files, one per note, named like m060_C4_v080.wav (the MIDI note number and the velocity). It stays in this browser and never goes online.'));
+  var ib=document.getElementById('importBtn');
+  if(ib){ ib.textContent = sampleMeta ? _('Import a different zip') : _('Import a samples zip'); ib.disabled=!!sampleBusy; }
+  var rb=document.getElementById('removeSamplesBtn');
+  if(rb){
+    rb.style.display = sampleMeta ? '' : 'none';
+    if(!removeArmed){ rb.textContent=_('Remove the samples'); rb.classList.remove('armed'); }
+  }
   renderSummaries();
 }
 function instrumentWords(){
   var src=soundSource();
-  return src==='midi' ? _('your piano (MIDI)') : src==='p225' ? 'Yamaha P-225' : _('app synth');
+  return src==='midi' ? _('piano (MIDI)') : src==='samples' ? _('samples') : _('app synth');
 }
 
 /* Where the drone sits. An octave below the tonic, nudged up by octaves until it
@@ -3515,7 +3554,7 @@ function save(){
       cadMode:S.cadMode, cadChange:S.cadChange, cadEvery:S.cadEvery, cadGap:S.cadGap, open:S.open,
       plans:S.plans, planId:S.planId, edits:S.edits, micAuto:S.micAuto, accent:S.accent,
       keyBag:S.keyBag, keyHist:S.keyHist, carryKey:S.carryKey, hideNotes:S.hideNotes, theme:S.theme, lang:S.lang,
-      instrument:S.instrument, midiOk:S.midiOk,
+      instrument:S.instrument, localInst:S.localInst, midiOk:S.midiOk,
       stats:S.stats, answered:S.answered
     }));
   }catch(e){}
@@ -3564,7 +3603,10 @@ function load(){
     if(typeof o.hideNotes==='boolean') S.hideNotes=o.hideNotes;
     if(o.theme==='system'||o.theme==='light'||o.theme==='dark') S.theme=o.theme;
     if(o.lang==='en'||o.lang==='he') S.lang=o.lang;
-    if(o.instrument==='synth'||o.instrument==='p225') S.instrument=o.instrument;
+    if(o.instrument==='p225') o.instrument='samples';          /* v20's name for it */
+    if(o.instrument==='synth'||o.instrument==='samples'||o.instrument==='midi') S.instrument=o.instrument;
+    if(o.localInst==='synth'||o.localInst==='samples') S.localInst=o.localInst;
+    else if(S.instrument!=='midi') S.localInst=S.instrument;
     if(typeof o.midiOk==='boolean') S.midiOk=o.midiOk;
     if(typeof o.level==='number') S.level=o.level;
     if(o.mode) S.mode=o.mode;
