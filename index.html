@@ -10,6 +10,14 @@ try{
   var __s=JSON.parse(localStorage.getItem('eartrain.v1')||'{}');
   if(__s.theme==='light'||__s.theme==='dark') document.documentElement.setAttribute('data-theme',__s.theme);
   if(__s.accent && __s.accent!=='plum') document.documentElement.setAttribute('data-accent',__s.accent);
+  if(__s.lang==='he'){
+    document.documentElement.setAttribute('lang','he');
+    document.documentElement.setAttribute('dir','rtl');
+    /* the page is written in English: keep it out of sight until it is Hebrew,
+       and never for long, even if the script fails */
+    document.documentElement.classList.add('lang-pending');
+    setTimeout(function(){ document.documentElement.classList.remove('lang-pending'); }, 3000);
+  }
 }catch(e){}
 </script>
 <meta name="mobile-web-app-capable" content="yes">
@@ -107,7 +115,7 @@ a.btn{text-decoration:none;display:inline-block}
 .seg{display:flex;border:1.5px solid var(--fill);border-radius:10px;overflow:hidden}
 .segopt{flex:1 1 0;border:0;background:var(--card);color:var(--plum);font:inherit;font-size:13.5px;
   font-weight:700;padding:9px 8px;cursor:pointer;line-height:1.25}
-.segopt+.segopt{border-left:1.5px solid var(--fill)}
+.segopt+.segopt{border-inline-start:1.5px solid var(--fill)}
 .segopt.on{background:var(--fill);color:var(--on-fill)}
 .blk{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--line)}
 .blk:first-child{border-top:0}
@@ -117,11 +125,11 @@ a.btn{text-decoration:none;display:inline-block}
 .blk .bt{display:flex;flex-direction:column;min-width:0;flex:1 1 auto}
 .blk .bt b{font-size:14px}
 .blk .bs{font-size:12px;color:var(--grey);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.blkedit{padding:4px 0 12px 28px;border-top:1px dashed var(--line)}
+.blkedit{padding:4px 0 12px;padding-inline-start:28px;border-top:1px dashed var(--line)}
 .fld{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:13px;color:var(--grey)}
 .fld>span{flex:0 0 94px}
 .fld select,.fld input{flex:1 1 auto;min-width:0;max-width:260px}
-.blk .x{margin-left:auto}
+.blk .x{margin-inline-start:auto}
 .blk .arrows{display:flex;gap:4px}
 .mins{font-size:12px;color:var(--grey)}
 /* ---------- collapsing sections ---------- */
@@ -133,7 +141,7 @@ a.btn{text-decoration:none;display:inline-block}
   border-bottom:2px solid var(--grey);transform:rotate(-45deg);transition:transform .15s}
 .sec[open]>summary::before{transform:rotate(45deg)}
 .sec>summary:hover{background:var(--hover)}
-.sec .sum{font-weight:400;font-size:13px;color:var(--grey);margin-left:auto;text-align:right}
+.sec .sum{font-weight:400;font-size:13px;color:var(--grey);margin-inline-start:auto;text-align:end}
 .sec>.card{border:0;border-top:1px solid var(--line);border-radius:0;margin:0}
 .sub{border-top:1px solid var(--line)}
 .sub:first-child{border-top:0}
@@ -208,7 +216,7 @@ button{font:inherit}
 .tcents{font-size:13px;color:var(--grey)}
 
 /* ---------- feedback ---------- */
-.fb{border-radius:8px;padding:12px 15px;margin:12px 0;border-left:4px solid}
+.fb{border-radius:8px;padding:12px 15px;margin:12px 0;border-inline-start:4px solid}
 .fb.good{background:var(--good-bg);border-color:var(--teal)}
 .fb.bad{background:var(--bad-bg);border-color:var(--red)}
 .fb.info{background:var(--info-bg);border-color:var(--amber)}
@@ -218,7 +226,7 @@ button{font:inherit}
 
 /* ---------- practice controls ---------- */
 .modepick{position:relative;margin:0 0 12px}
-.modebtn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;
+.modebtn{display:flex;align-items:center;gap:10px;width:100%;text-align:start;cursor:pointer;
   border:1.5px solid var(--line);border-radius:12px;background:var(--soft);color:var(--ink);
   padding:10px 14px;font:inherit}
 .modebtn:hover,.modebtn.open{border-color:var(--plum)}
@@ -229,7 +237,7 @@ button{font:inherit}
 .modebtn.open .chev{transform:rotate(180deg)}
 .modemenu{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:40;background:var(--card);
   border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 14px 34px rgba(0,0,0,.22)}
-.mopt{display:block;width:100%;text-align:left;border:0;background:transparent;color:var(--ink);
+.mopt{display:block;width:100%;text-align:start;border:0;background:transparent;color:var(--ink);
   font:inherit;padding:10px 12px;border-radius:9px;cursor:pointer}
 .mopt:hover{background:var(--hover)}
 .mopt b{display:block;font-size:15px;color:var(--plum);margin-bottom:2px}
@@ -330,7 +338,7 @@ button{font:inherit}
 .bar .track{flex:1;height:16px;background:var(--soft);border-radius:8px;overflow:hidden;
             border:1px solid var(--line)}
 .bar .fill{height:100%;border-radius:8px}
-.bar .pct{width:64px;text-align:right;color:var(--grey);flex:none;font-variant-numeric:tabular-nums}
+.bar .pct{width:64px;text-align:end;color:var(--grey);flex:none;font-variant-numeric:tabular-nums}
 
 .plan{list-style:none;margin:0 0 6px;padding:0}
 .plan li{display:flex;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
@@ -345,9 +353,9 @@ select,input[type=range]{font:inherit}
 select{padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
 input[type=range]{accent-color:var(--fill)}
 .hint{font-size:13px;color:var(--grey);margin:6px 0}
-.warn{background:var(--bad-bg);border-left:4px solid var(--red);padding:11px 14px;border-radius:8px;
+.warn{background:var(--bad-bg);border-inline-start:4px solid var(--red);padding:11px 14px;border-radius:8px;
       margin:12px 0;font-size:14px}
-.okbox{background:var(--good-bg);border-left:4px solid var(--teal);padding:11px 14px;border-radius:8px;
+.okbox{background:var(--good-bg);border-inline-start:4px solid var(--teal);padding:11px 14px;border-radius:8px;
        margin:12px 0;font-size:14px}
 kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:1px 6px;
     font-size:12px;font-family:inherit}
@@ -362,6 +370,23 @@ kbd{background:var(--soft);border:1px solid var(--line);border-radius:4px;paddin
 header.running .crosslink{display:none}
 /* the sticky bar is on screen the whole time: it gets compact well before the
    page does, because it is the first thing that runs out of room */
+/* ---------- Hebrew ----------
+   Flex rows and the logical sides above follow the text direction on their own.
+   These are the few pieces that point somewhere. */
+.lang-pending body{visibility:hidden}
+[dir="rtl"] .sec>summary::before,[dir="rtl"] .sub>summary::before{transform:rotate(135deg)}
+[dir="rtl"] .sec[open]>summary::before,[dir="rtl"] .sub[open]>summary::before{transform:rotate(45deg)}
+[dir="rtl"] .bigbtn::after{content:"\2190"}
+[dir="rtl"] .ladder span:not(:last-child)::after{content:" \2190"}
+[dir="rtl"] .stepbtn svg{transform:scaleX(-1)}
+[dir="rtl"] .switch .track::after{left:auto;right:3px}
+[dir="rtl"] .switch input:checked+.track::after{transform:translateX(-16px)}
+[dir="rtl"] .mopt.on{box-shadow:inset -3px 0 0 var(--fill)}
+/* Hebrew has no italics and no capitals: slanted letters and wide tracking only hurt it */
+[dir="rtl"] em,[dir="rtl"] .fb .char,[dir="rtl"] .deg .s{font-style:normal}
+[dir="rtl"] .lbl,[dir="rtl"] .lvlk,[dir="rtl"] .stat .k,[dir="rtl"] .modebtn .mk{letter-spacing:0}
+/* a note range such as "E♭3–D4" inside a Hebrew sentence: one piece, never split */
+bdi{white-space:nowrap}
 @media (max-width:680px){
   .wide,header .crosslink{display:none}
   .hbar{gap:6px;padding:7px 12px}
@@ -393,17 +418,17 @@ header.running .crosslink{display:none}
 
 <header id="topbar">
   <div class="hbar">
-    <span class="pill opt">Level <b id="hLevel">1</b></span>
-    <span class="pill">Key<span class="wide"> of</span> <b id="hKey">F</b></span>
-    <span class="pill opt">Session <b id="hAcc">&ndash;</b></span>
-    <label class="pill" for="masterVol" style="display:flex;align-items:center;gap:6px"><span>Vol<span class="wide">ume</span></span>
+    <span class="pill opt"><span data-t="hdr.level">Level</span> <b id="hLevel">1</b></span>
+    <span class="pill"><span data-t="hdr.key">Key<span class="wide"> of</span></span> <b id="hKey">F</b></span>
+    <span class="pill opt"><span data-t="hdr.session">Session</span> <b id="hAcc">&ndash;</b></span>
+    <label class="pill" for="masterVol" style="display:flex;align-items:center;gap:6px"><span data-t="hdr.vol">Vol<span class="wide">ume</span></span>
       <input id="masterVol" type="range" min="0" max="1" step="0.05" value="1"
              oninput="setMasterVol(parseFloat(this.value))" style="width:90px;margin:0">
     </label>
     <button class="pill timerpill" id="timerPill" style="display:none" onclick="togglePause()">
       <b id="timerBlock">&mdash;</b> <span id="timerLeft">0:00</span></button>
-    <button class="btn sm" onclick="stopAll()">Stop<span class="wide"> sound</span></button>
-    <a class="btn sm crosslink" href="tuner.html" title="Name any note you sing or play">Note detector</a>
+    <button class="btn sm" onclick="stopAll()" data-t="hdr.stop">Stop<span class="wide"> sound</span></button>
+    <a class="btn sm crosslink" href="tuner.html" title="Name any note you sing or play" data-t="hdr.tuner" data-t-title="hdr.tuner.title">Note detector</a>
   </div>
 </header>
 
@@ -414,35 +439,35 @@ header.running .crosslink{display:none}
     <div class="mtitle" id="modalTitle"></div>
     <p class="muted" id="modalBody" style="margin-bottom:14px"></p>
     <div id="modalKey" style="display:none;margin:0 0 16px">
-      <div class="lbl" style="margin-bottom:6px">Key for this block</div>
+      <div class="lbl" style="margin-bottom:6px" data-t="modal.key">Key for this block</div>
       <div class="seg" role="radiogroup">
         <button class="segopt" id="carryYes" role="radio" onclick="setCarry(true)"></button>
-        <button class="segopt" id="carryNo" role="radio" onclick="setCarry(false)">Start in a new key</button>
+        <button class="segopt" id="carryNo" role="radio" onclick="setCarry(false)" data-t="modal.newkey">Start in a new key</button>
       </div>
       <div class="hint" id="carryHint" style="margin-bottom:0"></div>
     </div>
     <div class="row">
       <button class="btn primary" id="modalGo" onclick="modalGoClick()">Start it</button>
-      <button class="btn sm" onclick="holdSession()">Hold</button>
-      <button class="btn sm" onclick="stopSession()">End session</button>
+      <button class="btn sm" onclick="holdSession()" data-t="modal.hold">Hold</button>
+      <button class="btn sm" onclick="stopSession()" data-t="sess.end">End session</button>
     </div>
   </div>
 </div>
 
 <div class="wrap">
 
-<h1>Functional Ear Trainer</h1>
-<p class="sub">Hear where a note sits in the key &mdash; not how far it is from the last one.</p>
-<p class="pagelink"><a href="tuner.html">Note detector &rarr;</a> <span class="muted">names any note you sing or play</span></p>
+<h1 data-t="title">Functional Ear Trainer</h1>
+<p class="sub" data-t="subtitle">Hear where a note sits in the key &mdash; not how far it is from the last one.</p>
+<p class="pagelink"><a href="tuner.html" data-t="link.tuner">Note detector &rarr;</a> <span class="muted" data-t="link.tuner.sub">names any note you sing or play</span></p>
 
 <details class="sec" id="secWhy" data-sec="why">
-  <summary>Why this is different</summary>
+  <summary data-t="why.title">Why this is different</summary>
   <div class="card">
-  <p style="margin-bottom:8px">Naming isolated intervals is hard because two notes in a vacuum give your ear
+  <p style="margin-bottom:8px" data-t="why.p1">Naming isolated intervals is hard because two notes in a vacuum give your ear
   nothing to hold onto. Here a <strong>tonic is always present</strong> &mdash; as a drone or a cadence
   &mdash; so every note has a fixed reference and a recognisable <em>character</em> rather than a
   measurement.</p>
-  <p class="muted" style="margin:0">Start at Level 1 with three notes, and follow the
+  <p class="muted" style="margin:0" data-t="why.p2">Start at Level 1 with three notes, and follow the
   <a href="#guide" style="color:var(--plum)">practice notes</a> at the bottom. Intervals become easy later,
   as a side effect.</p>
   </div>
@@ -450,129 +475,136 @@ header.running .crosslink{display:none}
 
 <!-- ===================== SETUP ===================== -->
 <details class="sec" id="secSetup" data-sec="setup">
-  <summary>Setup <span class="sum" id="setupSum"></span></summary>
+  <summary><span data-t="setup.title">Setup</span> <span class="sum" id="setupSum"></span></summary>
   <div class="card pad0">
-  <details class="sub" id="subTheme"><summary>Appearance <span class="sum" id="themeSum"></span></summary>
+  <details class="sub" id="subTheme"><summary><span data-t="look.title">Appearance</span> <span class="sum" id="themeSum"></span></summary>
   <div class="subbody">
+  <div class="row" id="langRow">
+    <button class="btn sm" data-lang="en" lang="en" dir="ltr" onclick="setLang('en')">English</button>
+    <button class="btn sm" data-lang="he" lang="he" dir="rtl" onclick="setLang('he')">עברית</button>
+  </div>
+  <div class="hint" data-t="look.lang.hint">The note detector follows the language too. Plan names and notes stay as
+  they were written.</div>
+  <div class="lbl" style="margin-top:14px" data-t="look.theme">Theme</div>
   <div class="row" id="themeRow">
-    <button class="btn sm" data-th="system" onclick="setTheme('system')">Match system</button>
-    <button class="btn sm" data-th="light"  onclick="setTheme('light')">Light</button>
-    <button class="btn sm" data-th="dark"   onclick="setTheme('dark')">Dark</button>
+    <button class="btn sm" data-th="system" onclick="setTheme('system')" data-t="look.system">Match system</button>
+    <button class="btn sm" data-th="light"  onclick="setTheme('light')" data-t="look.light">Light</button>
+    <button class="btn sm" data-th="dark"   onclick="setTheme('dark')" data-t="look.dark">Dark</button>
   </div>
-  <div class="lbl" style="margin-top:14px">Colour</div>
+  <div class="lbl" style="margin-top:14px" data-t="look.colour">Colour</div>
   <div class="row" id="accentRow">
-    <button class="btn sm" data-ac="plum"     onclick="setAccent('plum')">Plum</button>
-    <button class="btn sm" data-ac="blue"     onclick="setAccent('blue')">Blue</button>
-    <button class="btn sm" data-ac="steel"    onclick="setAccent('steel')">Steel</button>
-    <button class="btn sm" data-ac="graphite" onclick="setAccent('graphite')">Graphite</button>
-    <button class="btn sm" data-ac="rose"     onclick="setAccent('rose')">Rose</button>
+    <button class="btn sm" data-ac="plum"     onclick="setAccent('plum')" data-t="look.plum">Plum</button>
+    <button class="btn sm" data-ac="blue"     onclick="setAccent('blue')" data-t="look.blue">Blue</button>
+    <button class="btn sm" data-ac="steel"    onclick="setAccent('steel')" data-t="look.steel">Steel</button>
+    <button class="btn sm" data-ac="graphite" onclick="setAccent('graphite')" data-t="look.graphite">Graphite</button>
+    <button class="btn sm" data-ac="rose"     onclick="setAccent('rose')" data-t="look.rose">Rose</button>
   </div>
-  <div class="hint">Only the app's own colour changes &mdash; the green, amber and red of the answers
+  <div class="hint" data-t="look.hint">Only the app's own colour changes &mdash; the green, amber and red of the answers
   mean something, so they stay. The note detector and the browser tab follow it; the home-screen
   icon is fixed.</div>
 
   </div></details>
 
-  <details class="sub" id="subRange"><summary>Your singing range <span class="sum" id="rangeSum"></span></summary>
+  <details class="sub" id="subRange"><summary><span data-t="range.title">Your singing range</span> <span class="sum" id="rangeSum"></span></summary>
   <div class="subbody">
   <div class="row">
-    <label class="muted" for="loSel">Lowest comfortable</label>
+    <label class="muted" for="loSel" data-t="range.lo">Lowest comfortable</label>
     <select id="loSel"></select>
-    <button class="btn sm" onclick="auditionNote(S.voiceLo)">Hear</button>
-    <label class="muted" for="hiSel" style="margin-left:8px">Highest</label>
+    <button class="btn sm" onclick="auditionNote(S.voiceLo)" data-t="btn.hear">Hear</button>
+    <label class="muted" for="hiSel" style="margin-inline-start:8px" data-t="range.hi">Highest</label>
     <select id="hiSel"></select>
-    <button class="btn sm" onclick="auditionNote(S.voiceHi)">Hear</button>
+    <button class="btn sm" onclick="auditionNote(S.voiceHi)" data-t="btn.hear">Hear</button>
   </div>
-  <div class="hint">Sing along with each to check. Set these honestly &mdash; every note the app
+  <div class="hint" data-t="range.hint">Sing along with each to check. Set these honestly &mdash; every note the app
   plays is chosen so you can sing it back.</div>
 
   </div></details>
 
-  <details class="sub" id="subKey"><summary>Key and how often it changes <span class="sum" id="keySum"></span></summary>
+  <details class="sub" id="subKey"><summary><span data-t="key.title">Key and how often it changes</span> <span class="sum" id="keySum"></span></summary>
   <div class="subbody">
   <div class="row">
-    <label class="muted" for="tonicSel">Tonic</label>
+    <label class="muted" for="tonicSel" data-t="key.tonic">Tonic</label>
     <select id="tonicSel"></select>
-    <button class="btn sm" onclick="previewKey()">Hear the key</button>
-    <button class="btn sm" onclick="newKeyNow()">Pick a new key</button>
+    <button class="btn sm" onclick="previewKey()" data-t="key.hear">Hear the key</button>
+    <button class="btn sm" onclick="newKeyNow()" data-t="key.new">Pick a new key</button>
   </div>
   <div class="hint" id="rangeNote"></div>
 
-  <div class="lbl" style="margin-top:14px">Changing keys</div>
+  <div class="lbl" style="margin-top:14px" data-t="key.changing">Changing keys</div>
   <div class="row" id="keyModeRow">
-    <button class="btn sm" data-km="fixed"    onclick="setKeyMode('fixed')">Fixed</button>
-    <button class="btn sm" data-km="session"  onclick="setKeyMode('session')">New key each session</button>
-    <button class="btn sm" data-km="question" onclick="setKeyMode('question')">Every few questions</button>
+    <button class="btn sm" data-km="fixed"    onclick="setKeyMode('fixed')" data-t="key.fixed">Fixed</button>
+    <button class="btn sm" data-km="session"  onclick="setKeyMode('session')" data-t="key.session">New key each session</button>
+    <button class="btn sm" data-km="question" onclick="setKeyMode('question')" data-t="key.question">Every few questions</button>
   </div>
   <div class="row" id="keyEveryRow" style="margin-top:8px;display:none">
-    <label class="muted" for="keyEverySel">New key every</label>
+    <label class="muted" for="keyEverySel" data-t="key.every">New key every</label>
     <select id="keyEverySel" onchange="setKeyEvery(parseInt(this.value,10))">
-      <option value="10">10 questions</option>
-      <option value="8">8 questions</option>
-      <option value="5">5 questions</option>
-      <option value="3">3 questions</option>
-      <option value="2">2 questions</option>
-      <option value="1">question (hardest)</option>
+      <option value="10" data-t="q10">10 questions</option>
+      <option value="8" data-t="q8">8 questions</option>
+      <option value="5" data-t="q5">5 questions</option>
+      <option value="3" data-t="q3">3 questions</option>
+      <option value="2" data-t="q2">2 questions</option>
+      <option value="1" data-t="q1hard">question (hardest)</option>
     </select>
   </div>
   <div class="hint" id="keyModeHint"></div>
 
   </div></details>
 
-  <details class="sub" id="subRef"><summary>Key reference <span class="sum" id="refSum"></span></summary>
+  <details class="sub" id="subRef"><summary><span data-t="ref.title">Key reference</span> <span class="sum" id="refSum"></span></summary>
   <div class="subbody">
   <div class="row">
-    <button class="btn sm on" id="ctxDrone" onclick="setContext('drone')">Drone</button>
-    <button class="btn sm" id="ctxCad" onclick="setContext('cadence')">Cadence</button>
-    <button class="btn sm" id="ctxBoth" onclick="setContext('both')">Cadence then drone</button>
+    <button class="btn sm on" id="ctxDrone" onclick="setContext('drone')" data-t="ref.drone">Drone</button>
+    <button class="btn sm" id="ctxCad" onclick="setContext('cadence')" data-t="ref.cad">Cadence</button>
+    <button class="btn sm" id="ctxBoth" onclick="setContext('both')" data-t="ref.both">Cadence then drone</button>
   </div>
-  <div class="hint">A drone is the strongest anchor and the one to start with. Cadence mode is closer to
+  <div class="hint" data-t="ref.hint">A drone is the strongest anchor and the one to start with. Cadence mode is closer to
   real music and a little harder.</div>
-  <div class="lbl" style="margin-top:14px">Cadence</div>
+  <div class="lbl" style="margin-top:14px" data-t="ref.cad">Cadence</div>
   <div class="row" id="cadModeRow">
-    <button class="btn sm" data-cm="classic" onclick="setCadMode('classic')">Classic</button>
-    <button class="btn sm" data-cm="mixed" onclick="setCadMode('mixed')">Mixed</button>
-    <button class="btn sm" onclick="auditionCadence()">Hear it</button>
+    <button class="btn sm" data-cm="classic" onclick="setCadMode('classic')" data-t="ref.classic">Classic</button>
+    <button class="btn sm" data-cm="mixed" onclick="setCadMode('mixed')" data-t="ref.mixed">Mixed</button>
+    <button class="btn sm" onclick="auditionCadence()" data-t="btn.hearit">Hear it</button>
   </div>
   <div class="row" id="cadChangeRow" style="margin-top:8px;display:none">
-    <label class="muted" for="cadChangeSel">New cadence</label>
+    <label class="muted" for="cadChangeSel" data-t="ref.newcad">New cadence</label>
     <select id="cadChangeSel" onchange="setCadChange(this.value)">
-      <option value="question">every question</option>
-      <option value="n">every few questions</option>
-      <option value="key">when the key changes</option>
-      <option value="fixed">only when I ask</option>
+      <option value="question" data-t="ref.every.q">every question</option>
+      <option value="n" data-t="ref.every.n">every few questions</option>
+      <option value="key" data-t="ref.every.key">when the key changes</option>
+      <option value="fixed" data-t="ref.every.ask">only when I ask</option>
     </select>
     <select id="cadEverySel" style="display:none" onchange="setCadEvery(parseInt(this.value,10))">
-      <option value="2">2 questions</option>
-      <option value="3">3 questions</option>
-      <option value="5">5 questions</option>
-      <option value="8">8 questions</option>
+      <option value="2" data-t="q2">2 questions</option>
+      <option value="3" data-t="q3">3 questions</option>
+      <option value="5" data-t="q5">5 questions</option>
+      <option value="8" data-t="q8">8 questions</option>
     </select>
   </div>
   <div class="hint" id="cadHint"></div>
   <div class="row" style="margin-top:8px">
-    <label class="muted" for="cadGapSel">Silence before the note</label>
+    <label class="muted" for="cadGapSel" data-t="ref.gap">Silence before the note</label>
     <select id="cadGapSel" onchange="setCadGap(parseFloat(this.value))">
-      <option value="0">none</option>
-      <option value="1">1 second</option>
-      <option value="2">2 seconds</option>
+      <option value="0" data-t="ref.gap.0">none</option>
+      <option value="1" data-t="ref.gap.1">1 second</option>
+      <option value="2" data-t="ref.gap.2">2 seconds</option>
     </select>
   </div>
-  <div class="hint">A gap makes you hold the key in your head instead of measuring against a ringing
+  <div class="hint" data-t="ref.gap.hint">A gap makes you hold the key in your head instead of measuring against a ringing
   chord &mdash; harder, and closer to real singing. It applies when the reference is a cadence
   on its own.</div>
 
   <div class="row" style="margin-top:16px">
-    <label class="muted" for="droneVol">Drone volume</label>
+    <label class="muted" for="droneVol" data-t="ref.vol">Drone volume</label>
     <input id="droneVol" type="range" min="0" max="0.9" step="0.05" value="0.45"
            oninput="setDroneVol(parseFloat(this.value))" style="width:150px">
     <span class="muted" id="droneVolVal">45%</span>
-    <button class="btn sm" onclick="auditionDrone()">Hear the drone</button>
+    <button class="btn sm" onclick="auditionDrone()" data-t="ref.hear">Hear the drone</button>
   </div>
 
   </div></details>
 
-  <details class="sub" id="subMic"><summary>Microphone <span class="sum" id="micSum"></span></summary>
+  <details class="sub" id="subMic"><summary><span data-t="mic.title">Microphone</span> <span class="sum" id="micSum"></span></summary>
   <div class="subbody">
   <div class="row">
     <button class="btn teal" id="micBtn" onclick="toggleMic()">Turn on the microphone</button>
@@ -581,17 +613,17 @@ header.running .crosslink{display:none}
   <label class="row" style="margin-top:10px;cursor:pointer">
     <input id="micAuto" type="checkbox" onchange="setMicAuto(this.checked)"
            style="width:18px;height:18px;accent-color:var(--fill)">
-    <span class="muted">Turn the microphone on when the app opens</span>
+    <span class="muted" data-t="mic.auto">Turn the microphone on when the app opens</span>
   </label>
-  <div class="hint">Only once you have allowed it for this site. It never asks on its own.</div>
+  <div class="hint" data-t="mic.auto.hint">Only once you have allowed it for this site. It never asks on its own.</div>
   <div class="row" id="micPickRow" style="display:none;margin-top:10px">
-    <label class="muted" for="micSel">Sing into</label>
+    <label class="muted" for="micSel" data-t="mic.into">Sing into</label>
     <select id="micSel" style="max-width:100%;flex:1 1 220px" onchange="switchMic(this.value)"></select>
   </div>
   <div class="warn" id="btWarn" style="display:none"></div>
-  <div class="hint">Running as: <span id="envLine">&mdash;</span></div>
+  <div class="hint"><span data-t="mic.env">Running as:</span> <span id="envLine">&mdash;</span></div>
   <div class="warn" id="micHelp" style="display:none"></div>
-  <div class="warn" id="phoneWarn" style="display:none">
+  <div class="warn" id="phoneWarn" style="display:none" data-t="mic.phones">
     <strong>Use headphones.</strong> Without them the drone leaks into the microphone and the pitch
     detection gets confused. Wired headphones are best. With Bluetooth headphones, sing into the
     phone's or laptop's own microphone (pick it above) &mdash; using the headset's mic drops the
@@ -603,40 +635,40 @@ header.running .crosslink{display:none}
 
 <!-- ===================== SESSION ===================== -->
 <details class="sec" id="secSession" data-sec="session">
-  <summary>Session <span class="sum" id="sessSum"></span></summary>
+  <summary><span data-t="sess.title">Session</span> <span class="sum" id="sessSum"></span></summary>
   <div class="card">
     <div class="row">
-      <label class="muted" for="planSel">Plan</label>
+      <label class="muted" for="planSel" data-t="sess.plan">Plan</label>
       <select id="planSel" onchange="selectPlan(this.value)"></select>
     </div>
     <div class="row" style="margin-top:8px">
-      <label class="muted" for="planName">Name</label>
+      <label class="muted" for="planName" data-t="sess.name">Name</label>
       <input id="planName" type="text" maxlength="28" style="flex:1 1 130px"
              oninput="renamePlan(this.value)">
     </div>
     <div class="row" style="margin-top:10px">
-      <button class="btn primary" id="startSessBtn" onclick="startSession()">Start session</button>
+      <button class="btn primary" id="startSessBtn" onclick="startSession()" data-t="sess.start">Start session</button>
       <button class="btn primary" id="pauseBtn" style="display:none" onclick="togglePause()">Pause</button>
-      <button class="btn sm" id="skipBlockBtn" style="display:none" onclick="skipBlock()">Skip block</button>
-      <button class="btn sm" id="stopSessBtn" style="display:none" onclick="stopSession()">End session</button>
+      <button class="btn sm" id="skipBlockBtn" style="display:none" onclick="skipBlock()" data-t="sess.skip">Skip block</button>
+      <button class="btn sm" id="stopSessBtn" style="display:none" onclick="stopSession()" data-t="sess.end">End session</button>
     </div>
     <div class="hint" id="planHint"></div>
 
     <div id="planList"></div>
     <div class="row" style="margin-top:10px">
-      <button class="btn sm" onclick="addBlock()">Add a block</button>
-      <button class="btn sm" onclick="newPlan()">New plan</button>
-      <button class="btn sm" onclick="duplicatePlan()">Duplicate</button>
-      <button class="btn sm" id="revertBtn" style="display:none" onclick="revertPlan()">Revert to repo copy</button>
-      <button class="btn sm" id="delPlanBtn" onclick="deletePlan()">Delete plan</button>
-      <button class="btn sm" onclick="copyPlan()">Copy JSON</button>
-      <button class="btn sm" onclick="resetPlans()">Reset everything</button>
+      <button class="btn sm" onclick="addBlock()" data-t="sess.add">Add a block</button>
+      <button class="btn sm" onclick="newPlan()" data-t="sess.new">New plan</button>
+      <button class="btn sm" onclick="duplicatePlan()" data-t="sess.dup">Duplicate</button>
+      <button class="btn sm" id="revertBtn" style="display:none" onclick="revertPlan()" data-t="sess.revert">Revert to repo copy</button>
+      <button class="btn sm" id="delPlanBtn" onclick="deletePlan()" data-t="sess.del">Delete plan</button>
+      <button class="btn sm" onclick="copyPlan()" data-t="sess.copy">Copy JSON</button>
+      <button class="btn sm" onclick="resetPlans()" data-t="sess.reset">Reset everything</button>
     </div>
     <textarea id="planJson" readonly style="display:none;width:100%;height:150px;margin-top:10px;
       font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;border:1px solid var(--line);
       border-radius:8px;background:var(--soft);color:var(--ink);padding:8px"></textarea>
     <div class="hint" id="planSource"></div>
-    <div class="hint">Each block can carry its own mode, level, key setting, cadence style and
+    <div class="hint" data-t="sess.hint">Each block can carry its own mode, level, key setting, cadence style and
     note-name hiding. Anything left on <em>keep</em> stays as you have it. Plans in
     <code>plans/</code> in the repo load on every device; editing one here keeps your version in this
     browser only, and <em>Copy JSON</em> gives you the text to paste back into the file.</div>
@@ -644,13 +676,13 @@ header.running .crosslink{display:none}
 </details>
 
 <!-- ===================== PRACTICE ===================== -->
-<h2>Practice</h2>
+<h2 data-t="prac.title">Practice</h2>
 <div class="card" id="practice">
   <!-- what kind of question: one choice, so one control -->
   <div class="modepick" id="modePick">
     <button type="button" class="modebtn" id="modeBtn" aria-haspopup="listbox" aria-expanded="false"
             onclick="toggleModeMenu()">
-      <span class="mk">Mode</span>
+      <span class="mk" data-t="prac.mode">Mode</span>
       <span class="mv" id="modeName">Hear &rarr; sing &rarr; name</span>
       <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
     </button>
@@ -670,24 +702,24 @@ header.running .crosslink{display:none}
 
   <!-- help while answering: secondary, so they look it -->
   <div class="tools" id="tools">
-    <button type="button" class="tool" id="replayBtn" onclick="replay()" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4.5V9h4.5"/></svg><span>Replay note</span></button>
-    <button type="button" class="tool" id="ctxBtn" onclick="replayContext()" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V21"/><path d="M5 13.5a7 7 0 0 0 14 0"/><path d="M8.5 10.5h7"/></svg><span>Replay key</span></button>
-    <button type="button" class="tool" id="inctxBtn" onclick="hearInContext()" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="7" cy="17.5" rx="3" ry="2.3"/><ellipse cx="17" cy="8.5" rx="3" ry="2.3"/><path d="M9.6 15.6l4.8-5.2" stroke-dasharray="2 2.2"/></svg><span>Against do</span></button>
+    <button type="button" class="tool" id="replayBtn" onclick="replay()" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4.5V9h4.5"/></svg><span data-t="prac.replay">Replay note</span></button>
+    <button type="button" class="tool" id="ctxBtn" onclick="replayContext()" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V21"/><path d="M5 13.5a7 7 0 0 0 14 0"/><path d="M8.5 10.5h7"/></svg><span data-t="prac.replaykey">Replay key</span></button>
+    <button type="button" class="tool" id="inctxBtn" onclick="hearInContext()" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="7" cy="17.5" rx="3" ry="2.3"/><ellipse cx="17" cy="8.5" rx="3" ry="2.3"/><path d="M9.6 15.6l4.8-5.2" stroke-dasharray="2 2.2"/></svg><span data-t="prac.against">Against do</span></button>
   </div>
 
   <div id="selfCheck" class="card" style="display:none;margin:10px 0;background:var(--info-bg);
        border-color:var(--amber)">
-    <div class="lbl" style="color:var(--amber)">Sing it, then check yourself</div>
+    <div class="lbl" style="color:var(--amber)" data-t="self.title">Sing it, then check yourself</div>
     <p id="selfPrompt" style="margin-bottom:10px"></p>
-    <button type="button" class="tool full" onclick="playTarget()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg><span>Play the note to compare</span></button>
+    <button type="button" class="tool full" onclick="playTarget()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg><span data-t="self.play">Play the note to compare</span></button>
     <div class="answers">
-      <button type="button" class="ans yes" onclick="selfReport(true)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>I matched it</span></button>
-      <button type="button" class="ans no" onclick="selfReport(false)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg><span>I missed it</span></button>
+      <button type="button" class="ans yes" onclick="selfReport(true)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span data-t="self.yes">I matched it</span></button>
+      <button type="button" class="ans no" onclick="selfReport(false)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg><span data-t="self.no">I missed it</span></button>
     </div>
     <div class="row" style="justify-content:space-between;align-items:baseline;margin-top:4px">
-      <div class="hint" style="margin:0;flex:1 1 200px">Sing first, <em>then</em> play to compare. Checking
+      <div class="hint" style="margin:0;flex:1 1 200px" data-t="self.hint">Sing first, <em>then</em> play to compare. Checking
       before you commit teaches you nothing.</div>
-      <button type="button" class="textbtn" onclick="skipSing()">Skip singing</button>
+      <button type="button" class="textbtn" onclick="skipSing()" data-t="sing.skip">Skip singing</button>
     </div>
   </div>
 
@@ -695,7 +727,7 @@ header.running .crosslink{display:none}
     <div class="meter">
       <div class="zone"></div><div class="mid"></div>
       <div class="needle" id="needle"></div>
-      <div class="off" id="meterOff">waiting for your voice&hellip;</div>
+      <div class="off" id="meterOff" data-t="sing.waiting">waiting for your voice&hellip;</div>
     </div>
     <div class="tunerrow">
       <span class="tnote" id="tNote">&mdash;</span>
@@ -703,12 +735,12 @@ header.running .crosslink{display:none}
     </div>
     <div class="singctl">
       <button type="button" class="listen" id="listenBtn" onclick="toggleListen()"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/></svg><span class="dot"></span><span id="listenLabel">Start listening</span></button>
-      <button type="button" class="textbtn" onclick="skipSing()">Skip singing</button>
+      <button type="button" class="textbtn" onclick="skipSing()" data-t="sing.skip">Skip singing</button>
     </div>
     <label class="switch">
       <input type="checkbox" id="namesSwitch" role="switch" onchange="toggleHideNotes()">
       <span class="track"></span>
-      <span class="swlbl">Show note names <span class="muted">while I sing</span></span>
+      <span class="swlbl" data-t="sing.names">Show note names <span class="muted">while I sing</span></span>
     </label>
   </div>
 
@@ -720,44 +752,44 @@ header.running .crosslink{display:none}
 
 <!-- ===================== PROGRESS ===================== -->
 <details class="sec" id="secProgress" data-sec="progress" open>
-  <summary>Progress <span class="sum" id="progSum"></span></summary>
+  <summary><span data-t="prog.title">Progress</span> <span class="sum" id="progSum"></span></summary>
   <div class="card">
   <!-- the level is a value you step through, so it gets a stepper -->
   <div class="lvlstep">
-    <button type="button" class="stepbtn" id="lvlDown" onclick="prevLevel()" aria-label="Easier level"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"/></svg><span>Easier</span></button>
+    <button type="button" class="stepbtn" id="lvlDown" onclick="prevLevel()" aria-label="Easier level" data-t-aria="prog.easier.aria"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"/></svg><span data-t="prog.easier">Easier</span></button>
     <div class="lvlmid">
-      <div class="lvlk">Level <b id="pLevel">1</b> of 4</div>
+      <div class="lvlk"><span data-t="hdr.level">Level</span> <b id="pLevel">1</b> <span data-t="prog.of4">of 4</span></div>
       <div class="lvlname" id="pLevelName">Tonic triad</div>
       <div class="lvldeg" id="pLevelDeg"></div>
     </div>
-    <button type="button" class="stepbtn" id="lvlUp" onclick="nextLevel()" aria-label="Harder level"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg><span>Harder</span></button>
+    <button type="button" class="stepbtn" id="lvlUp" onclick="nextLevel()" aria-label="Harder level" data-t-aria="prog.harder.aria"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg><span data-t="prog.harder">Harder</span></button>
   </div>
   <div class="stats">
-    <div class="stat"><div class="k">Answered</div><div class="v" id="pCount">0</div></div>
-    <div class="stat"><div class="k">Recent</div><div class="v" id="pRecent">&ndash;</div></div>
+    <div class="stat"><div class="k" data-t="prog.answered">Answered</div><div class="v" id="pCount">0</div></div>
+    <div class="stat"><div class="k" data-t="prog.recent">Recent</div><div class="v" id="pRecent">&ndash;</div></div>
   </div>
   <div id="advice"></div>
   <div class="lbl" style="margin-top:12px" id="barsLabel">Naming accuracy by degree</div>
   <div class="bars" id="bars"></div>
   <div class="hint" id="weakNote"></div>
   <div class="resetrow">
-    <button type="button" class="textbtn danger" id="resetBtn" onclick="askReset()">Reset progress</button>
+    <button type="button" class="textbtn danger" id="resetBtn" onclick="askReset()" data-t="prog.reset">Reset progress</button>
   </div>
   </div>
 </details>
 
 <details class="sec" id="secGuide" data-sec="guide">
-  <summary id="guide">How to practise</summary>
+  <summary id="guide" data-t="guide.title">How to practise</summary>
   <div class="card">
-  <p><strong>Ten to twelve minutes a day, not an hour a week.</strong> This is a memory task, and memory
+  <p data-t="guide.p1"><strong>Ten to twelve minutes a day, not an hour a week.</strong> This is a memory task, and memory
   responds to frequency far more than duration.</p>
-  <p class="muted" style="margin-bottom:14px">What to do <em>in</em> a session is the
+  <p class="muted" style="margin-bottom:14px" data-t="guide.p2">What to do <em>in</em> a session is the
   <a href="#secSession" style="color:var(--plum)">Session plan</a> above &mdash; that is the thing that
   actually runs, so it is the only description of a session worth keeping. What follows is the reasoning
   behind it, which is what you need when you build a plan of your own.</p>
 
-  <h3>Shape of a session</h3>
-  <p class="muted" style="margin-bottom:10px">
+  <h3 data-t="guide.shape">Shape of a session</h3>
+  <p class="muted" style="margin-bottom:10px" data-t="guide.shape.p">
   <strong>Open with the voice, not the brain.</strong> A minute or two of <em>Match the pitch</em> connects
   ear to voice before anything is being judged.<br>
   <strong>Spend the bulk in one mode, at one level.</strong> Roughly two thirds of the session, in
@@ -769,8 +801,8 @@ header.running .crosslink{display:none}
   <strong>Warm up easier than you finish.</strong> If the main block has keys moving, give the warm-up one
   steady key so <em>do</em> settles first.</p>
 
-  <h3>Every question</h3>
-  <p class="muted" style="margin-bottom:10px">
+  <h3 data-t="guide.everyq">Every question</h3>
+  <p class="muted" style="margin-bottom:10px" data-t="guide.everyq.p">
   <strong>After a key change, find <em>do</em> before you answer.</strong> Hum it quietly the moment the
   cadence ends. If you can&rsquo;t, press <em>Replay key</em> &mdash; that isn&rsquo;t cheating,
   it&rsquo;s the skill.<br>
@@ -781,19 +813,19 @@ header.running .crosslink{display:none}
   <strong>Say the character, not just the number.</strong> &ldquo;The leaning one&rdquo; sticks;
   &ldquo;degree 7&rdquo; doesn&rsquo;t.</p>
 
-  <h3>The key-change ladder</h3>
-  <p class="muted" style="margin-bottom:8px">Each level is climbed in steps. Stay on a step until the main
+  <h3 data-t="guide.ladder">The key-change ladder</h3>
+  <p class="muted" style="margin-bottom:8px" data-t="guide.ladder.p">Each level is climbed in steps. Stay on a step until the main
   block scores <strong>85% or more</strong> over at least 15 questions (two sessions in a row is safer),
   then move one step right. Below about 60%, step back one. Only when you reach <em>every question</em> is
   the level truly done.</p>
   <div class="ladder">
-    <span>Each session</span><span>10</span><span>8</span><span>5</span><span>3</span><span>2</span><span>Every question</span>
+    <span data-t="ladder.session">Each session</span><span>10</span><span>8</span><span>5</span><span>3</span><span>2</span><span data-t="ladder.every">Every question</span>
   </div>
-  <p class="muted" style="margin:8px 0 10px">Then move up a level and start the ladder again from <em>Each
+  <p class="muted" style="margin:8px 0 10px" data-t="guide.ladder.after">Then move up a level and start the ladder again from <em>Each
   session</em>. It goes faster each time, because the skill of re-finding <em>do</em> carries over.</p>
 
-  <h3>What progress looks like</h3>
-  <p class="muted" style="margin:0">A score that drops when keys start moving is normal: it means you were
+  <h3 data-t="guide.progress">What progress looks like</h3>
+  <p class="muted" style="margin:0" data-t="guide.progress.p">A score that drops when keys start moving is normal: it means you were
   leaning on the key staying still, and now you&rsquo;re learning not to. Level 1 comes quickly &mdash; do,
   mi and sol are very distinct. Level 3 is where it gets real, because <em>fa</em> and <em>ti</em> are the
   two people confuse. If you stall, that&rsquo;s expected, not a sign this isn&rsquo;t working. Step back on
@@ -801,11 +833,12 @@ header.running .crosslink{display:none}
   </div>
 </details>
 
-<p class="muted" style="margin-top:22px">Progress is saved in this browser only. Nothing is uploaded, and
+<p class="muted" style="margin-top:22px" data-t="footer">Progress is saved in this browser only. Nothing is uploaded, and
 the microphone audio never leaves this page.</p>
 
 </div>
 
+<script src="he.js"></script>
 <script>
 /* =========================================================================
    PITCH DETECTION  (normalised autocorrelation, tuned for a low male voice)
@@ -909,6 +942,7 @@ var S = {
   cadMode:'classic', cadChange:'key', cadEvery:3, cadGap:0, cadId:'classic', cadClose:0, cadBpm:96, cadCount:0,
   open:{why:false, setup:false, session:false, progress:true, guide:false},
   plans:null, planId:'daily-12', edits:null, micAuto:false, accent:'plum', carryKey:true, masterVol:1, hideNotes:false, theme:'system',
+  lang:'en',
   stats:{}, recent:[], answered:0, current:null, lastDegree:null,
   phase:'idle'     // idle | sing | name | done
 };
@@ -1358,9 +1392,9 @@ function attachMic(stream){
   var track=stream.getAudioTracks()[0];
   var settings = track && track.getSettings ? track.getSettings() : {};
   if(settings.deviceId){ S.micId=settings.deviceId; save(); }
-  document.getElementById('micBtn').textContent='Turn the microphone off';
+  micErr=null;
+  renderMicText();
   document.getElementById('micBtn').classList.add('on');
-  document.getElementById('micStatus').textContent='On — singing modes available';
   document.getElementById('micHelp').style.display='none';
   document.getElementById('phoneWarn').style.display='block';
   renderMode();
@@ -1383,8 +1417,8 @@ function listMics(activeLabel, activeRate){
     var row=document.getElementById('micPickRow');
     if(!mics.length){ row.style.display='none'; return; }
     sel.innerHTML = mics.map(function(d,i){
-      var name = d.label || ('Microphone '+(i+1));
-      if(looksLikeHeadsetMic(name)) name += '  — headset, lowers playback quality';
+      var name = d.label || _('Microphone {n}', {n:i+1});
+      if(looksLikeHeadsetMic(name)) name += _('  — headset, lowers playback quality');
       return '<option value="'+d.deviceId.replace(/"/g,'&quot;')+'"'+
              (d.deviceId===S.micId?' selected':'')+'>'+name.replace(/</g,'&lt;')+'</option>';
     }).join('');
@@ -1396,15 +1430,16 @@ function warnIfHeadset(label, canSwitch, rate){
   var box=document.getElementById('btWarn');
   var byName=looksLikeHeadsetMic(label), byRate=callQuality(rate);
   if(!byName && !byRate){ box.style.display='none'; return; }
-  box.innerHTML='<strong>'+(byName ? 'You are singing into a Bluetooth headset microphone'
-                                    : 'This microphone is running at call quality ('+
-                                      Math.round(rate/1000)+'\u202fkHz)')+'</strong>'+
-    (label ? ' ('+String(label).replace(/</g,'&lt;')+')' : '')+'. While it is open, Bluetooth headphones drop into '+
-    'phone-call mode, so the drone and notes will sound muffled. '+
-    (canSwitch ? 'Pick the phone’s or laptop’s built-in microphone above. '
-               : 'No other microphone is available right now. ')+
-    'If playback still sounds like a call after switching, your phone is routing through the headset '+
-    'anyway — wired headphones, or the self-check modes with the mic off, avoid it.';
+  box.innerHTML='<strong>'+(byName ? _('You are singing into a Bluetooth headset microphone')
+                                    : _('This microphone is running at call quality ({k}\u202fkHz)',
+                                        {k:Math.round(rate/1000)}))+'</strong>'+
+    (label ? ' ('+String(label).replace(/</g,'&lt;')+')' : '')+
+    _('. While it is open, Bluetooth headphones drop into '+
+      'phone-call mode, so the drone and notes will sound muffled. ')+
+    (canSwitch ? _('Pick the phone’s or laptop’s built-in microphone above. ')
+               : _('No other microphone is available right now. '))+
+    _('If playback still sounds like a call after switching, your phone is routing through the headset '+
+      'anyway — wired headphones, or the self-check modes with the mic off, avoid it.');
   box.style.display='block';
 }
 function switchMic(id){
@@ -1429,35 +1464,37 @@ try{
 function inFrame(){
   try { return window.self !== window.top; } catch(e){ return true; }
 }
+var micErr=null;      /* the last failure, kept so a language switch can say it again */
 function micFailed(err){
+  micErr=err;
   var box=document.getElementById('micHelp');
   var status=document.getElementById('micStatus');
-  var name = err && err.name ? err.name : 'unknown error';
+  var name = err && err.name ? err.name : _('unknown error');
   var html;
   if(name==='NotAllowedError' && inFrame()){
-    status.textContent='Blocked by the preview frame';
-    html='<strong>This page is running inside a preview panel, which does not pass '+
+    status.textContent=_('Blocked by the preview frame');
+    html=_('<strong>This page is running inside a preview panel, which does not pass '+
          'microphone access through to it.</strong> Nothing here can work around that. '+
          '<br><br>Download this file and open it directly in a browser tab — double-click it, '+
          'or drag it onto a browser window — and the microphone will work. '+
-         'In the meantime <em>Identify only</em> mode needs no microphone and trains the same thing.';
+         'In the meantime <em>Identify only</em> mode needs no microphone and trains the same thing.');
   } else if(name==='NotAllowedError'){
-    status.textContent='Permission denied';
-    html='<strong>The browser refused microphone access.</strong> Two places to check: '+
+    status.textContent=_('Permission denied');
+    html=_('<strong>The browser refused microphone access.</strong> Two places to check: '+
          'the padlock or camera icon in the address bar, where you can allow the microphone '+
          'for this page and reload; and your operating system’s privacy settings, which have '+
-         'a separate list of apps allowed to use the microphone — your browser has to be on it.';
+         'a separate list of apps allowed to use the microphone — your browser has to be on it.');
   } else if(name==='NotFoundError' || name==='OverconstrainedError'){
-    status.textContent='No microphone found';
-    html='No input device was found. Plug in or enable a microphone and try again.';
+    status.textContent=_('No microphone found');
+    html=_('No input device was found. Plug in or enable a microphone and try again.');
   } else if(name==='NotReadableError'){
-    status.textContent='Microphone busy';
-    html='Something else is already using the microphone — a call, a recorder, another tab. '+
-         'Close it and try again.';
+    status.textContent=_('Microphone busy');
+    html=_('Something else is already using the microphone — a call, a recorder, another tab. '+
+         'Close it and try again.');
   } else {
-    status.textContent='Blocked: '+name;
-    html='The microphone could not be opened ('+name+'). <em>Identify only</em> mode works '+
-         'without it.';
+    status.textContent=_('Blocked: {e}', {e:name});
+    html=_('The microphone could not be opened ({e}). <em>Identify only</em> mode works '+
+         'without it.', {e:name});
   }
   box.innerHTML=html;
   box.style.display='block';
@@ -1477,25 +1514,25 @@ function checkEnvironment(){
 function checkEnvironmentInner(){
   var box=document.getElementById('micHelp'), msg=null;
   if(inFrame()){
-    msg='<strong>This page is inside a preview panel</strong>, which does not pass microphone access '+
+    msg=_('<strong>This page is inside a preview panel</strong>, which does not pass microphone access '+
         'through to it. Download the file and open it in its own browser tab for the microphone. '+
-        'Everything else works here, and the singing modes fall back to grading yourself.';
+        'Everything else works here, and the singing modes fall back to grading yourself.');
   } else if(localFile() && isMobile()){
-    msg='<strong>Chrome on a phone will not give the microphone to a page opened from a local file</strong> '+
+    msg=_('<strong>Chrome on a phone will not give the microphone to a page opened from a local file</strong> '+
         '— a file has no web address for the permission to attach to, so it is refused before you are '+
         'even asked. This is not something the page can fix.'+
         '<br><br>Either use the phone for <em>Identify only</em> and the singing modes on your computer, '+
         'or grade yourself: the singing modes work here, you just tap whether you matched it. '+
-        'To get the microphone working on the phone, the file has to be served over https.';
+        'To get the microphone working on the phone, the file has to be served over https.');
   }
   if(msg && box){ box.innerHTML=msg; box.style.display='block'; }
   var env=document.getElementById('envLine');
   if(env){
     var proto='?';
     try { proto=location.protocol.replace(':',''); } catch(e){}
-    env.textContent = proto + (inFrame()?' · inside a frame':' · top level') +
-      (window.isSecureContext===false ? ' · not a secure context' : '') +
-      (isMobile()?' · mobile':'');
+    env.textContent = proto + (inFrame() ? _(' · inside a frame') : _(' · top level')) +
+      (window.isSecureContext===false ? _(' · not a secure context') : '') +
+      (isMobile() ? _(' · mobile') : '');
   }
 }
 function stopMic(){
@@ -1505,13 +1542,19 @@ function stopMic(){
   analyser=null;
   document.getElementById('micPickRow').style.display='none';
   document.getElementById('btWarn').style.display='none';
-  document.getElementById('micBtn').textContent='Turn on the microphone';
+  renderMicText();
   document.getElementById('micBtn').classList.remove('on');
-  document.getElementById('micStatus').textContent=
-    'Off — singing modes will ask you to grade yourself';
   document.getElementById('phoneWarn').style.display='none';
   renderMode();
   renderSummaries();        /* the mic is the one setting that never saves */
+}
+/* the microphone button and status line, drawn from the state */
+function renderMicText(){
+  var b=document.getElementById('micBtn'), st=document.getElementById('micStatus');
+  if(b) b.textContent = micStream ? _('Turn the microphone off') : _('Turn on the microphone');
+  if(st && (micStream || !micErr))
+    st.textContent = micStream ? _('On — singing modes available')
+                               : _('Off — singing modes will ask you to grade yourself');
 }
 /* Seeing "A2" while you sing, in a known key, lets you work the degree out by
    arithmetic instead of by ear. This hides note names only -- the meter, the
@@ -1526,7 +1569,7 @@ function renderHideNotes(){
   var sw=document.getElementById('namesSwitch');
   if(sw){ sw.checked = !S.hideNotes; sw.setAttribute('aria-checked', String(!S.hideNotes)); }
   var t=document.getElementById('tNote');
-  if(t && S.hideNotes && t.textContent!=='—') t.textContent='note hidden';
+  if(t && S.hideNotes && t.textContent!=='—') t.textContent=_('note hidden');
 }
 function median(a){ var b=a.slice().sort(function(x,y){return x-y;}); return b[b.length>>1]; }
 
@@ -1545,7 +1588,7 @@ function startListening(target, cb){
     var r=autoCorrelate(decimate2(micBuf), ac.sampleRate/2);
     var off=document.getElementById('meterOff');
     if(r.hz<=0 || r.clarity<0.72){
-      off.style.display='flex'; off.textContent='sing a steady note…';
+      off.style.display='flex'; off.textContent=_('sing a steady note…');
       document.getElementById('tNote').textContent='—';
       document.getElementById('tCents').textContent='';
       pitchHist=[]; holdNote=null;
@@ -1559,11 +1602,10 @@ function startListening(target, cb){
     var cents=Math.round((mf-near)*100);
     document.getElementById('needle').style.left=
       Math.max(2,Math.min(98, 50 + (cmp.semitonesOff*100 + cmp.centsFromTarget)/2 ))+'%';
-    document.getElementById('tNote').textContent = S.hideNotes ? 'note hidden' : noteName(near);
+    document.getElementById('tNote').textContent = S.hideNotes ? _('note hidden') : noteName(near);
     document.getElementById('tCents').textContent =
-      (cents>0?'+':'')+cents+' cents'+(Math.abs(cmp.semitonesOff)>0
-        ? '  ·  '+Math.abs(cmp.semitonesOff)+' semitone'+(Math.abs(cmp.semitonesOff)>1?'s':'')+
-          ' '+(cmp.semitonesOff>0?'above':'below')+' target' : '  ·  right note');
+      _('{c} cents', {c:(cents>0?'+':'')+cents})+'  ·  '+
+      (cmp.semitonesOff ? semisFromTarget(cmp.semitonesOff) : _('right note'));
     /* lock in once the same note is held steadily */
     if(holdNote===near){
       if(performance.now()-holdStart > 450){
@@ -1574,6 +1616,17 @@ function startListening(target, cb){
   }
   loop();
 }
+/* "2 semitones below target": the count and the direction both change the words */
+function semisFromTarget(d){
+  var n=Math.abs(d);
+  if(n===1) return d>0 ? _('1 semitone above target') : _('1 semitone below target');
+  return d>0 ? _('{n} semitones above target', {n:n}) : _('{n} semitones below target', {n:n});
+}
+function semisOff(d){
+  var n=Math.abs(d);
+  if(n===1) return d>0 ? _('1 semitone sharp') : _('1 semitone flat');
+  return d>0 ? _('{n} semitones sharp', {n:n}) : _('{n} semitones flat', {n:n});
+}
 function stopListening(){
   listening=false;
   if(rafId) cancelAnimationFrame(rafId);
@@ -1583,7 +1636,7 @@ function stopListening(){
 }
 function setListenLabel(on){
   var b=document.getElementById('listenBtn'), l=document.getElementById('listenLabel');
-  if(l) l.textContent = on ? 'Listening \u2014 tap to stop' : 'Start listening';
+  if(l) l.textContent = on ? _('Listening \u2014 tap to stop') : _('Start listening');
   if(b){ b.classList.toggle('on', !!on); b.setAttribute('aria-pressed', String(!!on)); }
 }
 function toggleListen(){
@@ -1593,6 +1646,13 @@ function toggleListen(){
 }
 var NOTE_NAMES=['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
 function noteName(m){ return NOTE_NAMES[((m%12)+12)%12] + (Math.floor(m/12)-1); }
+/* A key is a note without its octave. In a right-to-left sentence a closing ♯ or ♭
+   would drift to the wrong side of its letter ("♭E"); the invisible left-to-right
+   mark after it keeps "E♭" together. */
+function keyName(m){ return noteName(m).replace(/-?\d/,'') + (S.lang==='he' ? '\u200e' : ''); }
+/* Your own words (plan names, notes) inside a Hebrew sentence keep their own
+   direction and punctuation instead of being reordered with it. */
+function iso(t){ return S.lang==='he' ? '\u2068'+t+'\u2069' : t; }
 
 /* =========================================================================
    UI
@@ -1616,18 +1676,18 @@ function setMode(m){
 function scoredKind(){ return (S.mode==='match'||S.mode==='produce') ? 'sing' : 'id'; }
 function renderMode(){
   var nm=document.getElementById('modeName');
-  if(nm) nm.textContent=MODE_NAMES[S.mode];
+  if(nm) nm.textContent=_(MODE_NAMES[S.mode]);
   /* the descriptions live in the menu, beside the choice they describe */
   document.querySelectorAll('#modeMenu .mopt').forEach(function(b){
     var m=b.getAttribute('data-mode'), on=(m===S.mode);
     b.classList.toggle('on', on);
     b.setAttribute('aria-selected', String(on));
-    b.innerHTML='<b>'+MODE_NAMES[m]+'</b><span>'+MODE_HINTS[m]+'</span>';
+    b.innerHTML='<b>'+_(MODE_NAMES[m])+'</b><span>'+_(MODE_HINTS[m])+'</span>';
   });
   /* the one thing worth saying outside the menu: you are grading yourself */
   var h=document.getElementById('modeHint');
   if(h){
-    var t = usingSelfCheck() ? 'No microphone on \u2014 you will grade your singing yourself.' : '';
+    var t = usingSelfCheck() ? _('No microphone on \u2014 you will grade your singing yourself.') : '';
     h.textContent=t; h.style.display = t ? '' : 'none';
   }
   renderSteps();
@@ -1656,8 +1716,8 @@ function renderNextBtn(){
   var b=document.getElementById('newBtn');
   if(!b) return;
   var mid = !!S.current && S.phase!=='idle' && S.phase!=='done';
-  b.textContent = !S.current || S.phase==='idle' ? 'New note'
-                : S.phase==='done' ? 'Next note' : 'Skip this one';
+  b.textContent = !S.current || S.phase==='idle' ? _('New note')
+                : S.phase==='done' ? _('Next note') : _('Skip this one');
   b.classList.toggle('quiet', mid);
 }
 /* Explicit map -- building these ids by string surgery is how they drift apart. */
@@ -1672,10 +1732,10 @@ function setContext(c){
 }
 function renderSteps(){
   var el=document.getElementById('steps');
-  var seq = S.mode==='both' ? ['Hear it','Sing it','Name it']
-          : S.mode==='match' ? ['Hear it','Sing it']
-          : S.mode==='produce' ? ['Read the name','Sing it']
-          : ['Hear it','Name it'];
+  var seq = S.mode==='both' ? [_('Hear it'),_('Sing it'),_('Name it')]
+          : S.mode==='match' ? [_('Hear it'),_('Sing it')]
+          : S.mode==='produce' ? [_('Read the name'),_('Sing it')]
+          : [_('Hear it'),_('Name it')];
   var idx = S.phase==='idle' ? -1
           : S.phase==='hear' ? 0
           : S.phase==='sing' ? 1
@@ -1720,9 +1780,9 @@ function newQuestion(){
     // name is given; she sings it
     establishKey(function(){
       document.getElementById('feedback').innerHTML =
-        '<div class="fb info"><div class="big">Sing '+q.degree.solfa+
-        ' &nbsp;(degree '+q.degree.n+')</div>'+
-        '<div class="char">'+q.degree.char+'</div></div>';
+        '<div class="fb info"><div class="big">'+
+        _('Sing {s} &nbsp;(degree {n})', {s:_(q.degree.solfa), n:q.degree.n})+'</div>'+
+        '<div class="char">'+_(q.degree.char)+'</div></div>';
       beginSingPhase(q);
     });
     return;
@@ -1751,8 +1811,8 @@ function showSelfCheck(on){
   if(on){
     document.getElementById('selfPrompt').textContent =
       S.mode==='produce'
-        ? 'Sing the degree named above. Then play it and see whether you matched.'
-        : 'Sing back the note you just heard. Then play it again and compare.';
+        ? _('Sing the degree named above. Then play it and see whether you matched.')
+        : _('Sing back the note you just heard. Then play it again and compare.');
   }
 }
 /* No microphone: you report the result yourself. */
@@ -1792,23 +1852,25 @@ function onSingResult(cmp, hz){
   if(cmp.selfReported){
     cls = cmp.correct ? 'good' : 'bad';
     msg = cmp.correct
-      ? '<div class="big">Logged as matched</div><div class="char">Your own judgement — be strict '+
-        'with it. If you were not sure, count it as a miss.</div>'
-      : '<div class="big">Logged as missed</div><div class="char">Play it once more and sing along '+
-        'with it before moving on.</div>';
+      ? '<div class="big">'+_('Logged as matched')+'</div><div class="char">'+
+        _('Your own judgement — be strict with it. If you were not sure, count it as a miss.')+'</div>'
+      : '<div class="big">'+_('Logged as missed')+'</div><div class="char">'+
+        _('Play it once more and sing along with it before moving on.')+'</div>';
   } else if(cmp.correct){
     var tight = Math.abs(cmp.centsFromTarget)<=15;
     cls='good';
-    msg='<div class="big">Right note'+(tight?' — and dead in tune':'')+'</div>'+
-        '<div class="char">'+(tight?'':(Math.abs(cmp.centsFromTarget)+' cents '+
-          (cmp.centsFromTarget>0?'sharp':'flat')+' — close enough, but aim to narrow that.'))+
-        (cmp.octaveOff?' You sang it in a different octave, which is fine.':'')+'</div>';
+    var off=Math.abs(cmp.centsFromTarget);
+    msg='<div class="big">'+_('Right note')+(tight ? _(' — and dead in tune') : '')+'</div>'+
+        '<div class="char">'+(tight ? '' : cmp.centsFromTarget>0
+          ? _('{c} cents sharp — close enough, but aim to narrow that.', {c:off})
+          : _('{c} cents flat — close enough, but aim to narrow that.', {c:off}))+
+        (cmp.octaveOff ? _(' You sang it in a different octave, which is fine.') : '')+'</div>';
   } else {
     cls='bad';
-    msg='<div class="big">'+Math.abs(cmp.semitonesOff)+' semitone'+
-        (Math.abs(cmp.semitonesOff)>1?'s':'')+' '+(cmp.semitonesOff>0?'sharp':'flat')+'</div>'+
-        '<div class="char">'+(S.hideNotes ? '' : 'You sang '+noteName(cmp.midi)+'; the note was '+
-        noteName(S.current.midi)+'. ')+'Press Replay and try again — it does not count against you.</div>';
+    msg='<div class="big">'+semisOff(cmp.semitonesOff)+'</div>'+
+        '<div class="char">'+(S.hideNotes ? '' : _('You sang {a}; the note was {b}. ',
+          {a:noteName(cmp.midi), b:noteName(S.current.midi)}))+
+        _('Press Replay and try again — it does not count against you.')+'</div>';
   }
   document.getElementById('feedback').innerHTML='<div class="fb '+cls+'">'+msg+'</div>';
 
@@ -1841,7 +1903,7 @@ function showDegrees(){
     var d=degByN(n);
     return '<button class="deg" data-n="'+n+'" onclick="answer('+n+')">'+
            '<div class="n" style="color:'+d.color+'">'+n+'</div>'+
-           '<div class="s">'+d.solfa+'</div></button>';
+           '<div class="s">'+_(d.solfa)+'</div></button>';
   }).join('');
 }
 function answer(n){
@@ -1864,18 +1926,18 @@ function answer(n){
   var d=S.current.degree;
   var fb=document.getElementById('feedback');
   if(correct){
-    fb.innerHTML='<div class="fb good"><div class="big">'+d.n+' — '+d.solfa+'</div>'+
-                 '<div class="char">'+d.char+'</div></div>';
+    fb.innerHTML='<div class="fb good"><div class="big">'+d.n+' — '+_(d.solfa)+'</div>'+
+                 '<div class="char">'+_(d.char)+'</div></div>';
     timers.push(setTimeout(function(){
       playSeq([[S.current.midi,1],[S.tonic,1.4]],84);
     },260));
   } else {
     var g=degByN(n);
-    fb.innerHTML='<div class="fb bad"><div class="big">That was '+d.n+' ('+d.solfa+
-                 '), not '+n+' ('+g.solfa+')</div>'+
-                 '<div class="char">'+d.char+'</div>'+
-                 '<div class="char" style="margin-top:6px;color:var(--grey)">Listen: your answer, '+
-                 'then the real one, each against do.</div></div>';
+    fb.innerHTML='<div class="fb bad"><div class="big">'+
+                 _('That was {a} ({as}), not {b} ({bs})', {a:d.n, as:_(d.solfa), b:n, bs:_(g.solfa)})+'</div>'+
+                 '<div class="char">'+_(d.char)+'</div>'+
+                 '<div class="char" style="margin-top:6px;color:var(--grey)">'+
+                 _('Listen: your answer, then the real one, each against do.')+'</div></div>';
     // contrastive replay -- this is where the learning actually happens
     var guessMidi = S.tonic + g.semi + (S.current.offset<0 ? -12 : 0);
     timers.push(setTimeout(function(){
@@ -1891,10 +1953,10 @@ function answer(n){
 function updateProgress(){
   document.getElementById('hLevel').textContent=S.level+1;
   document.getElementById('pLevel').textContent=S.level+1;
-  document.getElementById('pLevelName').textContent=LEVELS[S.level].name;
+  document.getElementById('pLevelName').textContent=_(LEVELS[S.level].name);
   var deg=document.getElementById('pLevelDeg');
-  if(deg) deg.textContent = LEVELS[S.level].degrees.map(function(n){ return degByN(n).solfa; }).join(' \u00b7 ') +
-                            (LEVELS[S.level].wide ? ' \u2014 across the octave' : '');
+  if(deg) deg.textContent = LEVELS[S.level].degrees.map(function(n){ return _(degByN(n).solfa); }).join(' \u00b7 ') +
+                            (LEVELS[S.level].wide ? _(' \u2014 across the octave') : '');
   var dn=document.getElementById('lvlDown'), up=document.getElementById('lvlUp');
   if(dn) dn.disabled = S.level<=0;
   if(up) up.disabled = S.level>=LEVELS.length-1;
@@ -1906,38 +1968,41 @@ function updateProgress(){
 
   var kind=scoredKind();
   document.getElementById('barsLabel').textContent =
-    kind==='sing' ? 'Singing accuracy by degree' : 'Naming accuracy by degree';
+    kind==='sing' ? _('Singing accuracy by degree') : _('Naming accuracy by degree');
   var bars=document.getElementById('bars');
   bars.innerHTML = activeDegrees().map(function(n){
     var d=degByN(n), a=accuracy(n,kind), st=S.stats[n][kind];
     var pct = a===null?0:Math.round(a*100);
     var col = a===null?'var(--bar-empty)':(a>=0.85?'var(--teal)':(a>=0.6?'var(--amber)':'var(--red)'));
-    return '<div class="bar"><div class="nm" style="color:'+d.color+'">'+n+' '+d.solfa+'</div>'+
+    return '<div class="bar"><div class="nm" style="color:'+d.color+'">'+n+' '+_(d.solfa)+'</div>'+
            '<div class="track"><div class="fill" style="width:'+pct+'%;background:'+col+'"></div></div>'+
            '<div class="pct">'+(a===null?'–':pct+'%')+' <span style="opacity:.6">('+st.a+')</span></div></div>';
   }).join('');
 
   var adv=levelAdvice(), el=document.getElementById('advice');
   var li=ladderIndex();
+  var pc=ra===null ? 0 : Math.round(ra*100), nr=S.recent.length;
   if(adv==='tighten'){
-    el.innerHTML='<div class="okbox">'+Math.round(ra*100)+'% over your last '+S.recent.length+
-      ' with '+ladderLabel(li)+'. Next step on the ladder: <strong>'+ladderLabel(li+1)+'</strong>. '+
-      '<button class="btn sm" style="margin-left:6px" onclick="setLadder('+(li+1)+')">Step up</button></div>';
+    el.innerHTML='<div class="okbox">'+
+      _('{p}% over your last {n} with {now}. Next step on the ladder: <strong>{next}</strong>. ',
+        {p:pc, n:nr, now:ladderLabel(li), next:ladderLabel(li+1)})+
+      '<button class="btn sm" style="margin-inline-start:6px" onclick="setLadder('+(li+1)+')">'+_('Step up')+'</button></div>';
   } else if(adv==='loosen'){
-    el.innerHTML='<div class="warn">'+Math.round(ra*100)+'% over your last '+S.recent.length+
-      ' with '+ladderLabel(li)+'. Too big a jump for now &mdash; go back to <strong>'+ladderLabel(li-1)+
-      '</strong> for a few days. '+
-      '<button class="btn sm" style="margin-left:6px" onclick="setLadder('+(li-1)+')">Step back</button></div>';
+    el.innerHTML='<div class="warn">'+
+      _('{p}% over your last {n} with {now}. Too big a jump for now &mdash; go back to <strong>{prev}</strong> for a few days. ',
+        {p:pc, n:nr, now:ladderLabel(li), prev:ladderLabel(li-1)})+
+      '<button class="btn sm" style="margin-inline-start:6px" onclick="setLadder('+(li-1)+')">'+_('Step back')+'</button></div>';
   } else if(adv==='advance'){
-    el.innerHTML='<div class="okbox">'+Math.round(ra*100)+
-      '% over your last '+S.recent.length+' with a new key every question &mdash; this level is done. Ready for <strong>'+
-      LEVELS[S.level+1].name+'</strong> &mdash; '+LEVELS[S.level+1].blurb+
-      '. Key changes go back to once per session for the new level. '+
-      '<button class="btn sm" style="margin-left:6px" onclick="advanceLevel()">Move up</button></div>';
+    el.innerHTML='<div class="okbox">'+
+      _('{p}% over your last {n} with a new key every question &mdash; this level is done. Ready for '+
+        '<strong>{name}</strong> &mdash; {blurb}. Key changes go back to once per session for the new level. ',
+        {p:pc, n:nr, name:_(LEVELS[S.level+1].name), blurb:_(LEVELS[S.level+1].blurb)})+
+      '<button class="btn sm" style="margin-inline-start:6px" onclick="advanceLevel()">'+_('Move up')+'</button></div>';
   } else if(adv==='back'){
-    el.innerHTML='<div class="warn">'+Math.round(ra*100)+'% over your last '+S.recent.length+
-      '. That is below the level where practice helps &mdash; drop back and rebuild. '+
-      '<button class="btn sm" style="margin-left:6px" onclick="prevLevel()">Go easier</button></div>';
+    el.innerHTML='<div class="warn">'+
+      _('{p}% over your last {n}. That is below the level where practice helps &mdash; drop back and rebuild. ',
+        {p:pc, n:nr})+
+      '<button class="btn sm" style="margin-inline-start:6px" onclick="prevLevel()">'+_('Go easier')+'</button></div>';
   } else el.innerHTML='';
 
   var weak=null;
@@ -1948,9 +2013,9 @@ function updateProgress(){
   });
   renderSummaries();
   document.getElementById('weakNote').textContent = weak
-    ? 'Weakest right now: '+weak.n+' ('+degByN(weak.n).solfa+') at '+Math.round(weak.a*100)+
-      '%. It will come up more often until it improves.'
-    : 'Answer a few more and this will show which degree needs work.';
+    ? _('Weakest right now: {n} ({s}) at {p}%. It will come up more often until it improves.',
+        {n:weak.n, s:_(degByN(weak.n).solfa), p:Math.round(weak.a*100)})
+    : _('Answer a few more and this will show which degree needs work.');
 }
 function nextLevel(){ if(S.level<LEVELS.length-1){ S.level++; S.recent=[]; S.lastDegree=null;
   resetQuestionUI(); updateProgress(); save(); } }
@@ -1962,14 +2027,14 @@ function askReset(){
   var b=document.getElementById('resetBtn');
   if(resetArmed){
     clearTimeout(resetArmed); resetArmed=null;
-    if(b){ b.textContent='Reset progress'; b.classList.remove('armed'); }
+    if(b){ b.textContent=_('Reset progress'); b.classList.remove('armed'); }
     resetProgress();
     return;
   }
-  if(b){ b.textContent='Tap again to erase all scores'; b.classList.add('armed'); }
+  if(b){ b.textContent=_('Tap again to erase all scores'); b.classList.add('armed'); }
   resetArmed=setTimeout(function(){
     resetArmed=null;
-    if(b){ b.textContent='Reset progress'; b.classList.remove('armed'); }
+    if(b){ b.textContent=_('Reset progress'); b.classList.remove('armed'); }
   }, 4000);
 }
 function resetProgress(){
@@ -2015,7 +2080,7 @@ function buildTonicSelect(){
   var html='';
   for(var m=loT;m<=hiT;m++){
     html+='<option value="'+m+'"'+(m===S.tonic?' selected':'')+'>'+noteName(m)+
-          (fitsRange(m)?'':' — level 4 reaches outside')+'</option>';
+          (fitsRange(m) ? '' : _(' — level 4 reaches outside'))+'</option>';
   }
   sel.innerHTML=html;
   if(S.tonic<loT || S.tonic>hiT){ S.tonic=Math.min(Math.max(S.tonic,loT),hiT); sel.value=S.tonic; }
@@ -2024,18 +2089,17 @@ function buildTonicSelect(){
   updateKeyNote();
 }
 function updateKeyNote(){
-  document.getElementById('hKey').textContent=noteName(S.tonic).replace(/-?\d/,'');
+  document.getElementById('hKey').textContent=keyName(S.tonic);
   updateKeyNow();
   var r=rangeFor(S.level,S.tonic), rw=rangeFor(3,S.tonic);
   var dr=droneRootFor(S.tonic);
   document.getElementById('rangeNote').innerHTML =
-    'At this level notes run '+noteName(r.lo)+'&ndash;'+noteName(r.hi)+
-    '; across all four levels '+noteName(rw.lo)+'&ndash;'+noteName(rw.hi)+
-    '. Drone sits on '+noteName(dr)+' and '+noteName(dr+7)+'. '+
+    _('At this level notes run {a}&ndash;{b}; across all four levels {c}&ndash;{d}. Drone sits on {e} and {f}. ',
+      {a:noteName(r.lo), b:noteName(r.hi), c:noteName(rw.lo), d:noteName(rw.hi), e:noteName(dr), f:noteName(dr+7)})+
     (fitsRange(S.tonic)
-      ? 'Everything is inside the range you set.'
-      : '<strong>Level 4 would reach outside your range.</strong> Levels 1–3 are fine; '+
-        'lower your bottom note or pick a higher tonic before you get there.');
+      ? _('Everything is inside the range you set.')
+      : _('<strong>Level 4 would reach outside your range.</strong> Levels 1–3 are fine; '+
+        'lower your bottom note or pick a higher tonic before you get there.'));
 }
 /* ---------- appearance ---------- */
 /* name -> the colour the phone's status bar should take in light mode */
@@ -2085,6 +2149,67 @@ function applyTheme(){
   }
 }
 function setTheme(t){ S.theme=t; applyTheme(); save(); }
+
+/* ---------- language ----------
+   English is written in place, in the page and in the code. The Hebrew lives in
+   he.js: HE.ui is the page's fixed text by key (the elements carry data-t), and
+   HE.str maps each English phrase the code writes to its Hebrew, with {name}
+   slots for the parts that vary. Anything he.js lacks simply stays English. */
+function _(s, vars){
+  var out = (S.lang==='he' && window.HE && window.HE.str && window.HE.str[s]) || s;
+  if(vars) out = String(out).replace(/\{(\w+)\}/g, function(m,k){ return (k in vars) ? vars[k] : m; });
+  return out;
+}
+function translatePage(){
+  var ui = S.lang==='he' && window.HE && window.HE.ui;
+  var els = document.querySelectorAll ? document.querySelectorAll('[data-t]') : [];
+  for(var i=0;i<els.length;i++){
+    var el=els[i], k=el.getAttribute('data-t');
+    if(el._en===undefined) el._en=el.innerHTML;          /* the English, kept for the way back */
+    el.innerHTML = (ui && ui[k]!=null) ? ui[k] : el._en;
+  }
+  var at = document.querySelectorAll ? document.querySelectorAll('[data-t-title],[data-t-aria]') : [];
+  for(var j=0;j<at.length;j++){
+    [['data-t-title','title'],['data-t-aria','aria-label']].forEach(function(p){
+      var el=at[j], key=el.getAttribute(p[0]);
+      if(!key) return;
+      if(el['_en_'+p[1]]===undefined) el['_en_'+p[1]]=el.getAttribute(p[1]);
+      el.setAttribute(p[1], (ui && ui[key]!=null) ? ui[key] : el['_en_'+p[1]]);
+    });
+  }
+}
+function applyLang(){
+  var he=S.lang==='he', root=document.documentElement;
+  if(root && root.setAttribute){
+    root.setAttribute('lang', he ? 'he' : 'en');
+    root.setAttribute('dir', he ? 'rtl' : 'ltr');
+  }
+  try{ document.title=_('Functional Ear Trainer'); }catch(e){}
+  translatePage();
+  var row=document.getElementById('langRow');
+  if(row && row.querySelectorAll){
+    var bs=row.querySelectorAll('.btn');
+    for(var i=0;i<bs.length;i++) bs[i].classList.toggle('on', bs[i].getAttribute('data-lang')===S.lang);
+  }
+}
+function setLang(l){
+  if(l!=='en' && l!=='he') return;
+  S.lang=l;
+  applyLang();
+  redrawText();
+  save();
+}
+/* Everything the code has written, again in the new language. A question in
+   progress is set aside rather than left half in one language and half in the
+   other: the practice card starts clean. */
+function redrawText(){
+  if(S.phase!=='idle') resetQuestionUI();
+  renderMode(); updateProgress(); buildTonicSelect(); renderKeyMode(); renderCadence();
+  renderSession(); renderHideNotes(); setListenLabel(listening); renderMicText();
+  checkEnvironment();
+  if(micErr && !micStream) micFailed(micErr);
+  renderSummaries();
+}
 try{
   if(window.matchMedia){
     var __mq=window.matchMedia('(prefers-color-scheme: dark)');
@@ -2118,8 +2243,8 @@ function setLadder(i){
   renderKeyMode(); resetQuestionUI(); updateProgress(); save();
 }
 function ladderLabel(i){
-  return i===0 ? 'a new key each session' :
-         LADDER[i]===1 ? 'a new key every question' : 'a new key every '+LADDER[i]+' questions';
+  return i===0 ? _('a new key each session') :
+         LADDER[i]===1 ? _('a new key every question') : _('a new key every {n} questions', {n:LADDER[i]});
 }
 function setKeyEvery(n){
   if(LADDER.indexOf(n)<1) return;
@@ -2178,8 +2303,8 @@ function renderKeyMode(){
   var h=document.getElementById('keyModeHint');
   if(h){
     var n=rotationKeys().length;
-    h.textContent = KEYMODE_HINTS[S.keyMode] +
-      (S.keyMode!=='fixed' ? '  ('+n+' key'+(n===1?'':'s')+' fit your range.)' : '');
+    h.textContent = _(KEYMODE_HINTS[S.keyMode]) +
+      (S.keyMode==='fixed' ? '' : n===1 ? _('  (1 key fit your range.)') : _('  ({n} keys fit your range.)', {n:n}));
   }
   renderSummaries();
   var er=document.getElementById('keyEveryRow');
@@ -2196,12 +2321,12 @@ function updateKeyNow(){
   if(!el) return;
   var tail='';
   if(S.keyMode==='question'){
-    if(S.keyEvery===1) tail=' \u2014 changes every question';
-    else if(S.inKey===0) tail=' \u2014 changes every '+S.keyEvery+' questions';
-    else tail=' \u2014 question '+S.inKey+' of '+S.keyEvery+' in this key'+
-              (S.inKey===1 ? ' <strong style="color:var(--amber)">(new key: find <em>do</em>)</strong>' : '');
-  } else if(S.keyMode==='session') tail=' \u2014 new key next time you open the app';
-  el.innerHTML='Key of <strong>'+noteName(S.tonic).replace(/-?\d/,'')+'</strong>'+tail;
+    if(S.keyEvery===1) tail=_(' \u2014 changes every question');
+    else if(S.inKey===0) tail=_(' \u2014 changes every {n} questions', {n:S.keyEvery});
+    else tail=_(' \u2014 question {i} of {n} in this key', {i:S.inKey, n:S.keyEvery})+
+              (S.inKey===1 ? _(' <strong style="color:var(--amber)">(new key: find <em>do</em>)</strong>') : '');
+  } else if(S.keyMode==='session') tail=_(' \u2014 new key next time you open the app');
+  el.innerHTML=_('Key of <strong>{k}</strong>', {k:keyName(S.tonic)})+tail;
 }
 /* ---------- opening with the microphone on ----------
    Only when the browser already holds the permission: asking for a microphone
@@ -2256,30 +2381,33 @@ function setSum(id, text){
   var el=document.getElementById(id);
   if(el) el.textContent=text;
 }
+function refWords(){
+  return S.context==='drone' ? _('drone') : S.context==='cadence' ? _('cadence') : _('cadence then drone');
+}
 function renderSubSummaries(){
-  setSum('themeSum', (S.theme==='system' ? 'follows your system' : S.theme)+
-                     ' \u00b7 '+(S.accent||'plum'));
-  setSum('rangeSum', noteName(S.voiceLo)+' to '+noteName(S.voiceHi));
-  setSum('keySum', noteName(S.tonic).replace(/-?\d/,'')+' \u00b7 '+
-    (S.keyMode==='fixed' ? 'fixed' :
-     S.keyMode==='session' ? 'new each session' :
-     S.keyEvery===1 ? 'new every question' : 'new every '+S.keyEvery));
-  setSum('refSum', (S.context==='drone' ? 'drone' :
-                    S.context==='cadence' ? 'cadence' : 'cadence then drone')+
-    (S.context==='drone' ? '' : ' \u00b7 '+(S.cadMode==='mixed' ? 'mixed cadences' : 'classic cadence')));
-  setSum('micSum', micStream ? 'on' : 'off');
+  setSum('themeSum', (S.lang==='he' ? 'עברית \u00b7 ' : '')+
+                     (S.theme==='system' ? _('follows your system') : _(S.theme))+
+                     ' \u00b7 '+_(S.accent||'plum'));
+  setSum('rangeSum', _('{a} to {b}', {a:noteName(S.voiceLo), b:noteName(S.voiceHi)}));
+  setSum('keySum', keyName(S.tonic)+' \u00b7 '+
+    (S.keyMode==='fixed' ? _('fixed') :
+     S.keyMode==='session' ? _('new each session') :
+     S.keyEvery===1 ? _('new every question') : _('new every {n}', {n:S.keyEvery})));
+  setSum('refSum', refWords()+
+    (S.context==='drone' ? '' : ' \u00b7 '+(S.cadMode==='mixed' ? _('mixed cadences') : _('classic cadence'))));
+  setSum('micSum', micStream ? _('on') : _('off'));
 }
 function renderSummaries(){
   renderSubSummaries();
   var set=document.getElementById('setupSum');
   if(set){
-    set.textContent = noteName(S.tonic).replace(/-?\d/,'') + ' \u00b7 ' +
-      (S.keyMode==='fixed' ? 'one key' :
-       S.keyMode==='session' ? 'key each session' :
-       S.keyEvery===1 ? 'key every question' : 'key every '+S.keyEvery) + ' \u00b7 ' +
-      (S.context==='drone' ? 'drone' : S.context==='cadence' ? 'cadence' : 'cadence then drone') +
-      (S.context!=='drone' && S.cadMode==='mixed' ? ' (mixed)' : '') +
-      (micStream ? ' \u00b7 mic on' : '');
+    set.textContent = keyName(S.tonic) + ' \u00b7 ' +
+      (S.keyMode==='fixed' ? _('one key') :
+       S.keyMode==='session' ? _('key each session') :
+       S.keyEvery===1 ? _('key every question') : _('key every {n}', {n:S.keyEvery})) + ' \u00b7 ' +
+      refWords() +
+      (S.context!=='drone' && S.cadMode==='mixed' ? _(' (mixed)') : '') +
+      (micStream ? _(' \u00b7 mic on') : '');
   }
   var se=document.getElementById('sessSum');
   if(se){
@@ -2287,15 +2415,15 @@ function renderSummaries(){
     /* no clock here: it would only be right at the moment it was drawn, and the
        timer in the bar at the top ticks properly */
     se.textContent = RUN.on
-      ? (RUN.waiting ? blockTitle(pl.blocks[RUN.idx])+' \u00b7 ready'
-                     : blockTitle(pl.blocks[RUN.idx])+(RUN.paused ? ' \u00b7 paused' : ' \u00b7 running'))
-      : pl.name+' \u00b7 '+planMinutes(pl)+' min';
+      ? (RUN.waiting ? iso(blockTitle(pl.blocks[RUN.idx]))+_(' \u00b7 ready')
+                     : iso(blockTitle(pl.blocks[RUN.idx]))+(RUN.paused ? _(' \u00b7 paused') : _(' \u00b7 running')))
+      : iso(pl.name)+' \u00b7 '+_('{n} min', {n:planMinutes(pl)});
   }
   var pr=document.getElementById('progSum');
   if(pr){
     var ra=recentAccuracy();
-    pr.textContent = 'Level '+(S.level+1)+' \u00b7 '+S.answered+' answered'+
-      (ra===null ? '' : ' \u00b7 '+Math.round(ra*100)+'% recent');
+    pr.textContent = _('Level {l} \u00b7 {n} answered', {l:S.level+1, n:S.answered})+
+      (ra===null ? '' : _(' \u00b7 {p}% recent', {p:Math.round(ra*100)}));
   }
 }
 
@@ -2434,7 +2562,7 @@ function planJson(){
 }
 function copyPlan(){
   var text=planJson(), note=document.getElementById('planHint');
-  var done=function(){ if(note) note.textContent='Copied. Paste it into plans/'+currentPlan().id+'.json.'; };
+  var done=function(){ if(note) note.textContent=_('Copied. Paste it into plans/{id}.json.', {id:currentPlan().id}); };
   try{
     if(navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(text).then(done, function(){ showPlanJson(text); });
@@ -2454,17 +2582,17 @@ function showPlanJson(text){
 function planMinutes(p){
   return p.blocks.reduce(function(a,b){ return a+(b.mins||0); },0);
 }
-function blockTitle(b){ return b.label || MODE_NAMES[b.mode] || 'Block'; }
+function blockTitle(b){ return b.label || (MODE_NAMES[b.mode] ? _(MODE_NAMES[b.mode]) : _('Block')); }
 function blockSummary(b){
-  var bits=[b.mins+' min', MODE_NAMES[b.mode]||b.mode];
-  if(b.level!=='keep') bits.push('level '+(parseInt(b.level,10)+1));
+  var bits=[_('{n} min', {n:b.mins}), MODE_NAMES[b.mode] ? _(MODE_NAMES[b.mode]) : b.mode];
+  if(b.level!=='keep') bits.push(_('level {n}', {n:parseInt(b.level,10)+1}));
   if(b.key!=='keep'){
     var k=String(b.key);
-    bits.push(k==='fixed' ? 'one fixed key' : k==='session' ? 'one key throughout' :
-              k==='1' ? 'a new key every question' : 'a new key every '+k);
+    bits.push(k==='fixed' ? _('one fixed key') : k==='session' ? _('one key throughout') :
+              k==='1' ? _('a new key every question') : _('a new key every {n}', {n:k}));
   }
-  if(b.cad!=='keep') bits.push(b.cad==='mixed' ? 'mixed cadences' : 'the classic cadence');
-  if(b.hide!=='keep') bits.push(b.hide==='on' ? 'note names hidden' : 'note names shown');
+  if(b.cad!=='keep') bits.push(b.cad==='mixed' ? _('mixed cadences') : _('the classic cadence'));
+  if(b.hide!=='keep') bits.push(b.hide==='on' ? _('note names hidden') : _('note names shown'));
   return bits.join(' \u00b7 ');
 }
 
@@ -2489,8 +2617,8 @@ function offerBlock(i){
   if(i>=p.blocks.length){ finishSession(); return; }
   RUN.idx=i; RUN.waiting=true; RUN.paused=true;
   var b=p.blocks[i];
-  showModal('Block '+(i+1)+' of '+p.blocks.length, blockTitle(b),
-            blockSummary(b) + (b.note ? ' \u2014 ' + b.note : ''), 'Start it');
+  showModal(_('Block {i} of {n}', {i:i+1, n:p.blocks.length}), blockTitle(b),
+            blockSummary(b) + (b.note ? ' \u2014 ' + iso(b.note) : ''), _('Start it'));
   renderCarry(b);
   renderSession();
 }
@@ -2509,16 +2637,17 @@ function renderCarry(b){
   if(!box) return;
   if(!RUN.on || !blockMovesKeys(b)){ box.style.display='none'; return; }
   box.style.display='block';
-  var k=noteName(S.tonic).replace(/-?\d/,''), n=parseInt(b.key,10);
+  var k=keyName(S.tonic), n=parseInt(b.key,10);
   var yes=document.getElementById('carryYes'), no=document.getElementById('carryNo');
-  yes.textContent='Stay in '+k;
+  yes.textContent=_('Stay in {k}', {k:k});
   yes.classList.toggle('on', S.carryKey!==false); yes.setAttribute('aria-checked', String(S.carryKey!==false));
   no.classList.toggle('on', S.carryKey===false);  no.setAttribute('aria-checked', String(S.carryKey===false));
   var h=document.getElementById('carryHint');
   if(h) h.textContent = S.carryKey===false
-    ? 'A new key straight away, then a new one every '+(n===1?'question':n+' questions')+'.'
-    : (n===1 ? 'The first question stays in '+k+', then every question moves.'
-             : 'The first '+n+' questions stay in '+k+', then the key moves every '+n+'.');
+    ? (n===1 ? _('A new key straight away, then a new one every question.')
+             : _('A new key straight away, then a new one every {n} questions.', {n:n}))
+    : (n===1 ? _('The first question stays in {k}, then every question moves.', {k:k})
+             : _('The first {n} questions stay in {k}, then the key moves every {n}.', {n:n, k:k}));
 }
 function confirmBlock(){
   if(!RUN.waiting) return;
@@ -2583,8 +2712,8 @@ function togglePause(){
 function showModalForCurrent(){
   var b=currentPlan().blocks[RUN.idx];
   if(!b) return;
-  showModal('Held \u2014 block '+(RUN.idx+1), blockTitle(b),
-            blockSummary(b) + (b.note ? ' \u2014 ' + b.note : ''), 'Start it');
+  showModal(_('Held \u2014 block {i}', {i:RUN.idx+1}), blockTitle(b),
+            blockSummary(b) + (b.note ? ' \u2014 ' + iso(b.note) : ''), _('Start it'));
   renderCarry(b);
 }
 function finishSession(){
@@ -2592,9 +2721,12 @@ function finishSession(){
   var n=S.answered-RUN.answered0, c=sessCorrect-RUN.correct0;
   endRun();
   renderCarry(null);
-  showModal('Session finished', mins+' minute'+(mins===1?'':'s')+' of practice',
-            n ? n+' question'+(n===1?'':'s')+', '+Math.round(100*c/n)+'% right. Same again tomorrow.'
-              : 'No questions answered this time.', 'Done', true);
+  showModal(_('Session finished'),
+            mins===1 ? _('1 minute of practice') : _('{n} minutes of practice', {n:mins}),
+            !n ? _('No questions answered this time.')
+               : n===1 ? _('1 question, {p}% right. Same again tomorrow.', {p:Math.round(100*c/n)})
+                       : _('{n} questions, {p}% right. Same again tomorrow.', {n:n, p:Math.round(100*c/n)}),
+            _('Done'), true);
 }
 function stopSession(){
   endRun();
@@ -2665,7 +2797,7 @@ function renderTimer(){
   var left = RUN.waiting ? (b ? b.mins*60000 : 0)
            : RUN.paused ? RUN.left : (RUN.endAt-Date.now());
   document.getElementById('timerLeft').textContent =
-    RUN.waiting ? 'tap to start' : fmtClock(left) + (RUN.paused ? ' \u2014 tap to resume' : '');
+    RUN.waiting ? _('tap to start') : fmtClock(left) + (RUN.paused ? _(' \u2014 tap to resume') : '');
 }
 function renderSession(){
   renderTimer();
@@ -2675,11 +2807,11 @@ function renderSession(){
     var repoOpts='', mine='';
     plans().forEach(function(pl){
       var o='<option value="'+pl.id+'"'+(pl.id===S.planId?' selected':'')+'>'+
-            String(pl.name).replace(/</g,'&lt;')+(isEdited(pl.id)?' \u00b7 edited':'')+'</option>';
+            String(pl.name).replace(/</g,'&lt;')+(isEdited(pl.id) ? _(' \u00b7 edited') : '')+'</option>';
       if(isRepo(pl.id)) repoOpts+=o; else mine+=o;
     });
-    sel.innerHTML = (repoOpts ? '<optgroup label="From the repo">'+repoOpts+'</optgroup>' : '')+
-                    (mine ? '<optgroup label="Made here">'+mine+'</optgroup>' : '');
+    sel.innerHTML = (repoOpts ? '<optgroup label="'+_('From the repo')+'">'+repoOpts+'</optgroup>' : '')+
+                    (mine ? '<optgroup label="'+_('Made here')+'">'+mine+'</optgroup>' : '');
     sel.value=S.planId;
   }
   var nm=document.getElementById('planName');
@@ -2689,7 +2821,7 @@ function renderSession(){
   var pause=document.getElementById('pauseBtn');
   if(pause){
     pause.style.display = RUN.on ? '' : 'none';
-    pause.textContent = RUN.waiting ? 'Start block' : (RUN.paused ? 'Resume' : 'Pause');
+    pause.textContent = RUN.waiting ? _('Start block') : (RUN.paused ? _('Resume') : _('Pause'));
   }
   var skip=document.getElementById('skipBlockBtn');
   if(skip) skip.style.display = RUN.on ? '' : 'none';
@@ -2699,10 +2831,10 @@ function renderSession(){
   if(src){
     src.innerHTML = isRepo(p.id)
       ? (isEdited(p.id)
-          ? '<strong style="color:var(--amber)">Edited here</strong> \u2014 your version, not the one in '+
-            'plans/'+p.id+'.json. Revert to go back to the shared copy.'
-          : 'From the repo \u2014 plans/'+p.id+'.json' + (p.note ? '. '+p.note : ''))
-      : 'Made in this browser. Copy JSON to put it in the repo.' + (p.note ? ' '+p.note : '');
+          ? _('<strong style="color:var(--amber)">Edited here</strong> \u2014 your version, not the one in '+
+              'plans/{id}.json. Revert to go back to the shared copy.', {id:p.id})
+          : _('From the repo \u2014 plans/{id}.json', {id:p.id}) + (p.note ? '. '+iso(p.note) : ''))
+      : _('Made in this browser. Copy JSON to put it in the repo.') + (p.note ? ' '+iso(p.note) : '');
   }
   var rev=document.getElementById('revertBtn');
   if(rev) rev.style.display = isEdited(p.id) ? '' : 'none';
@@ -2713,11 +2845,12 @@ function renderSession(){
   var hint=document.getElementById('planHint');
   if(hint){
     hint.textContent = RUN.on
-      ? (RUN.waiting ? 'Waiting for you. Press Start block, or tap the timer at the top.'
-                     : (RUN.paused ? 'Paused. Press Resume, or tap the timer at the top.'
-                                   : 'Running block '+(RUN.idx+1)+' of '+p.blocks.length+'.'))
-      : planMinutes(p)+' minutes over '+p.blocks.length+' block'+(p.blocks.length===1?'':'s')+
-        '. Each one asks before it starts.';
+      ? (RUN.waiting ? _('Waiting for you. Press Start block, or tap the timer at the top.')
+                     : (RUN.paused ? _('Paused. Press Resume, or tap the timer at the top.')
+                                   : _('Running block {i} of {n}.', {i:RUN.idx+1, n:p.blocks.length})))
+      : p.blocks.length===1
+        ? _('{m} minutes over 1 block. Each one asks before it starts.', {m:planMinutes(p)})
+        : _('{m} minutes over {n} blocks. Each one asks before it starts.', {m:planMinutes(p), n:p.blocks.length});
   }
   renderPlanList();
   renderSummaries();
@@ -2730,7 +2863,7 @@ function toggleBlockEdit(i){
 }
 function optionsFor(list, val){
   return list.map(function(o){
-    return '<option value="'+o[0]+'"'+(String(val)===o[0]?' selected':'')+'>'+o[1]+'</option>';
+    return '<option value="'+o[0]+'"'+(String(val)===o[0]?' selected':'')+'>'+_(o[1])+'</option>';
   }).join('');
 }
 function fieldRow(label, i, field, list, val, lock){
@@ -2743,10 +2876,10 @@ function renderPlanList(){
   if(!el) return;
   var p=currentPlan(), lock=planLocked() ? ' disabled' : '';
   var modes=Object.keys(MODE_NAMES).map(function(k){ return [k, MODE_NAMES[k]]; });
-  var levels=[['keep','keep the level']].concat(LEVELS.map(function(L,j){
-    return [String(j),'level '+(j+1)+' \u2014 '+L.name.toLowerCase()]; }));
-  var cads=[['keep','keep the cadence'],['classic','classic cadence'],['mixed','mixed cadences']];
-  var hides=[['keep','keep note names as they are'],['on','hide note names'],['off','show note names']];
+  var levels=[['keep',_('keep the level')]].concat(LEVELS.map(function(L,j){
+    return [String(j), _('level {n} \u2014 {name}', {n:j+1, name:_(L.name).toLowerCase()})]; }));
+  var cads=[['keep',_('keep the cadence')],['classic',_('classic cadence')],['mixed',_('mixed cadences')]];
+  var hides=[['keep',_('keep note names as they are')],['on',_('hide note names')],['off',_('show note names')]];
   el.innerHTML = p.blocks.map(function(b,i){
     var open = planEdit===i && !planLocked();
     var head = '<div class="blk'+(RUN.on && RUN.idx===i ? ' now' : '')+'">'+
@@ -2754,26 +2887,26 @@ function renderPlanList(){
       '<span class="bt"><b>'+String(blockTitle(b)).replace(/</g,'&lt;')+'</b>'+
       '<span class="bs">'+blockSummary(b)+'</span></span></span>'+
       '<span class="arrows">'+
-        '<button class="btn sm"'+lock+' onclick="moveBlock('+i+',-1)" aria-label="move up">\u2191</button>'+
-        '<button class="btn sm"'+lock+' onclick="moveBlock('+i+',1)" aria-label="move down">\u2193</button>'+
+        '<button class="btn sm"'+lock+' onclick="moveBlock('+i+',-1)" aria-label="'+_('move up')+'">\u2191</button>'+
+        '<button class="btn sm"'+lock+' onclick="moveBlock('+i+',1)" aria-label="'+_('move down')+'">\u2193</button>'+
         '<button class="btn sm'+(open?' on':'')+'"'+lock+' onclick="toggleBlockEdit('+i+')">'+
-          (open?'Done':'Edit')+'</button>'+
+          (open ? _('Done') : _('Edit'))+'</button>'+
       '</span></div>';
     if(!open) return head;
     return head+'<div class="blkedit">'+
-      '<label class="fld"><span>Name</span><input type="text" maxlength="40" value="'+
+      '<label class="fld"><span>'+_('Name')+'</span><input type="text" maxlength="40" value="'+
         String(b.label||'').replace(/"/g,'&quot;')+'" onchange="editBlock('+i+',\'label\',this.value)"></label>'+
-      '<label class="fld"><span>Minutes</span><input type="number" min="1" max="60" value="'+b.mins+
+      '<label class="fld"><span>'+_('Minutes')+'</span><input type="number" min="1" max="60" value="'+b.mins+
         '" onchange="editBlock('+i+',\'mins\',this.value)"></label>'+
-      fieldRow('Mode', i, 'mode', modes, b.mode, lock)+
-      fieldRow('Key', i, 'key', KEY_CHOICES, b.key, lock)+
-      fieldRow('Level', i, 'level', levels, b.level, lock)+
-      fieldRow('Cadence', i, 'cad', cads, b.cad, lock)+
-      fieldRow('Note names', i, 'hide', hides, b.hide, lock)+
-      '<label class="fld"><span>Note to self</span><input type="text" maxlength="160" value="'+
+      fieldRow(_('Mode'), i, 'mode', modes, b.mode, lock)+
+      fieldRow(_('Key'), i, 'key', KEY_CHOICES, b.key, lock)+
+      fieldRow(_('Level'), i, 'level', levels, b.level, lock)+
+      fieldRow(_('Cadence'), i, 'cad', cads, b.cad, lock)+
+      fieldRow(_('Note names'), i, 'hide', hides, b.hide, lock)+
+      '<label class="fld"><span>'+_('Note to self')+'</span><input type="text" maxlength="160" value="'+
         String(b.note||'').replace(/"/g,'&quot;')+'" onchange="editBlock('+i+',\'note\',this.value)"></label>'+
       '<div class="row" style="margin-top:4px"><button class="btn sm"'+lock+
-        ' onclick="removeBlock('+i+')">Remove this block</button></div>'+
+        ' onclick="removeBlock('+i+')">'+_('Remove this block')+'</button></div>'+
       '</div>';
   }).join('');
   if(el.style) el.style.opacity = planLocked() ? '0.7' : '';
@@ -2840,14 +2973,14 @@ function renamePlan(name){
 }
 function newPlan(){
   if(planLocked()) return;
-  var p={ id:planIdFor(), name:'New plan', note:'', blocks:[
+  var p={ id:planIdFor(), name:_('New plan'), note:'', blocks:[
     { mins:10, mode:'both', level:'keep', key:'keep', cad:'keep', hide:'keep', label:'', note:'' }]};
   localPlans().push(p); S.planId=p.id; save(); renderSession();
 }
 function duplicatePlan(){
   if(planLocked()) return;
   var p=JSON.parse(JSON.stringify(currentPlan()));
-  p.id=planIdFor(); p.name=(p.name+' copy').slice(0,28);
+  p.id=planIdFor(); p.name=(p.name+_(' copy')).slice(0,28);
   localPlans().push(p); S.planId=p.id; save(); renderSession();
 }
 /* Only your own plans can be deleted; a repo plan is reverted instead. */
@@ -2882,10 +3015,10 @@ function setCadChange(c){
 function setCadEvery(n){ if(n>0){ S.cadEvery=n; S.cadCount=0; renderCadence(); save(); } }
 function setCadGap(sec){ S.cadGap = sec>0 ? sec : 0; renderCadence(); save(); }
 function cadChangeWords(){
-  return S.cadChange==='question' ? 'a different one every question' :
-         S.cadChange==='n'        ? 'a different one every '+S.cadEvery+' questions' :
-         S.cadChange==='key'      ? 'a different one whenever the key changes' :
-                                    'the same one until you change it';
+  return S.cadChange==='question' ? _('a different one every question') :
+         S.cadChange==='n'        ? _('a different one every {n} questions', {n:S.cadEvery}) :
+         S.cadChange==='key'      ? _('a different one whenever the key changes') :
+                                    _('the same one until you change it');
 }
 function renderCadence(){
   renderSummaries();
@@ -2907,10 +3040,10 @@ function renderCadence(){
   var h=document.getElementById('cadHint');
   if(h){
     h.textContent = S.cadMode==='classic'
-      ? 'Always I \u2013 IV \u2013 V \u2013 I, in the same voicing. Familiar, but it always leaves sol ' +
-        'ringing on top, which your ear can start using as the reference instead of do.'
-      : 'Five cadences, and the closing chord leaves do, mi or sol on top at random \u2014 never the ' +
-        'degree about to be tested. Now playing ' + cadenceById(S.cadId).name + ', ' + cadChangeWords() + '.';
+      ? _('Always I \u2013 IV \u2013 V \u2013 I, in the same voicing. Familiar, but it always leaves sol ' +
+        'ringing on top, which your ear can start using as the reference instead of do.')
+      : _('Five cadences, and the closing chord leaves do, mi or sol on top at random \u2014 never the ' +
+        'degree about to be tested. Now playing {name}, {how}.', {name:_(cadenceById(S.cadId).name), how:cadChangeWords()});
   }
 }
 function auditionCadence(){
@@ -2940,7 +3073,7 @@ function save(){
       voiceLo:S.voiceLo, voiceHi:S.voiceHi, droneVol:S.droneVol, micId:S.micId, keyMode:S.keyMode, keyEvery:S.keyEvery, masterVol:S.masterVol,
       cadMode:S.cadMode, cadChange:S.cadChange, cadEvery:S.cadEvery, cadGap:S.cadGap, open:S.open,
       plans:S.plans, planId:S.planId, edits:S.edits, micAuto:S.micAuto, accent:S.accent,
-      keyBag:S.keyBag, keyHist:S.keyHist, carryKey:S.carryKey, hideNotes:S.hideNotes, theme:S.theme,
+      keyBag:S.keyBag, keyHist:S.keyHist, carryKey:S.carryKey, hideNotes:S.hideNotes, theme:S.theme, lang:S.lang,
       stats:S.stats, answered:S.answered
     }));
   }catch(e){}
@@ -2988,6 +3121,7 @@ function load(){
     if(typeof o.masterVol==='number') S.masterVol=Math.max(0,Math.min(1,o.masterVol));
     if(typeof o.hideNotes==='boolean') S.hideNotes=o.hideNotes;
     if(o.theme==='system'||o.theme==='light'||o.theme==='dark') S.theme=o.theme;
+    if(o.lang==='en'||o.lang==='he') S.lang=o.lang;
     if(typeof o.level==='number') S.level=o.level;
     if(o.mode) S.mode=o.mode;
     if(o.context) S.context=o.context;
@@ -3011,6 +3145,8 @@ try {
 } catch(e){}
 
 load();
+applyLang();               /* first, so everything drawn below comes out in the right language */
+renderMicText();
 buildRangeSelects();
 buildTonicSelect();
 if(S.keyMode==='session') rotateKey();
@@ -3038,6 +3174,7 @@ checkEnvironment();
 renderMode();
 resetQuestionUI();
 updateProgress();
+try{ document.documentElement.classList.remove('lang-pending'); }catch(e){}
 window.addEventListener('keydown', function(e){
   if(e.key==='Escape'){ toggleModeMenu(false); return; }
   if(e.key===' '){ e.preventDefault(); newQuestion(); return; }

@@ -14,8 +14,15 @@ try{
   var __t=JSON.parse(localStorage.getItem('tuner.v1')||'{}').theme;
   if(__t==='light'||__t==='dark') document.documentElement.setAttribute('data-theme',__t);
   /* the colour is chosen in the ear trainer and shared with this page */
-  var __a=JSON.parse(localStorage.getItem('eartrain.v1')||'{}').accent;
+  var __e=JSON.parse(localStorage.getItem('eartrain.v1')||'{}'), __a=__e.accent;
   if(__a && __a!=='plum') document.documentElement.setAttribute('data-accent',__a);
+  /* and so is the language */
+  if(__e.lang==='he'){
+    document.documentElement.setAttribute('lang','he');
+    document.documentElement.setAttribute('dir','rtl');
+    document.documentElement.classList.add('lang-pending');
+    setTimeout(function(){ document.documentElement.classList.remove('lang-pending'); }, 3000);
+  }
 }catch(e){}
 </script>
 <link rel="icon" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233d3159'/%3E%3Ctext x='32' y='45' font-size='34' text-anchor='middle' fill='%23f5d98a' font-family='Georgia,serif'%3E%E2%99%AA%3C/text%3E%3C/svg%3E">
@@ -79,7 +86,7 @@ body{margin:0;background:var(--bg);color:var(--ink);
 header{position:sticky;top:0;z-index:50;background:var(--header-bg);
   border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
 .hbar{max-width:640px;margin:0 auto;padding:9px 18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.htitle{font-weight:700;font-size:15px;color:var(--plum);margin-right:auto}
+.htitle{font-weight:700;font-size:15px;color:var(--plum);margin-inline-end:auto}
 a.btn{text-decoration:none;display:inline-block}
 .pagelink{font-size:13.5px;margin:-8px 0 16px}
 .pagelink a{color:var(--plum);font-weight:700;text-decoration:none;border-bottom:1.5px solid var(--line)}
@@ -128,9 +135,9 @@ input[type=number]{width:86px}
 .stat .k{font-size:11px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--grey)}
 .stat .v{font-size:19px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
 .held{margin-top:12px;padding:10px 14px;border-radius:8px;background:var(--good-bg);
-  border-left:4px solid var(--teal);font-size:14px;display:none}
+  border-inline-start:4px solid var(--teal);font-size:14px;display:none}
 .held b{color:var(--teal)}
-.warn{background:var(--bad-bg);border-left:4px solid var(--red);padding:11px 14px;border-radius:8px;
+.warn{background:var(--bad-bg);border-inline-start:4px solid var(--red);padding:11px 14px;border-radius:8px;
   margin:12px 0;font-size:14px;display:none}
 .log{margin-top:10px;font-size:13px;color:var(--grey);font-variant-numeric:tabular-nums;
   max-height:132px;overflow:auto}
@@ -142,14 +149,21 @@ input[type=number]{width:86px}
   .note{font-size:60px}
   .wrap{padding:0 14px 70px}
 }
+/* ---------- Hebrew ----------
+   The meter, its scale, the note readout and the log are measurements: they
+   read left to right in either language. */
+.lang-pending body{visibility:hidden}
+.meter,.scale,.readout,.log{direction:ltr}
+[dir="rtl"] em{font-style:normal}
+[dir="rtl"] .lbl,[dir="rtl"] .stat .k{letter-spacing:0}
 </style>
 </head>
 <body>
 
 <header>
   <div class="hbar">
-    <a class="btn sm crosslink" href="index.html">&larr; Ear trainer</a>
-    <span class="htitle" style="margin-left:2px">Note Detector</span>
+    <a class="btn sm crosslink" href="index.html" data-t="tu.back">&larr; Ear trainer</a>
+    <span class="htitle" style="margin-inline-start:2px" data-t="tu.title">Note Detector</span>
     <button class="btn sm" id="themeBtn" onclick="cycleTheme()">Theme</button>
     <button class="btn sm" id="micBtn" onclick="toggleMic()">Mic<span class="wide"> — turn on</span></button>
   </div>
@@ -157,10 +171,10 @@ input[type=number]{width:86px}
 
 <div class="wrap">
 
-<h1>Note Detector</h1>
-<p class="sub">Sing or play a note &mdash; it names the note, shows how far off it is in cents, and the
+<h1 data-t="tu.title">Note Detector</h1>
+<p class="sub" data-t="tu.sub">Sing or play a note &mdash; it names the note, shows how far off it is in cents, and the
 frequency in hertz.</p>
-<p class="pagelink"><a href="index.html">&larr; Ear trainer</a> <span class="muted">scale-degree practice</span></p>
+<p class="pagelink"><a href="index.html" data-t="tu.back">&larr; Ear trainer</a> <span class="muted" data-t="tu.back.sub">scale-degree practice</span></p>
 
 <div class="card">
   <div class="readout">
@@ -172,69 +186,70 @@ frequency in hertz.</p>
     <div class="tick" style="left:25%"></div><div class="tick" style="left:75%"></div>
     <div class="mid"></div>
     <div class="needle" id="needle"></div>
-    <div class="off" id="meterOff">microphone is off</div>
+    <div class="off" id="meterOff" data-t="tu.micoff">microphone is off</div>
   </div>
   <div class="scale"><span>&minus;50&nbsp;c</span><span>&minus;25</span><span>0</span><span>+25</span><span>+50&nbsp;c</span></div>
 
   <div class="stats">
-    <div class="stat"><div class="k">Cents</div><div class="v" id="vCents">&ndash;</div></div>
-    <div class="stat"><div class="k">Frequency</div><div class="v" id="vHz">&ndash;</div></div>
-    <div class="stat"><div class="k">Clarity</div><div class="v" id="vClarity">&ndash;</div></div>
+    <div class="stat"><div class="k" data-t="tu.cents">Cents</div><div class="v" id="vCents">&ndash;</div></div>
+    <div class="stat"><div class="k" data-t="tu.freq">Frequency</div><div class="v" id="vHz">&ndash;</div></div>
+    <div class="stat"><div class="k" data-t="tu.clarity">Clarity</div><div class="v" id="vClarity">&ndash;</div></div>
   </div>
 
   <div class="held" id="held"></div>
   <div class="warn" id="warnBox"></div>
 </div>
 
-<h2>Settings</h2>
+<h2 data-t="tu.settings">Settings</h2>
 <div class="card">
   <div class="row" id="micPickRow" style="display:none;margin-bottom:10px">
-    <label class="muted" for="micSel">Microphone</label>
+    <label class="muted" for="micSel" data-t="mic.title">Microphone</label>
     <select id="micSel" onchange="switchMic(this.value)"></select>
   </div>
 
   <div class="row">
-    <label class="muted" for="a4">Reference A4</label>
+    <label class="muted" for="a4" data-t="tu.a4">Reference A4</label>
     <input id="a4" type="number" min="380" max="500" step="0.5" value="440"
            onchange="setA4(parseFloat(this.value))">
     <span class="muted">Hz</span>
     <button class="btn sm" onclick="setA4(440)">440</button>
   </div>
-  <div class="hint">Everything &mdash; note names and cents &mdash; is measured against this.</div>
+  <div class="hint" data-t="tu.a4.hint">Everything &mdash; note names and cents &mdash; is measured against this.</div>
 
   <div class="row" style="margin-top:10px">
-    <label class="muted" for="accSel">Note spelling</label>
+    <label class="muted" for="accSel" data-t="tu.spell">Note spelling</label>
     <select id="accSel" onchange="setAcc(this.value)">
-      <option value="mixed">Mixed (C♯, E♭)</option>
-      <option value="sharp">Sharps (C♯, D♯)</option>
-      <option value="flat">Flats (D♭, E♭)</option>
+      <option value="mixed" data-t="tu.spell.mixed">Mixed (C♯, E♭)</option>
+      <option value="sharp" data-t="tu.spell.sharp">Sharps (C♯, D♯)</option>
+      <option value="flat" data-t="tu.spell.flat">Flats (D♭, E♭)</option>
     </select>
-    <label class="muted" for="holdSel" style="margin-left:8px">Log a note after</label>
+    <label class="muted" for="holdSel" style="margin-inline-start:8px" data-t="tu.logafter">Log a note after</label>
     <select id="holdSel" onchange="setHold(parseInt(this.value,10))">
-      <option value="300">0.3 s steady</option>
-      <option value="450" selected>0.45 s steady</option>
-      <option value="800">0.8 s steady</option>
-      <option value="0">never</option>
+      <option value="300" data-t="tu.hold.3">0.3 s steady</option>
+      <option value="450" selected data-t="tu.hold.45">0.45 s steady</option>
+      <option value="800" data-t="tu.hold.8">0.8 s steady</option>
+      <option value="0" data-t="tu.hold.never">never</option>
     </select>
   </div>
-  <div class="hint">A note held steadily for that long is logged below, so you can look away while you sing
+  <div class="hint" data-t="tu.hold.hint">A note held steadily for that long is logged below, so you can look away while you sing
   or play.</div>
 </div>
 
-<h2>Notes held</h2>
+<h2 data-t="tu.held">Notes held</h2>
 <div class="card">
   <div class="row" style="margin-bottom:8px">
-    <button class="btn sm" onclick="clearLog()">Clear</button>
+    <button class="btn sm" onclick="clearLog()" data-t="tu.clear">Clear</button>
     <span class="muted" id="logCount">nothing yet</span>
   </div>
   <div class="log" id="log"></div>
 </div>
 
-<p class="muted" style="margin-top:20px">Everything runs in this page. The microphone audio is analysed
+<p class="muted" style="margin-top:20px" data-t="tu.footer">Everything runs in this page. The microphone audio is analysed
 locally and never leaves the browser.</p>
 
 </div>
 
+<script src="he.js"></script>
 <script>
 /* =========================================================================
    PITCH DETECTION  (normalised autocorrelation — same detector as the ear trainer)
@@ -296,7 +311,7 @@ function median(a){ var b=a.slice().sort(function(x,y){return x-y;}); return b[b
 /* =========================================================================
    NAMING
    ========================================================================= */
-var S = { a4:440, acc:'mixed', holdMs:450, theme:'system', micId:'', accent:'plum' };
+var S = { a4:440, acc:'mixed', holdMs:450, theme:'system', micId:'', accent:'plum', lang:'en' };
 var NAMES = {
   mixed:['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'],
   sharp:['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'],
@@ -366,8 +381,7 @@ function attachMic(stream){
   var track=stream.getAudioTracks()[0];
   var st = track && track.getSettings ? track.getSettings() : {};
   if(st.deviceId){ S.micId=st.deviceId; save(); }
-  var b=document.getElementById('micBtn');
-  b.innerHTML='Mic<span class="wide"> — turn off</span>'; b.classList.add('on');
+  renderMicBtn();
   hideWarn();
   listMics(track ? track.label : '', st.sampleRate);
   start();
@@ -376,27 +390,34 @@ function stopMic(){
   stop();
   if(micStream){ micStream.getTracks().forEach(function(t){t.stop();}); }
   micStream=null; micSource=null;
-  var b=document.getElementById('micBtn');
-  b.innerHTML='Mic<span class="wide"> — turn on</span>'; b.classList.remove('on');
+  renderMicBtn();
   document.getElementById('meterOff').style.display='flex';
-  document.getElementById('meterOff').textContent='microphone is off';
+  document.getElementById('meterOff').textContent=_('microphone is off');
   blankReadout();
 }
+function renderMicBtn(){
+  var b=document.getElementById('micBtn');
+  if(!b) return;
+  b.innerHTML = micStream ? _('Mic<span class="wide"> — turn off</span>') : _('Mic<span class="wide"> — turn on</span>');
+  b.classList.toggle('on', !!micStream);
+}
+var micErr=null;      /* the last failure, kept so a language switch can say it again */
 function micFailed(err){
+  micErr=err;
   var n=err && err.name, msg;
   if(inFrame() && (n==='NotAllowedError'||n==='unavailable')){
-    msg='This page is running inside a frame that has not been given the microphone. '+
-        'Open the file directly in a browser tab.';
+    msg=_('This page is running inside a frame that has not been given the microphone. '+
+        'Open the file directly in a browser tab.');
   } else if(n==='NotAllowedError'){
-    msg='Microphone permission was refused. Allow it for this page and try again. '+
+    msg=_('Microphone permission was refused. Allow it for this page and try again. '+
         'On Android, Chrome only gives the microphone to pages served over https — a file opened '+
-        'from disk will always be refused.';
+        'from disk will always be refused.');
   } else if(n==='NotFoundError'){
-    msg='No microphone was found.';
+    msg=_('No microphone was found.');
   } else if(n==='NotReadableError'){
-    msg='The microphone is busy in another app.';
+    msg=_('The microphone is busy in another app.');
   } else {
-    msg='The microphone could not be opened ('+(n||'unknown error')+').';
+    msg=_('The microphone could not be opened ({e}).', {e:n||_('unknown error')});
   }
   showWarn(msg);
 }
@@ -416,8 +437,8 @@ function listMics(activeLabel, activeRate){
     var sel=document.getElementById('micSel'), row=document.getElementById('micPickRow');
     if(!mics.length){ row.style.display='none'; return; }
     sel.innerHTML = mics.map(function(d,i){
-      var name=d.label || ('Microphone '+(i+1));
-      if(looksLikeHeadsetMic(name)) name += '  — headset, call quality';
+      var name=d.label || _('Microphone {n}', {n:i+1});
+      if(looksLikeHeadsetMic(name)) name += _('  — headset, call quality');
       return '<option value="'+d.deviceId.replace(/"/g,'&quot;')+'"'+
              (d.deviceId===S.micId?' selected':'')+'>'+name.replace(/</g,'&lt;')+'</option>';
     }).join('');
@@ -428,12 +449,11 @@ function listMics(activeLabel, activeRate){
 function warnIfHeadset(label, canSwitch, rate){
   var byName=looksLikeHeadsetMic(label), byRate=callQuality(rate);
   if(!byName && !byRate){ hideWarn(); return; }
-  showWarn('<strong>'+(byName ? 'This is a Bluetooth headset microphone'
-                              : 'This microphone is running at call quality ('+
-                                Math.round(rate/1000)+' kHz)')+'</strong>'+
+  showWarn('<strong>'+(byName ? _('This is a Bluetooth headset microphone')
+                              : _('This microphone is running at call quality ({k} kHz)', {k:Math.round(rate/1000)}))+'</strong>'+
     (label ? ' ('+String(label).replace(/</g,'&lt;')+')' : '')+
-    '. Call mode cuts everything above about 4 kHz, which makes the reading jumpy. '+
-    (canSwitch ? 'Pick the built-in microphone above.' : 'No other microphone is available right now.'));
+    _('. Call mode cuts everything above about 4 kHz, which makes the reading jumpy. ')+
+    (canSwitch ? _('Pick the built-in microphone above.') : _('No other microphone is available right now.')));
 }
 function switchMic(id){
   if(!micStream) return;
@@ -480,7 +500,7 @@ function start(){
     var off=document.getElementById('meterOff');
     if(r.hz<=0 || r.clarity<0.72){
       off.style.display='flex';
-      off.textContent = r.rms<0.008 ? 'listening…' : 'sing or play a steady note…';
+      off.textContent = r.rms<0.008 ? _('listening…') : _('sing or play a steady note…');
       hist=[]; holdNote=null; logged=null;
       blankReadout();
       return;
@@ -523,8 +543,8 @@ function holdCheck(d){
 }
 function pin(d){
   var el=document.getElementById('held');
-  el.innerHTML='Held: <b>'+noteName(d.midi)+'</b> · '+(d.cents>0?'+':'')+d.cents+
-    ' cents · '+d.hz.toFixed(1)+' Hz (exact '+d.exactHz.toFixed(1)+')';
+  el.innerHTML=_('Held: <b>{n}</b> · {c} cents · {hz} Hz (exact {x})',
+    {n:noteName(d.midi), c:(d.cents>0?'+':'')+d.cents, hz:d.hz.toFixed(1), x:d.exactHz.toFixed(1)});
   el.style.display='block';
 }
 var LOG=[];
@@ -542,7 +562,7 @@ function renderLog(){
            (e.cents>0?'+':'')+e.cents+' c &nbsp; '+e.hz.toFixed(1)+' Hz</div>';
   }).join('');
   document.getElementById('logCount').textContent =
-    LOG.length ? LOG.length+' note'+(LOG.length===1?'':'s')+' held' : 'nothing yet';
+    !LOG.length ? _('nothing yet') : LOG.length===1 ? _('1 note held') : _('{n} notes held', {n:LOG.length});
 }
 function clearLog(){ LOG=[]; document.getElementById('held').style.display='none'; renderLog(); }
 
@@ -573,12 +593,43 @@ function faviconFor(fill){
     "%3Ctext x='32' y='45' font-size='34' text-anchor='middle' fill='%23f5d98a' " +
     "font-family='Georgia,serif'%3E%E2%99%AA%3C/text%3E%3C/svg%3E";
 }
-/* the colour lives in the ear trainer's settings, not this page's */
+/* the colour and the language live in the ear trainer's settings, not this page's */
 function readAccent(){
   try{
-    var a=JSON.parse(localStorage.getItem('eartrain.v1')||'{}').accent;
-    S.accent = ACCENTS[a] ? a : 'plum';
-  }catch(e){ S.accent='plum'; }
+    var o=JSON.parse(localStorage.getItem('eartrain.v1')||'{}');
+    S.accent = ACCENTS[o.accent] ? o.accent : 'plum';
+    S.lang = o.lang==='he' ? 'he' : 'en';
+  }catch(e){ S.accent='plum'; S.lang='en'; }
+}
+/* ---------- language: the same mechanism as the ear trainer's (see there) ---------- */
+function _(s, vars){
+  var out = (S.lang==='he' && window.HE && window.HE.str && window.HE.str[s]) || s;
+  if(vars) out = String(out).replace(/\{(\w+)\}/g, function(m,k){ return (k in vars) ? vars[k] : m; });
+  return out;
+}
+function translatePage(){
+  var ui = S.lang==='he' && window.HE && window.HE.ui;
+  var els = document.querySelectorAll('[data-t]');
+  for(var i=0;i<els.length;i++){
+    var el=els[i], k=el.getAttribute('data-t');
+    if(el._en===undefined) el._en=el.innerHTML;
+    el.innerHTML = (ui && ui[k]!=null) ? ui[k] : el._en;
+  }
+}
+function applyLang(){
+  var he=S.lang==='he', r=document.documentElement;
+  r.setAttribute('lang', he ? 'he' : 'en');
+  r.setAttribute('dir', he ? 'rtl' : 'ltr');
+  document.title=_('Note Detector');
+  translatePage();
+}
+function redrawText(){
+  applyTheme(); renderMicBtn(); renderLog();
+  if(!running){
+    var off=document.getElementById('meterOff');
+    if(off) off.textContent = micStream ? _('listening…') : _('microphone is off');
+  }
+  if(micErr && !micStream) micFailed(micErr);
 }
 function applyTheme(){
   var r=document.documentElement;
@@ -590,8 +641,8 @@ function applyTheme(){
   var fav=document.getElementById('favicon');
   if(fav) fav.setAttribute('href', faviconFor(ACCENTS[S.accent]||ACCENTS.plum));
   var b=document.getElementById('themeBtn');
-  if(b) b.innerHTML = '<span class="wide">Theme: </span>' +
-    (S.theme==='system' ? 'auto' : S.theme);
+  if(b) b.innerHTML = _('<span class="wide">Theme: </span>') +
+    (S.theme==='system' ? _('auto') : _(S.theme));
 }
 function cycleTheme(){
   S.theme = S.theme==='system' ? 'light' : (S.theme==='light' ? 'dark' : 'system');
@@ -607,7 +658,11 @@ try{
    the ear trainer reaches this one straight away */
 try{
   window.addEventListener('storage', function(e){
-    if(e.key==='eartrain.v1' || e.key===null){ readAccent(); applyTheme(); }
+    if(e.key==='eartrain.v1' || e.key===null){
+      var was=S.lang;
+      readAccent(); applyTheme();
+      if(S.lang!==was){ applyLang(); redrawText(); }
+    }
   });
 }catch(e){}
 
@@ -639,7 +694,9 @@ try {
 
 load();
 readAccent();
+applyLang();
 applyTheme();
+renderMicBtn();
 (function(){
   var a=document.getElementById('a4'); if(a) a.value=S.a4;
   var ac_=document.getElementById('accSel'); if(ac_) ac_.value=S.acc;
@@ -647,6 +704,7 @@ applyTheme();
 })();
 blankReadout();
 renderLog();
+try{ document.documentElement.classList.remove('lang-pending'); }catch(e){}
 </script>
 </body>
 </html>
