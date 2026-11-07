@@ -614,13 +614,22 @@ bdi{white-space:nowrap}
   </div>
   <div class="hint" id="sndNow"></div>
   <div class="hint" id="midiHint"></div>
-  <div class="row" id="velRow" style="display:none;margin-top:8px">
-    <label class="muted" for="midiVel" data-t="snd.vel">Touch</label>
-    <input id="midiVel" type="range" min="20" max="110" step="1" value="62"
-           oninput="setMidiVel(parseInt(this.value,10))" onchange="auditionInstrument()" style="width:150px">
-    <span class="muted" id="midiVelVal"></span>
+  <div id="velRow" style="display:none;margin-top:10px">
+    <div class="lbl" data-t="snd.vel">Touch</div>
+    <div class="row">
+      <label class="muted" for="midiVel" style="flex:0 0 74px" data-t="snd.vel.note">Note</label>
+      <input id="midiVel" type="range" min="20" max="110" step="1" value="62"
+             oninput="setMidiVel(parseInt(this.value,10))" onchange="previewVel('note')" style="width:150px">
+      <span class="muted" id="midiVelVal"></span>
+    </div>
+    <div class="row" style="margin-top:4px">
+      <label class="muted" for="cadVel" style="flex:0 0 74px" data-t="snd.vel.cad">Cadence</label>
+      <input id="cadVel" type="range" min="20" max="110" step="1" value="50"
+             oninput="setCadVel(parseInt(this.value,10))" onchange="previewVel('cad')" style="width:150px">
+      <span class="muted" id="cadVelVal"></span>
+    </div>
   </div>
-  <div class="row"><button class="btn sm" onclick="auditionInstrument()" data-t="btn.hearit">Hear it</button></div>
+  <div class="row" style="margin-top:8px"><button class="btn sm" onclick="auditionInstrument()" data-t="btn.hearit">Hear it</button></div>
   <div class="lbl" style="margin-top:16px" data-t="snd.samples">Samples</div>
   <div class="hint" id="sampleState"></div>
   <div class="row">
@@ -969,7 +978,7 @@ var S = {
   cadMode:'classic', cadChange:'key', cadEvery:3, cadGap:0, cadId:'classic', cadClose:0, cadBpm:96, cadCount:0,
   open:{why:false, setup:false, session:false, progress:true, guide:false},
   plans:null, planId:'daily-12', edits:null, micAuto:false, accent:'plum', carryKey:true, masterVol:1, hideNotes:false, theme:'system',
-  lang:'en', instrument:'synth', localInst:'synth', midiOk:false, midiVel:62,
+  lang:'en', instrument:'synth', localInst:'synth', midiOk:false, midiVel:62, cadVel:50,
   stats:{}, recent:[], answered:0, current:null, lastDegree:null,
   phase:'idle'     // idle | sing | name | done
 };
@@ -1195,7 +1204,7 @@ function soundSource(){
 /* One note, m, at audio-clock time t. synthDur is how long the synth's pluck
    takes to die away; hold is how long a key is held down, which only the piano
    and the samples care about. chord marks a note of a cadence chord, which the
-   piano plays a little softer than the note you are tested on. */
+   piano plays at the cadence's own Touch. */
 function tone(m, t, synthDur, hold, gain, chord){
   var src=soundSource();
   if(src==='midi'){ midiNote(m, t, hold, chord); return; }
@@ -1228,15 +1237,15 @@ function auditionInstrument(){
    Every start reconnects by itself, and a piano plugged in while the app runs
    takes over on its own; unplugged, it hands back. */
 var midiAccess=null, midiOut=null, midiErr=null;
-/* How hard the piano's keys are struck is S.midiVel, set with the Touch slider;
-   the cadence's chords sit this much under it, the way a pianist plays the
-   accompaniment softer than the tune. */
-var CHORD_SOFTER=12;
+/* How hard the piano's keys are struck, set with the two Touch sliders: S.midiVel
+   for the note you are tested on (and every single note), S.cadVel for the
+   cadence's chords -- usually a little softer, the way a pianist plays the
+   accompaniment under the tune. */
 var PIANO_PORT=/p-?225|p-?series|digital ?piano|yamaha/i;
 /* ports a computer has whether or not anything is plugged in */
 var SOFT_PORT=/wavetable|microsoft gs|midi through|through port|iac driver/i;
 function midiSend(bytes){ try{ if(midiOut) midiOut.send(bytes); }catch(e){} }
-function chordVel(){ return Math.max(1, S.midiVel-CHORD_SOFTER); }
+function chordVel(){ return S.cadVel; }
 function midiNote(m, t, hold, chord){
   if(!(m>=0 && m<=127)) return;
   var wait=Math.max(0, (t-ctx().currentTime)*1000), vel=chord ? chordVel() : S.midiVel;
@@ -1249,14 +1258,29 @@ function setMidiVel(v){
   renderVel();
   save();
 }
+function setCadVel(v){
+  if(!(v>=1 && v<=127)) return;
+  S.cadVel=Math.round(v);
+  renderVel();
+  save();
+}
+/* on letting go of a slider: the thing it sets, at its new touch */
+function previewVel(which){
+  if(soundSource()!=='midi') return;
+  stopNotes();
+  var t=S.tonic;
+  if(which==='cad') playSeq([[t-12,0,1.6],[t,0,1.6],[t+4,0,1.6],[t+7,1.6,1.6]],96);
+  else playSeq([[t+7,1.6]],96);
+}
 /* only there while the piano is what plays */
 function renderVel(){
   var row=document.getElementById('velRow');
-  if(row) row.style.display = soundSource()==='midi' ? 'flex' : 'none';
-  var sl=document.getElementById('midiVel');
-  if(sl && String(sl.value)!==String(S.midiVel)) sl.value=S.midiVel;
-  var v=document.getElementById('midiVelVal');
-  if(v) v.textContent=_('{v} \u00b7 cadence {c}', {v:S.midiVel, c:chordVel()});
+  if(row) row.style.display = soundSource()==='midi' ? '' : 'none';
+  [['midiVel','midiVelVal',S.midiVel],['cadVel','cadVelVal',S.cadVel]].forEach(function(p){
+    var sl=document.getElementById(p[0]), out=document.getElementById(p[1]);
+    if(sl && String(sl.value)!==String(p[2])) sl.value=p[2];
+    if(out) out.textContent=p[2];
+  });
 }
 /* pedal up, every key let go */
 function midiSilence(){ if(midiOut){ midiSend([0xB0,64,0]); midiSend([0xB0,123,0]); } }
@@ -3581,7 +3605,7 @@ function save(){
       cadMode:S.cadMode, cadChange:S.cadChange, cadEvery:S.cadEvery, cadGap:S.cadGap, open:S.open,
       plans:S.plans, planId:S.planId, edits:S.edits, micAuto:S.micAuto, accent:S.accent,
       keyBag:S.keyBag, keyHist:S.keyHist, carryKey:S.carryKey, hideNotes:S.hideNotes, theme:S.theme, lang:S.lang,
-      instrument:S.instrument, localInst:S.localInst, midiOk:S.midiOk, midiVel:S.midiVel,
+      instrument:S.instrument, localInst:S.localInst, midiOk:S.midiOk, midiVel:S.midiVel, cadVel:S.cadVel,
       stats:S.stats, answered:S.answered
     }));
   }catch(e){}
@@ -3636,6 +3660,8 @@ function load(){
     else if(S.instrument!=='midi') S.localInst=S.instrument;
     if(typeof o.midiOk==='boolean') S.midiOk=o.midiOk;
     if(typeof o.midiVel==='number' && o.midiVel>=1 && o.midiVel<=127) S.midiVel=Math.round(o.midiVel);
+    if(typeof o.cadVel==='number' && o.cadVel>=1 && o.cadVel<=127) S.cadVel=Math.round(o.cadVel);
+    else if(typeof o.midiVel==='number') S.cadVel=Math.max(1, S.midiVel-12);   /* v22 kept it 12 under */
     if(typeof o.level==='number') S.level=o.level;
     if(o.mode) S.mode=o.mode;
     if(o.context) S.context=o.context;
