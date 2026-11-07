@@ -88,6 +88,7 @@ var HE = {
     "snd.midi": "פסנתר (MIDI)",
     "snd.synth": "סינתיסייזר",
     "snd.samples": "דגימות",
+    "snd.vel": "עוצמת הקשה",
     "mic.title": "מיקרופון",
     "mic.auto": "להפעיל את המיקרופון כשהאפליקציה נפתחת",
     "mic.auto.hint": "רק אחרי שכבר אישרתם אותו לאתר הזה. האפליקציה אף פעם לא מבקשת הרשאה מעצמה.",
@@ -171,6 +172,7 @@ var HE = {
     "prog.harder.aria": "רמה קשה יותר"
   },
   str: {
+    "{v} · cadence {c}": "{v} · קדנצה {c}",
     "Could not load the samples: {e}": "לא ניתן היה לטעון את הדגימות: {e}",
     "Reading {f}…": "קורא את {f}…",
     "Reading note {i} of {n}…": "קורא צליל {i} מתוך {n}…",
