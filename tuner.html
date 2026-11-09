@@ -351,13 +351,31 @@ function toggleMic(){
   }
   openMic(S.micId||'');
 }
+/* ---------- the piano's USB audio, on Android ----------
+   Plugged in by USB, the piano is a sound card as well as a MIDI device, and
+   Android then takes every microphone's input from it -- which only carries the
+   piano's own sound, never your voice. Chrome can still pick the phone's own
+   microphone ("Speakerphone"), but it applies that choice only through the
+   phone's call routing, which it switches on only when echo cancellation is
+   asked for (media/audio/android/audio_manager_android.cc: communication mode
+   needs platform effects). So exactly then -- an Android phone, a USB audio
+   input present, and a different microphone wanted -- the app asks for it.
+   Echo cancellation removes the phone's own playback from what it hears, which
+   suits pitch detection; noise suppression and gain control stay off. */
+var usbInputId='';         /* the USB audio input, while one is plugged in */
+var micAskedFor='', micAec=false, micReopens=0;
+function isAndroid(){ try{ return /Android/i.test(navigator.userAgent||''); }catch(e){ return false; } }
+function looksLikeUsbAudio(label){ return /usb audio|p-?series|p-?225|digital ?piano|0499:/i.test(label||''); }
+function needsCallRouting(id){ return !!(isAndroid() && usbInputId && id && id!=='default' && id!==usbInputId); }
 function micConstraints(id){
   /* the three "helpful" filters all distort pitch — off */
   var a={echoCancellation:false, noiseSuppression:false, autoGainControl:false};
   if(id) a.deviceId={exact:id};
+  if(needsCallRouting(id)) a.echoCancellation=true;   /* see above: only to reach the phone's own mic */
   return {audio:a};
 }
 function openMic(id, isRetry){
+  micAskedFor=id||''; micAec=!!micConstraints(id).audio.echoCancellation;
   navigator.mediaDevices.getUserMedia(micConstraints(id))
   .then(function(stream){ attachMic(stream); })
   .catch(function(err){
@@ -380,7 +398,7 @@ function attachMic(stream){
   micSource.connect(analyser);
   var track=stream.getAudioTracks()[0];
   var st = track && track.getSettings ? track.getSettings() : {};
-  if(st.deviceId){ S.micId=st.deviceId; save(); }
+  if(st.deviceId && !micAskedFor){ S.micId=st.deviceId; save(); }
   renderMicBtn();
   hideWarn();
   listMics(track ? track.label : '', st.sampleRate);
@@ -436,6 +454,7 @@ function listMics(activeLabel, activeRate){
     var mics=devs.filter(function(d){ return d.kind==='audioinput'; });
     var sel=document.getElementById('micSel'), row=document.getElementById('micPickRow');
     if(!mics.length){ row.style.display='none'; return; }
+    if(steerFromUsb(mics)) return;
     sel.innerHTML = mics.map(function(d,i){
       var name=d.label || _('Microphone {n}', {n:i+1});
       if(looksLikeHeadsetMic(name)) name += _('  — headset, call quality');
@@ -455,6 +474,27 @@ function warnIfHeadset(label, canSwitch, rate){
     _('. Call mode cuts everything above about 4 kHz, which makes the reading jumpy. ')+
     (canSwitch ? _('Pick the built-in microphone above.') : _('No other microphone is available right now.')));
 }
+/* With a USB audio input present on Android: sing into the phone's own
+   microphone unless you picked the USB one, and reopen the microphone whenever
+   the routing it needs has changed (plugged in, or unplugged). True when it
+   reopened, so the caller can stop: the new stream lists the devices again. */
+function steerFromUsb(mics){
+  var usb=mics.filter(function(d){ return looksLikeUsbAudio(d.label); })[0];
+  usbInputId = usb ? usb.deviceId : '';
+  if(!micStream || !isAndroid() || micReopens>=4) return false;
+  var want=S.micId;
+  if(usb && (!want || want==='default')){
+    var own=mics.filter(function(d){ return /speaker/i.test(d.label); })[0] ||
+            mics.filter(function(d){ return d.deviceId!=='default' && d.deviceId!=='communications' &&
+                                            d.deviceId!==usb.deviceId && !looksLikeHeadsetMic(d.label); })[0];
+    if(own) want=own.deviceId;
+  }
+  if(want===S.micId && needsCallRouting(want)===micAec) return false;
+  micReopens++;
+  S.micId=want; save();
+  openMic(want);
+  return true;
+}
 function switchMic(id){
   if(!micStream) return;
   S.micId=id; save();
@@ -464,6 +504,7 @@ try{
   if(navigator.mediaDevices && navigator.mediaDevices.addEventListener){
     navigator.mediaDevices.addEventListener('devicechange', function(){
       if(micStream){
+        micReopens=0;          /* something was plugged or unplugged: the routing may change again */
         var t=micStream.getAudioTracks()[0];
         var st=t && t.getSettings ? t.getSettings() : {};
         listMics(t ? t.label : '', st.sampleRate);
