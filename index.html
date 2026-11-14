@@ -191,10 +191,10 @@ button{font:inherit}
 /* ---------- degree buttons ---------- */
 .degrees{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
 .deg{border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:9px 0;
-     cursor:pointer;text-align:center;flex:1 1 68px;min-width:68px;transition:.12s}
+     cursor:pointer;text-align:center;flex:1 1 var(--deg-w,68px);min-width:var(--deg-w,68px);transition:.12s}
 .deg:hover{border-color:var(--plum);background:var(--deg-hover)}
 .deg .n{font-size:19px;font-weight:700;line-height:1}
-.deg .s{font-size:12px;color:var(--grey);margin-top:2px;font-style:italic}
+.deg .s{font-size:var(--deg-s,12px);color:var(--grey);margin:2px auto 0;font-style:italic;white-space:nowrap;width:max-content}
 .deg.right{background:var(--good-bg);border-color:var(--teal)}
 .deg.right .n{color:var(--teal)}
 .deg.wrong{background:var(--bad-bg);border-color:var(--red)}
@@ -390,6 +390,11 @@ header.running .crosslink{display:none}
 [dir="rtl"] .lbl,[dir="rtl"] .lvlk,[dir="rtl"] .stat .k,[dir="rtl"] .modebtn .mk{letter-spacing:0}
 /* a note range such as "E♭3–D4" inside a Hebrew sentence: one piece, never split */
 bdi{white-space:nowrap}
+/* Hebrew names the degrees by function, and סובדומיננטה is long: the progress
+   bars' name column is as wide as the longest name (the buttons: fitDegreeNames). */
+[dir="rtl"] .bars{display:grid;grid-template-columns:max-content 1fr auto;column-gap:10px;row-gap:6px;align-items:center}
+[dir="rtl"] .bar{display:contents}
+[dir="rtl"] .bar .nm{width:auto;white-space:nowrap}
 @media (max-width:680px){
   .wide,header .crosslink{display:none}
   .hbar{gap:6px;padding:7px 12px}
@@ -402,7 +407,7 @@ bdi{white-space:nowrap}
   #masterVol{width:64px !important}
   header .btn.sm{padding:4px 11px}
   html{scroll-padding-top:96px}
-  .deg{flex:1 1 62px;min-width:62px;padding:13px 0}   /* bigger tap targets on a phone */
+  .deg{flex:1 1 var(--deg-w,62px);min-width:var(--deg-w,62px);padding:13px 0}   /* bigger tap targets on a phone */
   .deg .n{font-size:21px}
   .btn{padding:10px 18px}
   .btn.sm{padding:7px 13px}
@@ -2503,7 +2508,32 @@ function showDegrees(){
            '<div class="n" style="color:'+d.color+'">'+n+'</div>'+
            '<div class="s">'+_(d.solfa)+'</div></button>';
   }).join('');
+  fitDegreeNames();
 }
+/* Room for long degree names (Hebrew's סובדומיננטה) on the answer buttons.
+   Short names (English, or the triad) keep the usual layout. Otherwise every
+   button gets the width of the longest name, so they stay equal and a phone
+   goes four across instead of five. Only when even that leaves a lonely
+   button on a third row (a narrow phone) do the names shrink, all together,
+   just enough for half the buttons to fit on a row. Names never wrap. */
+function fitDegreeNames(){
+  var row=document.getElementById('degRow'); if(!row) return;
+  row.style.removeProperty('--deg-w'); row.style.removeProperty('--deg-s');
+  var bs=row.querySelectorAll('.deg'), n=bs.length, R=row.clientWidth;
+  if(!n || !R) return;
+  var W=0;
+  for(var i=0;i<n;i++){ var s=bs[i].querySelector('.s'); if(s) W=Math.max(W, s.scrollWidth); }
+  var base=parseFloat(getComputedStyle(bs[0]).minWidth)||62,
+      gap=parseFloat(getComputedStyle(row).columnGap)||8,
+      need=Math.ceil(W)+8;                 /* the 2px border and 2px of air, each side */
+  if(need<=base) return;
+  var want=Math.ceil(n/2);
+  if(Math.floor((R+gap)/(need+gap))>=want){ row.style.setProperty('--deg-w', need+'px'); return; }
+  var bw=Math.floor((R-(want-1)*gap)/want);
+  row.style.setProperty('--deg-w', bw+'px');
+  row.style.setProperty('--deg-s', Math.max(9, Math.floor(12*(bw-8)/W*4)/4)+'px');
+}
+window.addEventListener('resize', function(){ clearTimeout(fitDegreeNames.t); fitDegreeNames.t=setTimeout(fitDegreeNames,150); });
 function answer(n){
   if(!S.current || S.current.idDone) return;
   S.current.idDone=true;
