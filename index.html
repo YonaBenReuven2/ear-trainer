@@ -132,6 +132,65 @@ a.btn{text-decoration:none;display:inline-block}
 .blk .x{margin-inline-start:auto}
 .blk .arrows{display:flex;gap:4px}
 .mins{font-size:12px;color:var(--grey)}
+/* ---------- the session card ---------- */
+.sesscard{margin:14px 0;border:1px solid var(--line);border-radius:12px;background:var(--card);
+  overflow:hidden;transition:border-color .15s,box-shadow .15s}
+.sesscard.running{border-color:var(--fill);box-shadow:0 0 0 1px var(--fill)}
+.sessmain{padding:13px 16px 15px}
+.sesstop{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;min-height:18px}
+.sesstop .lbl{margin:0}
+.sessmeta{font-size:12.5px;color:var(--grey);white-space:nowrap}
+.sessstate{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--teal);white-space:nowrap}
+.sessstate::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.sessstate.paused{color:var(--amber)}
+.sessstate.ready{color:var(--plum)}
+.sessrow{display:flex;gap:8px;align-items:stretch}
+.selwrap{position:relative;flex:1 1 auto;min-width:0;display:flex}
+.plansel{flex:1 1 auto;width:100%;min-width:0;appearance:none;-webkit-appearance:none;margin:0;
+  border:1.5px solid var(--line);border-radius:12px;background:var(--soft);color:var(--plum);
+  font:inherit;font-size:15px;font-weight:700;padding:11px 38px 11px 14px;cursor:pointer;text-overflow:ellipsis}
+.plansel:hover,.plansel:focus-visible{border-color:var(--plum);outline:none}
+.plansel:disabled{cursor:default}
+.selwrap .chev{position:absolute;inset-inline-end:12px;top:50%;margin-top:-9px;pointer-events:none}
+[dir="rtl"] .plansel{padding:11px 14px 11px 38px}
+.sessgo{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:none;
+  border:1.6px solid var(--fill);border-radius:12px;background:var(--fill);color:var(--on-fill);
+  font:inherit;font-size:15px;font-weight:700;padding:10px 18px;cursor:pointer;line-height:1.2;transition:background .12s}
+.sessgo:hover{background:var(--fill-hover);border-color:var(--fill-hover)}
+.sessalt{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:none;
+  border:1.5px solid var(--line);border-radius:12px;background:var(--soft);color:var(--ink);
+  font:inherit;font-size:14px;font-weight:600;padding:10px 14px;cursor:pointer;line-height:1.2}
+.sessalt:hover{border-color:var(--plum);color:var(--plum)}
+.sessgo svg,.sessalt svg{width:15px;height:15px;fill:currentColor;flex:none}
+.sessnow{display:flex;align-items:flex-end;gap:12px}
+.sesstxt{flex:1 1 auto;min-width:0}
+.sesstitle{font-size:18px;font-weight:700;color:var(--plum);line-height:1.25}
+.sessdesc{font-size:12.5px;color:var(--grey);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sessclock{flex:none;font-size:30px;font-weight:700;line-height:1;color:var(--ink);
+  font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.sesscard.paused .sessclock{color:var(--grey)}
+/* the plan at a glance: one segment per block, as long as the block */
+.strip{display:flex;gap:3px;margin-top:12px}
+.strip>i{flex:var(--m) 1 0;min-width:6px;height:6px;border-radius:3px;background:var(--bar-empty);overflow:hidden}
+.strip>i.done{background:var(--fill)}
+.strip>i>b{display:block;height:100%;width:0;background:var(--fill);border-radius:3px}
+.sesshead{display:flex;align-items:center;gap:12px;min-width:0}
+.sesshead .lbl{white-space:nowrap}
+.sessend{font-size:13px;padding:0 2px}
+/* Pause and Skip share the row; ending, the rarer and final step, sits apart at the top */
+.sessbtns{display:flex;gap:8px;align-items:stretch;margin-top:14px}
+.sessbtns>button{flex:1 1 0;min-width:0}
+.sesscard>.sub{margin:0}
+.sesscard>.sub>summary{color:var(--grey);font-size:13.5px;font-weight:600}
+@media (max-width:380px){
+  .sessgo,.sessalt{padding:10px 13px}
+  .sessclock{font-size:26px}
+}
+@media (max-width:350px){
+  .sesshead{gap:8px}
+  .sesshead .lbl{letter-spacing:.6px}
+  .sessend{font-size:12px}
+}
 /* ---------- collapsing sections ---------- */
 .sec{margin:14px 0;border:1px solid var(--line);border-radius:10px;background:var(--card);overflow:hidden}
 .sec>summary{list-style:none;cursor:pointer;padding:12px 16px;font-size:16px;font-weight:700;
@@ -296,6 +355,10 @@ button{font:inherit}
 .switch input:checked+.track::after{transform:translateX(16px)}
 .switch input:focus-visible+.track{outline:2px solid var(--plum);outline-offset:2px}
 .swlbl .muted{font-size:13px}
+.switch input:disabled+.track{opacity:.45}
+.switch:has(input:disabled){cursor:default}
+.pill b .eyeoff{width:15px;height:15px;vertical-align:-3px;fill:none;stroke:currentColor;stroke-width:2.2;
+  stroke-linecap:round;stroke-linejoin:round}
 .tool.full{flex-direction:row;width:100%;min-height:0;padding:10px;gap:8px;font-size:14px;margin-bottom:8px}
 .tool.full svg{fill:var(--plum);stroke:none;width:16px;height:16px}
 .answers{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -537,6 +600,13 @@ bdi{white-space:nowrap}
     <button class="btn sm" onclick="newKeyNow()" data-t="key.new">Pick a new key</button>
   </div>
   <div class="hint" id="rangeNote"></div>
+  <label class="switch">
+    <input type="checkbox" id="hideKeySwitch" role="switch" onchange="setHideKey(this.checked)">
+    <span class="track"></span>
+    <span class="swlbl" data-t="key.hide">Hide the key</span>
+  </label>
+  <div class="hint" data-t="key.hide.hint">Nothing on screen names the key, or the notes you sing, so where the key
+  sits can&rsquo;t tell you whether to go high or low: you find <em>do</em> by ear.</div>
 
   <div class="lbl" style="margin-top:14px" data-t="key.changing">Changing keys</div>
   <div class="row" id="keyModeRow">
@@ -682,23 +752,42 @@ bdi{white-space:nowrap}
 </details>
 
 <!-- ===================== SESSION ===================== -->
-<details class="sec" id="secSession" data-sec="session">
-  <summary><span data-t="sess.title">Session</span> <span class="sum" id="sessSum"></span></summary>
-  <div class="card">
-    <div class="row">
-      <label class="muted" for="planSel" data-t="sess.plan">Plan</label>
-      <select id="planSel" onchange="selectPlan(this.value)"></select>
+<!-- What you touch every day stays in view: the plan, Start, and while it runs the
+     block, its clock and Pause / Skip / End. Editing plans folds away underneath. -->
+<section class="sesscard" id="sessCard">
+  <div class="sessmain">
+    <div class="sesstop">
+      <span class="sesshead"><span class="lbl" id="sessLbl">Session</span><span class="sessstate" id="sessState" style="display:none"></span></span>
+      <span class="sessmeta" id="sessSum"></span>
+      <button type="button" class="textbtn sessend" id="stopSessBtn" style="display:none" onclick="stopSession()" data-t="sess.end">End session</button>
     </div>
-    <div class="row" style="margin-top:8px">
+    <div class="sessrow" id="sessIdle">
+      <span class="selwrap">
+        <select id="planSel" class="plansel" aria-labelledby="sessLbl" onchange="selectPlan(this.value)"></select>
+        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </span>
+      <button type="button" class="sessgo" id="startSessBtn" onclick="startSession()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.8v14.4L19 12z"/></svg><span data-t="sess.go">Start</span></button>
+    </div>
+    <div class="sessnow" id="sessRun" style="display:none">
+      <div class="sesstxt">
+        <div class="sesstitle" id="sessTitle"></div>
+        <div class="sessdesc" id="sessDesc"></div>
+      </div>
+      <div class="sessclock" id="sessClock">0:00</div>
+    </div>
+    <div class="strip" id="sessStrip" aria-hidden="true"></div>
+    <div class="sessbtns" id="sessBtns" style="display:none">
+      <button type="button" class="sessgo" id="pauseBtn" onclick="togglePause()"></button>
+      <button type="button" class="sessalt" id="skipBlockBtn" onclick="skipBlock()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.5v13L15 12z"/><rect x="16" y="5.5" width="3" height="13" rx="1"/></svg><span data-t="sess.skip">Skip block</span></button>
+    </div>
+  </div>
+  <details class="sub" id="secSession" data-sec="session">
+    <summary><span data-t="sess.edit">Plans and blocks</span></summary>
+    <div class="subbody">
+    <div class="row">
       <label class="muted" for="planName" data-t="sess.name">Name</label>
       <input id="planName" type="text" maxlength="28" style="flex:1 1 130px"
              oninput="renamePlan(this.value)">
-    </div>
-    <div class="row" style="margin-top:10px">
-      <button class="btn primary" id="startSessBtn" onclick="startSession()" data-t="sess.start">Start session</button>
-      <button class="btn primary" id="pauseBtn" style="display:none" onclick="togglePause()">Pause</button>
-      <button class="btn sm" id="skipBlockBtn" style="display:none" onclick="skipBlock()" data-t="sess.skip">Skip block</button>
-      <button class="btn sm" id="stopSessBtn" style="display:none" onclick="stopSession()" data-t="sess.end">End session</button>
     </div>
     <div class="hint" id="planHint"></div>
 
@@ -720,8 +809,9 @@ bdi{white-space:nowrap}
     note-name hiding. Anything left on <em>keep</em> stays as you have it. Plans in
     <code>plans/</code> in the repo load on every device; editing one here keeps your version in this
     browser only, and <em>Copy JSON</em> gives you the text to paste back into the file.</div>
-  </div>
-</details>
+    </div>
+  </details>
+</section>
 
 <!-- ===================== PRACTICE ===================== -->
 <h2 data-t="prac.title">Practice</h2>
@@ -789,6 +879,7 @@ bdi{white-space:nowrap}
       <input type="checkbox" id="namesSwitch" role="switch" onchange="toggleHideNotes()">
       <span class="track"></span>
       <span class="swlbl" data-t="sing.names">Show note names <span class="muted">while I sing</span></span>
+      <span class="muted" id="namesKeyNote" style="display:none" data-t="sing.names.key">(off while the key is hidden)</span>
     </label>
   </div>
 
@@ -832,7 +923,7 @@ bdi{white-space:nowrap}
   <p data-t="guide.p1"><strong>Ten to twelve minutes a day, not an hour a week.</strong> This is a memory task, and memory
   responds to frequency far more than duration.</p>
   <p class="muted" style="margin-bottom:14px" data-t="guide.p2">What to do <em>in</em> a session is the
-  <a href="#secSession" style="color:var(--plum)">Session plan</a> above &mdash; that is the thing that
+  <a href="#sessCard" style="color:var(--plum)">Session plan</a> above &mdash; that is the thing that
   actually runs, so it is the only description of a session worth keeping. What follows is the reasoning
   behind it, which is what you need when you build a plan of your own.</p>
 
@@ -989,7 +1080,7 @@ var S = {
   droneVol:0.55, micId:'', keyMode:'session', keyEvery:5, inKey:0, freshKey:true,
   cadMode:'classic', cadChange:'key', cadEvery:3, cadGap:0, cadId:'classic', cadClose:0, cadBpm:96, cadCount:0,
   open:{why:false, setup:false, session:false, progress:true, guide:false},
-  plans:null, planId:'daily-12', edits:null, micAuto:false, accent:'plum', carryKey:true, masterVol:1, hideNotes:false, theme:'system',
+  plans:null, planId:'daily-12', edits:null, micAuto:false, accent:'plum', carryKey:true, masterVol:1, hideNotes:false, hideKey:false, theme:'system',
   lang:'en', instrument:'synth', localInst:'synth', midiOk:false, midiVel:62, cadVel:50,
   stats:{}, recent:[], answered:0, current:null, lastDegree:null,
   phase:'idle'     // idle | sing | name | done
@@ -1002,18 +1093,46 @@ function weightFor(n){
   var a=accuracy(n, scoredKind());
   return a===null ? 2.0 : (1+2*(1-a));    // 1.0 solid .. 3.0 never right
 }
-function offsetsFor(deg){
+function offsetsFor(deg, level){
   var base=[deg.semi];
-  if(LEVELS[S.level].wide){
+  if(LEVELS[level===undefined ? S.level : level].wide){
     if(deg.semi===0) base.push(12);
     else if(deg.semi>=7) base.push(deg.semi-12);
   }
   return base;
 }
+/* Every note a level can ask for, in semitones from the tonic: do-mi-sol is
+   0..7, the pentatonic 0..9, the full scale 0..11, and the wide level -5..12
+   (sol below do up to the octave). */
+function levelSpan(level){
+  var lo=Infinity, hi=-Infinity;
+  LEVELS[level].degrees.forEach(function(n){
+    offsetsFor(degByN(n), level).forEach(function(o){ lo=Math.min(lo,o); hi=Math.max(hi,o); });
+  });
+  return {lo:lo, hi:hi};
+}
 function rangeFor(level,tonic){
-  var lo=tonic, hi=tonic+11;
-  if(LEVELS[level].wide){ lo=tonic-5; hi=tonic+12; }
-  return {lo:lo,hi:hi};
+  var s=levelSpan(level);
+  return {lo:tonic+s.lo, hi:tonic+s.hi};
+}
+/* Keys are chosen so every note of the current level is one you can sing: with
+   F2 as your lowest note, F2 can be do at levels 1-3, but at level 4 (which
+   reaches a fourth below do) do can be no lower than C3. The same holds at the
+   top. A range too narrow for a level falls back to the widest level below it
+   that fits, and pickQuestion then sings each note in the octave that fits. */
+function keySpan(level){
+  if(level===undefined) level=S.level;
+  var room=S.voiceHi-S.voiceLo;
+  for(var l=level; l>=0; l--){
+    var s=levelSpan(l);
+    if(s.hi-s.lo<=room){ s.fits=(l===level); return s; }
+  }
+  var s0=levelSpan(0); s0.fits=false; return s0;
+}
+/* the lowest and highest tonic that keep the level inside your range */
+function keyLimits(level){
+  var s=keySpan(level);
+  return {lo:S.voiceLo-s.lo, hi:Math.max(S.voiceLo-s.lo, S.voiceHi-s.hi), fits:s.fits};
 }
 /* ---------- fair randomness ----------
    Independent random draws clump. Measured over 5000 questions: with do-mi-sol
@@ -1083,7 +1202,10 @@ function pickQuestion(){
   if(!S.degBag.length) S.degBag=buildDegreeBag();
   var pick=S.degBag.shift();
   S.degHist=remember(S.degHist||[], pick, 12);
-  var deg=degByN(pick), offs=offsetsFor(deg);
+  var deg=degByN(pick), all=offsetsFor(deg);
+  /* the octave that fits your range, when the level offers two */
+  var offs=all.filter(function(o){ return S.tonic+o>=S.voiceLo && S.tonic+o<=S.voiceHi; });
+  if(!offs.length) offs=all;
   var off=offs[Math.floor(Math.random()*offs.length)];
   S.lastDegree=pick;
   S.current={degree:deg, midi:S.tonic+off, offset:off, idDone:false, singDone:false};
@@ -2163,16 +2285,33 @@ function renderMicText(){
    arithmetic instead of by ear. This hides note names only -- the meter, the
    cents reading and "semitones above/below" still tell you how close you are. */
 function toggleHideNotes(){
-  S.hideNotes=!S.hideNotes;
+  if(!S.hideKey) S.hideNotes=!S.hideNotes;
   renderHideNotes();
   save();
 }
+/* A hidden key hides note names too: "A3" for mi gives the key straight back.
+   Your own note-name setting is kept for when the key shows again. */
+function namesHidden(){ return !!(S.hideNotes || S.hideKey); }
 function renderHideNotes(){
   /* the switch reads "show note names", so it is on when they are not hidden */
   var sw=document.getElementById('namesSwitch');
-  if(sw){ sw.checked = !S.hideNotes; sw.setAttribute('aria-checked', String(!S.hideNotes)); }
+  if(sw){ sw.checked = !namesHidden(); sw.setAttribute('aria-checked', String(!namesHidden())); sw.disabled=!!S.hideKey; }
+  var kn=document.getElementById('namesKeyNote');
+  if(kn) kn.style.display = S.hideKey ? '' : 'none';
+  var hk=document.getElementById('hideKeySwitch');
+  if(hk){ hk.checked=!!S.hideKey; hk.setAttribute('aria-checked', String(!!S.hideKey)); }
   var t=document.getElementById('tNote');
-  if(t && S.hideNotes && t.textContent!=='—') t.textContent=_('note hidden');
+  if(t && namesHidden() && t.textContent!=='—') t.textContent=_('note hidden');
+}
+/* the key in the header, when it is hidden */
+var EYE_OFF='<svg class="eyeoff" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.4-6.2 9.5-6.2 9.5 6.2 9.5 6.2-3.4 6.2-9.5 6.2S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/><path d="M4 4l16 16"/></svg>';
+function setHideKey(on){
+  S.hideKey=!!on;
+  buildTonicSelect();
+  renderHideNotes();
+  renderSummaries();
+  if(RUN.on) renderCarry(currentPlan().blocks[RUN.idx]);
+  save();
 }
 function median(a){ var b=a.slice().sort(function(x,y){return x-y;}); return b[b.length>>1]; }
 
@@ -2205,7 +2344,7 @@ function startListening(target, cb){
     var cents=Math.round((mf-near)*100);
     document.getElementById('needle').style.left=
       Math.max(2,Math.min(98, 50 + (cmp.semitonesOff*100 + cmp.centsFromTarget)/2 ))+'%';
-    document.getElementById('tNote').textContent = S.hideNotes ? _('note hidden') : noteName(near);
+    document.getElementById('tNote').textContent = namesHidden() ? _('note hidden') : noteName(near);
     document.getElementById('tCents').textContent =
       _('{c} cents', {c:(cents>0?'+':'')+cents})+'  ·  '+
       (cmp.semitonesOff ? semisFromTarget(cmp.semitonesOff) : _('right note'));
@@ -2471,7 +2610,7 @@ function onSingResult(cmp, hz){
   } else {
     cls='bad';
     msg='<div class="big">'+semisOff(cmp.semitonesOff)+'</div>'+
-        '<div class="char">'+(S.hideNotes ? '' : _('You sang {a}; the note was {b}. ',
+        '<div class="char">'+(namesHidden() ? '' : _('You sang {a}; the note was {b}. ',
           {a:noteName(cmp.midi), b:noteName(S.current.midi)}))+
         _('Press Replay and try again — it does not count against you.')+'</div>';
   }
@@ -2646,9 +2785,9 @@ function updateProgress(){
     : _('Answer a few more and this will show which degree needs work.');
 }
 function nextLevel(){ if(S.level<LEVELS.length-1){ S.level++; S.recent=[]; S.lastDegree=null;
-  resetQuestionUI(); updateProgress(); save(); } }
+  fitKeyToLevel(); resetQuestionUI(); updateProgress(); save(); } }
 function prevLevel(){ if(S.level>0){ S.level--; S.recent=[]; S.lastDegree=null;
-  resetQuestionUI(); updateProgress(); save(); } }
+  fitKeyToLevel(); resetQuestionUI(); updateProgress(); save(); } }
 /* Reset wipes every score, so it asks twice -- inline, not with a pop-up. */
 var resetArmed=null;
 function askReset(){
@@ -2668,17 +2807,10 @@ function askReset(){
 function resetProgress(){
   DEGREES.forEach(function(d){ S.stats[d.n]={id:{a:0,c:0},sing:{a:0,c:0}}; });
   S.recent=[]; S.answered=0; S.level=0;
-  resetQuestionUI(); updateProgress(); save();
+  fitKeyToLevel(); resetQuestionUI(); updateProgress(); save();
 }
 
 /* ---------- key setup ---------- */
-function fitsRange(tonic){
-  for(var l=0;l<LEVELS.length;l++){
-    var r=rangeFor(l,tonic);
-    if(r.lo<S.voiceLo || r.hi>S.voiceHi) return false;
-  }
-  return true;
-}
 function opts(from,to,selected){
   var h='';
   for(var m=from;m<=to;m++){
@@ -2693,41 +2825,55 @@ function buildRangeSelects(){
   lo.onchange=function(){
     S.voiceLo=parseInt(this.value,10);
     if(S.voiceHi < S.voiceLo+13){ S.voiceHi=S.voiceLo+13; hi.value=S.voiceHi; }
-    buildTonicSelect(); save();
+    fitKeyToLevel(); save();
   };
   hi.onchange=function(){
     S.voiceHi=parseInt(this.value,10);
     if(S.voiceHi < S.voiceLo+13){ S.voiceLo=S.voiceHi-13; lo.value=S.voiceLo; }
-    buildTonicSelect(); save();
+    fitKeyToLevel(); save();
   };
 }
+/* Only the keys this level fits are offered, and a key it no longer fits (after
+   a level or range change) moves to the nearest one that does. */
 function buildTonicSelect(){
   var sel=document.getElementById('tonicSel');
-  var loT=S.voiceLo, hiT=S.voiceHi-11;
-  if(hiT<loT) hiT=loT;
-  var html='';
-  for(var m=loT;m<=hiT;m++){
-    html+='<option value="'+m+'"'+(m===S.tonic?' selected':'')+'>'+noteName(m)+
-          (fitsRange(m) ? '' : _(' — level 4 reaches outside'))+'</option>';
+  var k=keyLimits(), loT=k.lo, hiT=k.hi;
+  if(S.tonic<loT || S.tonic>hiT){ S.tonic=Math.min(Math.max(S.tonic,loT),hiT); S.inKey=0; }
+  if(S.hideKey){
+    sel.innerHTML='<option>'+_('hidden')+'</option>';
+    sel.disabled=true;
+  } else {
+    var html='';
+    for(var m=loT;m<=hiT;m++)
+      html+='<option value="'+m+'"'+(m===S.tonic?' selected':'')+'>'+noteName(m)+'</option>';
+    sel.innerHTML=html;
+    sel.disabled=false;
+    sel.value=S.tonic;
   }
-  sel.innerHTML=html;
-  if(S.tonic<loT || S.tonic>hiT){ S.tonic=Math.min(Math.max(S.tonic,loT),hiT); sel.value=S.tonic; }
   sel.onchange=function(){ S.tonic=parseInt(this.value,10); S.inKey=0; resetQuestionUI();
                            updateKeyNote(); save(); };
   updateKeyNote();
 }
 function updateKeyNote(){
-  document.getElementById('hKey').textContent=keyName(S.tonic);
+  var hk=document.getElementById('hKey');
+  if(hk){
+    if(S.hideKey){ hk.innerHTML=EYE_OFF; hk.setAttribute('aria-label', _('hidden')); }
+    else { hk.textContent=keyName(S.tonic); hk.setAttribute('aria-label', keyName(S.tonic)); }
+  }
   updateKeyNow();
-  var r=rangeFor(S.level,S.tonic), rw=rangeFor(3,S.tonic);
-  var dr=droneRootFor(S.tonic);
-  document.getElementById('rangeNote').innerHTML =
-    _('At this level notes run {a}&ndash;{b}; across all four levels {c}&ndash;{d}. Drone sits on {e} and {f}. ',
-      {a:noteName(r.lo), b:noteName(r.hi), c:noteName(rw.lo), d:noteName(rw.hi), e:noteName(dr), f:noteName(dr+7)})+
-    (fitsRange(S.tonic)
-      ? _('Everything is inside the range you set.')
-      : _('<strong>Level 4 would reach outside your range.</strong> Levels 1–3 are fine; '+
-        'lower your bottom note or pick a higher tonic before you get there.'));
+  var s=keySpan(), dr=droneRootFor(S.tonic), note=document.getElementById('rangeNote');
+  if(!note) return;
+  note.innerHTML = (S.hideKey
+      ? _('The key is hidden. Every note at this level stays inside your range.')
+      : _('At this level the notes run {a}&ndash;{b}, inside your range. The drone sits on {e} and {f}.',
+          {a:noteName(S.tonic+s.lo), b:noteName(S.tonic+s.hi), e:noteName(dr), f:noteName(dr+7)}))+
+    (s.fits ? '' : ' '+_('Your range is narrower than this level needs, so a note that would fall outside it comes in the octave that fits.'));
+}
+/* After the level or your range changes: the key stays if the level still fits
+   it, otherwise it moves to the nearest key that does. */
+function fitKeyToLevel(){
+  buildTonicSelect();
+  renderKeyMode();
 }
 /* ---------- appearance ---------- */
 /* name -> the colour the phone's status bar should take in light mode */
@@ -2880,16 +3026,11 @@ function setKeyEvery(n){
   S.keyEvery=n; S.inKey=0;
   renderKeyMode(); updateProgress(); save();
 }
-/* Keys where every level fits the singer's range; failing that, keys where the
-   current level fits; failing that, no rotation at all. */
+/* Every key in which the current level fits your range. */
 function rotationKeys(){
-  var all=[], cur=[], t;
-  for(t=S.voiceLo; t<=S.voiceHi-11; t++){
-    if(fitsRange(t)) all.push(t);
-    var r=rangeFor(S.level,t);
-    if(r.lo>=S.voiceLo && r.hi<=S.voiceHi) cur.push(t);
-  }
-  return all.length>1 ? all : cur;
+  var k=keyLimits(), out=[];
+  for(var t=k.lo; t<=k.hi; t++) out.push(t);
+  return out;
 }
 /* Keys come out of a bag too: every key that fits your range is used once
    before any comes back. The bag is saved, so "a new key each session" walks
@@ -2903,11 +3044,12 @@ function rotateKey(){
     /* with eight keys, none returns within six changes */
     bag=fairOrder(others.slice(), hist, Math.max(2, keys.length-2), keys.length+2);
   }
-  S.keyHist=remember(S.keyHist||[], S.tonic, 12);
+  /* the history has to reach back past every key, or the spacing can't be kept */
+  S.keyHist=remember(S.keyHist||[], S.tonic, Math.max(12, keys.length+2));
   S.tonic=bag.shift();
   S.keyBag=bag;
   var sel=document.getElementById('tonicSel');
-  if(sel) sel.value=S.tonic;
+  if(sel && !S.hideKey) sel.value=S.tonic;
   updateKeyNote();
   save();
   return true;
@@ -2954,7 +3096,7 @@ function updateKeyNow(){
     else tail=_(' \u2014 question {i} of {n} in this key', {i:S.inKey, n:S.keyEvery})+
               (S.inKey===1 ? _(' <strong style="color:var(--amber)">(new key: find <em>do</em>)</strong>') : '');
   } else if(S.keyMode==='session') tail=_(' \u2014 new key next time you open the app');
-  el.innerHTML=_('Key of <strong>{k}</strong>', {k:keyName(S.tonic)})+tail;
+  el.innerHTML=(S.hideKey ? _('Key hidden') : _('Key of <strong>{k}</strong>', {k:keyName(S.tonic)}))+tail;
 }
 /* ---------- opening with the microphone on ----------
    Only when the browser already holds the permission: asking for a microphone
@@ -3012,12 +3154,13 @@ function setSum(id, text){
 function refWords(){
   return S.context==='drone' ? _('drone') : S.context==='cadence' ? _('cadence') : _('cadence then drone');
 }
+function keyWord(){ return S.hideKey ? _('key hidden') : keyName(S.tonic); }
 function renderSubSummaries(){
   setSum('themeSum', (S.lang==='he' ? 'עברית \u00b7 ' : '')+
                      (S.theme==='system' ? _('follows your system') : _(S.theme))+
                      ' \u00b7 '+_(S.accent||'plum'));
   setSum('rangeSum', _('{a} to {b}', {a:noteName(S.voiceLo), b:noteName(S.voiceHi)}));
-  setSum('keySum', keyName(S.tonic)+' \u00b7 '+
+  setSum('keySum', keyWord()+' \u00b7 '+
     (S.keyMode==='fixed' ? _('fixed') :
      S.keyMode==='session' ? _('new each session') :
      S.keyEvery===1 ? _('new every question') : _('new every {n}', {n:S.keyEvery})));
@@ -3030,7 +3173,7 @@ function renderSummaries(){
   renderSubSummaries();
   var set=document.getElementById('setupSum');
   if(set){
-    set.textContent = keyName(S.tonic) + ' \u00b7 ' +
+    set.textContent = keyWord() + ' \u00b7 ' +
       (S.keyMode==='fixed' ? _('one key') :
        S.keyMode==='session' ? _('key each session') :
        S.keyEvery===1 ? _('key every question') : _('key every {n}', {n:S.keyEvery})) + ' \u00b7 ' +
@@ -3038,16 +3181,6 @@ function renderSummaries(){
       (S.context!=='drone' && S.cadMode==='mixed' ? _(' (mixed)') : '') +
       (micStream ? _(' \u00b7 mic on') : '') +
       (soundSource()==='synth' ? '' : ' \u00b7 '+instrumentWords());
-  }
-  var se=document.getElementById('sessSum');
-  if(se){
-    var pl=currentPlan();
-    /* no clock here: it would only be right at the moment it was drawn, and the
-       timer in the bar at the top ticks properly */
-    se.textContent = RUN.on
-      ? (RUN.waiting ? iso(blockTitle(pl.blocks[RUN.idx]))+_(' \u00b7 ready')
-                     : iso(blockTitle(pl.blocks[RUN.idx]))+(RUN.paused ? _(' \u00b7 paused') : _(' \u00b7 running')))
-      : iso(pl.name)+' \u00b7 '+_('{n} min', {n:planMinutes(pl)});
   }
   var pr=document.getElementById('progSum');
   if(pr){
@@ -3269,15 +3402,18 @@ function renderCarry(b){
   box.style.display='block';
   var k=keyName(S.tonic), n=parseInt(b.key,10);
   var yes=document.getElementById('carryYes'), no=document.getElementById('carryNo');
-  yes.textContent=_('Stay in {k}', {k:k});
+  yes.textContent=S.hideKey ? _('Stay in this key') : _('Stay in {k}', {k:k});
   yes.classList.toggle('on', S.carryKey!==false); yes.setAttribute('aria-checked', String(S.carryKey!==false));
   no.classList.toggle('on', S.carryKey===false);  no.setAttribute('aria-checked', String(S.carryKey===false));
   var h=document.getElementById('carryHint');
   if(h) h.textContent = S.carryKey===false
     ? (n===1 ? _('A new key straight away, then a new one every question.')
              : _('A new key straight away, then a new one every {n} questions.', {n:n}))
-    : (n===1 ? _('The first question stays in {k}, then every question moves.', {k:k})
-             : _('The first {n} questions stay in {k}, then the key moves every {n}.', {n:n, k:k}));
+    : S.hideKey
+      ? (n===1 ? _('The first question stays in this key, then every question moves.')
+               : _('The first {n} questions stay in this key, then the key moves every {n}.', {n:n}))
+      : (n===1 ? _('The first question stays in {k}, then every question moves.', {k:k})
+               : _('The first {n} questions stay in {k}, then the key moves every {n}.', {n:n, k:k}));
 }
 function confirmBlock(){
   if(!RUN.waiting) return;
@@ -3300,7 +3436,7 @@ function holdSession(){
 function applyBlock(b){
   if(b.level!=='keep'){
     var lv=parseInt(b.level,10);
-    if(lv>=0 && lv<LEVELS.length && lv!==S.level){ S.level=lv; S.recent=[]; S.lastDegree=null; }
+    if(lv>=0 && lv<LEVELS.length && lv!==S.level){ S.level=lv; S.recent=[]; S.lastDegree=null; fitKeyToLevel(); }
   }
   if(b.key!=='keep'){
     if(b.key==='fixed' || b.key==='session') setKeyMode(b.key);
@@ -3329,7 +3465,7 @@ function blockDone(){
 }
 function skipBlock(){
   if(!RUN.on) return;
-  if(RUN.waiting){ confirmBlock(); return; }
+  if(RUN.waiting) hideModal();
   offerBlock(RUN.idx+1);
 }
 function togglePause(){
@@ -3418,7 +3554,61 @@ function fmtClock(ms){
   var s=Math.max(0,Math.ceil(ms/1000));
   return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2);
 }
+var ICON_PLAY='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.8v14.4L19 12z"/></svg>';
+var ICON_PAUSE='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4.5" width="4.2" height="15" rx="1.2"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1.2"/></svg>';
+function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function showEl(id, on){ var e=document.getElementById(id); if(e) e.style.display = on ? '' : 'none'; }
+/* The session card: idle it offers the plan and Start; running it shows the
+   block, its clock, where you are in the plan, and Pause / Skip / End. */
+function renderSessCard(){
+  var card=document.getElementById('sessCard');
+  if(!card) return;
+  var p=currentPlan(), b=RUN.on ? p.blocks[RUN.idx] : null;
+  card.classList.toggle('running', !!RUN.on);
+  card.classList.toggle('paused', !!(RUN.on && RUN.paused));
+  showEl('sessIdle', !RUN.on); showEl('sessRun', !!RUN.on); showEl('sessBtns', !!RUN.on);
+  var lbl=document.getElementById('sessLbl');
+  if(lbl) lbl.textContent = RUN.on ? _('Block {i} of {n}', {i:RUN.idx+1, n:p.blocks.length}) : _('Session');
+  showEl('sessSum', !RUN.on); showEl('sessState', !!RUN.on); showEl('stopSessBtn', !!RUN.on);
+  var meta=document.getElementById('sessSum');
+  if(meta) meta.textContent = _('{n} min', {n:planMinutes(p)})+' \u00b7 '+
+    (p.blocks.length===1 ? _('1 block') : _('{n} blocks', {n:p.blocks.length}));
+  var state=document.getElementById('sessState');
+  if(state && RUN.on){
+    var st = RUN.waiting ? 'ready' : RUN.paused ? 'paused' : 'running';
+    state.className='sessstate '+st;
+    state.textContent = st==='ready' ? _('ready') : st==='paused' ? _('paused') : _('running');
+  }
+  var t=document.getElementById('sessTitle'), ds=document.getElementById('sessDesc');
+  if(t) t.textContent = b ? blockTitle(b) : '';
+  /* the summary without its minutes: the clock beside it has them */
+  if(ds) ds.textContent = b ? blockSummary(b).split(' \u00b7 ').slice(1).join(' \u00b7 ') + (b.note ? ' \u2014 ' + iso(b.note) : '') : '';
+  var strip=document.getElementById('sessStrip');
+  if(strip) strip.innerHTML = p.blocks.map(function(bl,i){
+    var cls = !RUN.on ? '' : i<RUN.idx ? 'done' : i===RUN.idx ? 'now' : '';
+    return '<i class="'+cls+'" style="--m:'+Math.max(1, bl.mins||1)+'" title="'+
+           esc(blockTitle(bl)+' \u00b7 '+_('{n} min', {n:bl.mins}))+'">'+(cls==='now' ? '<b></b>' : '')+'</i>';
+  }).join('');
+  var pause=document.getElementById('pauseBtn');
+  if(pause) pause.innerHTML = (RUN.waiting || RUN.paused ? ICON_PLAY : ICON_PAUSE)+'<span>'+
+    (RUN.waiting ? _('Start block') : RUN.paused ? _('Resume') : _('Pause'))+'</span>';
+  renderSessClock();
+}
+/* the clock and the current block's share of the strip; every tick */
+function renderSessClock(){
+  if(!RUN.on) return;
+  var b=currentPlan().blocks[RUN.idx];
+  if(!b) return;
+  var total=Math.max(1, b.mins*60000);
+  var left = RUN.waiting ? total : RUN.paused ? RUN.left : Math.max(0, RUN.endAt-Date.now());
+  var c=document.getElementById('sessClock');
+  if(c) c.textContent=fmtClock(left);
+  var strip=document.getElementById('sessStrip');
+  var now=strip && strip.querySelector ? strip.querySelector('i.now>b') : null;
+  if(now) now.style.width=Math.min(100, Math.max(0, 100*(1-left/total))).toFixed(1)+'%';
+}
 function renderTimer(){
+  renderSessClock();
   var pill=document.getElementById('timerPill'), bar=document.getElementById('topbar');
   if(bar) bar.classList.toggle('running', !!RUN.on);
   if(!pill) return;
@@ -3449,17 +3639,7 @@ function renderSession(){
   }
   var nm=document.getElementById('planName');
   if(nm && nm.value!==p.name) nm.value=p.name;
-  var start=document.getElementById('startSessBtn');
-  if(start) start.style.display = RUN.on ? 'none' : '';
-  var pause=document.getElementById('pauseBtn');
-  if(pause){
-    pause.style.display = RUN.on ? '' : 'none';
-    pause.textContent = RUN.waiting ? _('Start block') : (RUN.paused ? _('Resume') : _('Pause'));
-  }
-  var skip=document.getElementById('skipBlockBtn');
-  if(skip) skip.style.display = RUN.on ? '' : 'none';
-  var stop=document.getElementById('stopSessBtn');
-  if(stop) stop.style.display = RUN.on ? '' : 'none';
+  renderSessCard();
   var src=document.getElementById('planSource');
   if(src){
     src.innerHTML = isRepo(p.id)
@@ -3706,7 +3886,7 @@ function save(){
       voiceLo:S.voiceLo, voiceHi:S.voiceHi, droneVol:S.droneVol, micId:S.micId, keyMode:S.keyMode, keyEvery:S.keyEvery, masterVol:S.masterVol,
       cadMode:S.cadMode, cadChange:S.cadChange, cadEvery:S.cadEvery, cadGap:S.cadGap, open:S.open,
       plans:S.plans, planId:S.planId, edits:S.edits, micAuto:S.micAuto, accent:S.accent,
-      keyBag:S.keyBag, keyHist:S.keyHist, carryKey:S.carryKey, hideNotes:S.hideNotes, theme:S.theme, lang:S.lang,
+      keyBag:S.keyBag, keyHist:S.keyHist, carryKey:S.carryKey, hideNotes:S.hideNotes, hideKey:S.hideKey, theme:S.theme, lang:S.lang,
       instrument:S.instrument, localInst:S.localInst, midiOk:S.midiOk, midiVel:S.midiVel, cadVel:S.cadVel,
       stats:S.stats, answered:S.answered
     }));
@@ -3735,7 +3915,7 @@ function load(){
     if(typeof o.micAuto==='boolean') S.micAuto=o.micAuto;
     if(typeof o.carryKey==='boolean') S.carryKey=o.carryKey;
     if(o.keyBag && o.keyBag.length) S.keyBag=o.keyBag.filter(function(t){ return typeof t==='number'; }).slice(0,24);
-    if(o.keyHist && o.keyHist.length) S.keyHist=o.keyHist.filter(function(t){ return typeof t==='number'; }).slice(-12);
+    if(o.keyHist && o.keyHist.length) S.keyHist=o.keyHist.filter(function(t){ return typeof t==='number'; }).slice(-40);
     if(ACCENTS[o.accent]) S.accent=o.accent;
     if(o.plans) S.plans=sanitisePlans(o.plans) || [];
     if(o.edits && typeof o.edits==='object'){
@@ -3754,6 +3934,7 @@ function load(){
     else if(o.keyMode==='question') S.keyEvery=1;   /* saved before this setting existed */
     if(typeof o.masterVol==='number') S.masterVol=Math.max(0,Math.min(1,o.masterVol));
     if(typeof o.hideNotes==='boolean') S.hideNotes=o.hideNotes;
+    if(typeof o.hideKey==='boolean') S.hideKey=o.hideKey;
     if(o.theme==='system'||o.theme==='light'||o.theme==='dark') S.theme=o.theme;
     if(o.lang==='en'||o.lang==='he') S.lang=o.lang;
     if(o.instrument==='p225') o.instrument='samples';          /* v20's name for it */
