@@ -531,19 +531,6 @@ bdi{white-space:nowrap}
 <p class="sub" data-t="subtitle">Hear where a note sits in the key &mdash; not how far it is from the last one.</p>
 <p class="pagelink"><a href="tuner.html" data-t="link.tuner">Note detector &rarr;</a> <span class="muted" data-t="link.tuner.sub">names any note you sing or play</span></p>
 
-<details class="sec" id="secWhy" data-sec="why">
-  <summary data-t="why.title">Why this is different</summary>
-  <div class="card">
-  <p style="margin-bottom:8px" data-t="why.p1">Naming isolated intervals is hard because two notes in a vacuum give your ear
-  nothing to hold onto. Here a <strong>tonic is always present</strong> &mdash; as a drone or a cadence
-  &mdash; so every note has a fixed reference and a recognisable <em>character</em> rather than a
-  measurement.</p>
-  <p class="muted" style="margin:0" data-t="why.p2">Start at Level 1 with three notes, and follow the
-  <a href="#guide" style="color:var(--plum)">practice notes</a> at the bottom. Intervals become easy later,
-  as a side effect.</p>
-  </div>
-</details>
-
 <!-- ===================== SETUP ===================== -->
 <details class="sec" id="secSetup" data-sec="setup">
   <summary><span data-t="setup.title">Setup</span> <span class="sum" id="setupSum"></span></summary>
@@ -607,6 +594,12 @@ bdi{white-space:nowrap}
   </label>
   <div class="hint" data-t="key.hide.hint">Nothing on screen names the key, or the notes you sing, so where the key
   sits can&rsquo;t tell you whether to go high or low: you find <em>do</em> by ear.</div>
+  <label class="switch">
+    <input type="checkbox" id="namesSwitch" role="switch" onchange="toggleHideNotes()">
+    <span class="track"></span>
+    <span class="swlbl" data-t="sing.names">Show note names <span class="muted">while I sing</span></span>
+  </label>
+  <div class="hint" id="namesKeyNote" style="display:none" data-t="key.names.off">Off while the key is hidden.</div>
 
   <div class="lbl" style="margin-top:14px" data-t="key.changing">Changing keys</div>
   <div class="row" id="keyModeRow">
@@ -875,12 +868,6 @@ bdi{white-space:nowrap}
       <button type="button" class="listen" id="listenBtn" onclick="toggleListen()"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/></svg><span class="dot"></span><span id="listenLabel">Start listening</span></button>
       <button type="button" class="textbtn" onclick="skipSing()" data-t="sing.skip">Skip singing</button>
     </div>
-    <label class="switch">
-      <input type="checkbox" id="namesSwitch" role="switch" onchange="toggleHideNotes()">
-      <span class="track"></span>
-      <span class="swlbl" data-t="sing.names">Show note names <span class="muted">while I sing</span></span>
-      <span class="muted" id="namesKeyNote" style="display:none" data-t="sing.names.key">(off while the key is hidden)</span>
-    </label>
   </div>
 
   <div class="hint" id="keyNow" style="margin:4px 0 0"></div>
@@ -914,6 +901,19 @@ bdi{white-space:nowrap}
   <div class="resetrow">
     <button type="button" class="textbtn danger" id="resetBtn" onclick="askReset()" data-t="prog.reset">Reset progress</button>
   </div>
+  </div>
+</details>
+
+<details class="sec" id="secWhy" data-sec="why">
+  <summary data-t="why.title">Why this is different</summary>
+  <div class="card">
+  <p style="margin-bottom:8px" data-t="why.p1">Naming isolated intervals is hard because two notes in a vacuum give your ear
+  nothing to hold onto. Here a <strong>tonic is always present</strong> &mdash; as a drone or a cadence
+  &mdash; so every note has a fixed reference and a recognisable <em>character</em> rather than a
+  measurement.</p>
+  <p class="muted" style="margin:0" data-t="why.p2">Start at Level 1 with three notes, and follow the
+  <a href="#guide" style="color:var(--plum)">practice notes</a> below. Intervals become easy later,
+  as a side effect.</p>
   </div>
 </details>
 
