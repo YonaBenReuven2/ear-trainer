@@ -132,6 +132,132 @@ a.btn{text-decoration:none;display:inline-block}
 .blk .x{margin-inline-start:auto}
 .blk .arrows{display:flex;gap:4px}
 .mins{font-size:12px;color:var(--grey)}
+/* ---------- settings: groups, headed parts, one row style ---------- */
+.grp>summary{font-size:15px;padding:13px 16px}
+.grp>.subbody{padding:0 16px 6px}
+.part{padding:14px 0 12px;border-top:1px solid var(--line)}
+.part:first-child{border-top:0;padding-top:2px}
+.part>h4{font-size:11px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--grey);margin:0 0 8px}
+.part h5{font-size:13.5px;font-weight:700;color:var(--ink);margin:14px 0 2px}
+.field{padding:6px 0}
+.field>.fl{display:block;font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:7px}
+.field>.hint{margin:7px 0 0}
+.srow{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;padding:7px 0;min-height:40px}
+.srow>.fl{flex:1 1 auto;font-size:13.5px;font-weight:600;color:var(--ink)}
+.srow .fl small{display:block;font-size:12.5px;font-weight:400;color:var(--grey);margin-top:2px;line-height:1.4}
+.srow+.hint,.srow+.srow{margin-top:0}
+.srow.switch{margin:0;cursor:pointer;flex-wrap:nowrap}
+.srow.switch .fl{min-width:0}
+.srow.switch .track{flex:none}
+.selwrap.sm{flex:0 0 auto}
+.selwrap.sm.grow{flex:1 1 200px;min-width:0}
+.ssel{appearance:none;-webkit-appearance:none;margin:0;border:1.5px solid var(--line);border-radius:10px;
+  background:var(--soft);color:var(--plum);font:inherit;font-size:14px;font-weight:700;padding:7px 30px 7px 11px;
+  cursor:pointer;max-width:100%;width:100%;text-overflow:ellipsis}
+.ssel:hover,.ssel:focus-visible{border-color:var(--plum);outline:none}
+.ssel:disabled{cursor:default;color:var(--grey)}
+.selwrap.sm .chev{width:15px;height:15px;inset-inline-end:9px;margin-top:-7.5px}
+[dir="rtl"] .ssel{padding:7px 11px 7px 30px}
+.sbtn{display:inline-flex;align-items:center;gap:6px;flex:none;border:1.5px solid var(--line);border-radius:999px;
+  background:var(--soft);color:var(--ink);font:inherit;font-size:13px;font-weight:600;padding:6px 12px;
+  cursor:pointer;white-space:nowrap;line-height:1.2}
+.sbtn:hover{border-color:var(--plum);color:var(--plum)}
+.sbtn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.seg .segopt{font-size:13px;padding:8px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg.sm{display:inline-flex;flex:0 0 auto}
+.seg.sm .segopt{flex:0 0 auto;padding:6px 12px}
+.segopt:disabled{opacity:.45;cursor:not-allowed}
+.sslider{flex:1 1 80px;min-width:60px;max-width:180px;margin:0;accent-color:var(--fill)}
+.sval{min-width:34px;text-align:end;font-variant-numeric:tabular-nums}
+@media (max-width:400px){ .sval{display:none} }
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.swatch{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line);border-radius:999px;
+  background:var(--card);color:var(--ink);font:inherit;font-size:13px;font-weight:600;padding:5px 12px 5px 6px;cursor:pointer}
+[dir="rtl"] .swatch{padding:5px 6px 5px 12px}
+.swatch i{width:18px;height:18px;border-radius:50%;background:var(--c);flex:none}
+.swatch:hover{border-color:var(--plum)}
+.swatch.on{border-color:var(--fill);box-shadow:inset 0 0 0 1px var(--fill)}
+/* a summary is one line, whatever is chosen: it shortens, it never wraps */
+.sec .sum{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec summary>span:first-child{flex:none}
+/* ---------- design B: a quiet top bar, the session bar, panels ---------- */
+.hbar{gap:8px;flex-wrap:nowrap}
+.appname{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--plum);font-size:15.5px;white-space:nowrap;min-width:0}
+.appname i{width:26px;height:26px;border-radius:7px;background:var(--fill);color:#f5d98a;font-style:normal;
+  display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-family:Georgia,serif;flex:none}
+.hgrow{flex:1 1 auto}
+.ibtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--soft);color:var(--plum);
+  display:inline-flex;align-items:center;justify-content:center;flex:none;padding:0;cursor:pointer}
+.ibtn:hover{border-color:var(--plum)}
+.ibtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+/* a running session */
+.sbar{background:var(--fill);color:var(--on-fill)}
+.sbarrow{max-width:780px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:7px 14px}
+.sbplay{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.42);
+  color:#fff;display:inline-flex;align-items:center;justify-content:center;flex:none;cursor:pointer;padding:0}
+.sbplay svg{width:14px;height:14px;fill:currentColor}
+.sbmain{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:10px;background:none;border:0;color:inherit;
+  font:inherit;cursor:pointer;padding:0;text-align:start}
+.sbt{min-width:0;flex:1 1 auto;line-height:1.25}
+.sbt b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sbt small{display:block;font-size:11.5px;opacity:.85;white-space:nowrap}
+.sbclock{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;flex:none}
+.sbar.paused .sbclock{opacity:.6}
+.sbmain .chev{stroke:#fff}
+.sbar.open .sbmain .chev{transform:rotate(180deg)}
+.sbprog{display:block;height:3px;background:rgba(255,255,255,.22)}
+.sbprog b{display:block;height:100%;width:0;background:#f5d98a}
+.sbopen{max-width:780px;margin:0 auto;padding:6px 14px 14px}
+.sbdesc{font-size:12.5px;opacity:.88;margin:2px 0 8px}
+.sbopen .strip{margin-top:0}
+.sbopen .strip>i{background:rgba(255,255,255,.25)}
+.sbopen .strip>i.done,.sbopen .strip>i>b{background:#f5d98a}
+.sbmeta{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;opacity:.85;margin-top:6px}
+.sbmeta span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sbmeta span:last-child{white-space:nowrap}
+.sbbtns{display:flex;gap:8px;margin-top:12px}
+.sbb{flex:1;border-radius:10px;padding:9px;text-align:center;font:inherit;font-weight:700;font-size:14px;line-height:1.2;
+  background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.38);cursor:pointer}
+.sbb:hover{background:rgba(255,255,255,.24)}
+/* the mode, shown as its steps */
+.modebtn{padding:8px 10px}
+.chips{display:flex;align-items:center;gap:4px;flex:1 1 auto;min-width:0}
+.chips .c{flex:1 1 0;min-width:0;text-align:center;font-size:12.5px;font-weight:700;padding:5px 2px;border-radius:7px;
+  background:var(--card);border:1px solid var(--line);color:var(--plum);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+.chips .c.done{background:var(--good-bg);color:var(--teal);border-color:var(--teal)}
+.chips .c.active{background:var(--fill);color:var(--on-fill);border-color:var(--fill)}
+.chips i{font-style:normal;color:var(--grey);font-size:11px;flex:none}
+[dir="rtl"] .chips i{display:inline-block;transform:scaleX(-1)}
+.mopt .chips{display:flex;margin:6px 0 5px;max-width:320px}
+.mopt .chips .c{display:block;font-size:12px}
+.keyline{display:flex;flex-wrap:wrap;gap:2px 10px;margin:4px 0 0}
+.keyline #recentNow{margin-inline-start:auto;white-space:nowrap}
+.keyline #recentNow b{color:var(--ink)}
+#practice .lvlstep{margin:0 0 10px}
+.progcard .sesstop{margin-bottom:8px}
+/* Settings and the Guide, over the page */
+.pnl{position:fixed;inset:0;z-index:150;display:flex;align-items:flex-end;justify-content:center}
+.pnldim{position:absolute;inset:0;background:rgba(10,8,18,.5)}
+.pnlsheet{position:relative;width:100%;max-width:680px;height:calc(100% - 36px);background:var(--bg);
+  border-radius:18px 18px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.3);display:flex;flex-direction:column;overflow:hidden}
+@media (min-width:760px){ .pnl{align-items:center} .pnlsheet{height:auto;max-height:88vh;border-radius:16px} }
+.pnlhead{display:flex;align-items:center;gap:10px;padding:14px 16px 12px;border-bottom:1px solid var(--line);flex:none}
+.pnlhead h2{margin:0;font-size:19px;flex:1 1 auto}
+.pnlbody{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;padding:14px 14px calc(30px + env(safe-area-inset-bottom,0px))}
+html.pnl-open,html.pnl-open body{overflow:hidden}
+.pnlbody>.grp{border:1px solid var(--line);border-radius:12px;background:var(--card);margin:0 0 10px;overflow:hidden}
+.grp>summary{gap:10px}
+.grp>summary::before{order:9;margin-inline-start:2px}
+.grp>summary>span:not(.sum){flex:none}
+.grp .sum{flex:0 1 auto;min-width:0;margin-inline-start:auto;font-weight:400;font-size:12.5px;color:var(--grey);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gicon{width:30px;height:30px;border-radius:9px;background:var(--soft);border:1px solid var(--line);color:var(--plum);
+  display:inline-flex;align-items:center;justify-content:center;flex:none}
+.gicon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gtitle{font-size:22px;margin:2px 0 2px}
+.gsec{border-top:1px solid var(--line);margin-top:16px}
+.gsec h3{font-size:16px;color:var(--plum);margin:14px 0 8px}
 /* ---------- the session card ---------- */
 .sesscard{margin:14px 0;border:1px solid var(--line);border-radius:12px;background:var(--card);
   overflow:hidden;transition:border-color .15s,box-shadow .15s}
@@ -489,17 +615,33 @@ bdi{white-space:nowrap}
 
 <header id="topbar">
   <div class="hbar">
-    <span class="pill opt"><span data-t="hdr.level">Level</span> <b id="hLevel">1</b></span>
-    <span class="pill"><span data-t="hdr.key">Key<span class="wide"> of</span></span> <b id="hKey">F</b></span>
-    <span class="pill opt"><span data-t="hdr.session">Session</span> <b id="hAcc">&ndash;</b></span>
-    <label class="pill" for="masterVol" style="display:flex;align-items:center;gap:6px"><span data-t="hdr.vol">Vol<span class="wide">ume</span></span>
-      <input id="masterVol" type="range" min="0" max="1" step="0.05" value="1"
-             oninput="setMasterVol(parseFloat(this.value))" style="width:90px;margin:0">
-    </label>
-    <button class="pill timerpill" id="timerPill" style="display:none" onclick="togglePause()">
-      <b id="timerBlock">&mdash;</b> <span id="timerLeft">0:00</span></button>
+    <span class="appname"><i aria-hidden="true">♪</i><span data-t="app.short">Ear Trainer</span></span>
+    <span class="hgrow"></span>
     <button class="btn sm" onclick="stopAll()" data-t="hdr.stop">Stop<span class="wide"> sound</span></button>
-    <a class="btn sm crosslink" href="tuner.html" title="Name any note you sing or play" data-t="hdr.tuner" data-t-title="hdr.tuner.title">Note detector</a>
+    <button type="button" class="ibtn" id="setBtn" onclick="openPanel('set')" aria-label="Settings" data-t-aria="hdr.settings.aria" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><circle cx="12" cy="12" r="6.6"/><path d="M12 2.6v2.8M12 18.6v2.8M2.6 12h2.8M18.6 12h2.8M5.4 5.4l2 2M16.6 16.6l2 2M5.4 18.6l2-2M16.6 7.4l2-2"/></svg></button>
+    <button type="button" class="ibtn" id="guideBtn" onclick="openPanel('guide')" aria-label="Guide" data-t-aria="hdr.guide.aria" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 1c0 1.8-2.5 2.2-2.5 3.9"/><path d="M12 17.2v.3"/></svg></button>
+  </div>
+  <!-- A running session is this one slim bar, pinned under the top bar, so the
+       Practice card keeps the screen. Tapping it shows the plan, Skip and End. -->
+  <div class="sbar" id="sessBar" style="display:none">
+    <div class="sbarrow">
+      <button type="button" class="sbplay" id="pauseBtn" onclick="togglePause()"></button>
+      <button type="button" class="sbmain" id="sessBarToggle" onclick="toggleSessBar()" aria-expanded="false" aria-controls="sessBarOpen">
+        <span class="sbt"><b id="sessTitle"></b><small id="sessLbl"></small></span>
+        <span class="sbclock" id="sessClock">0:00</span>
+        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+    </div>
+    <i class="sbprog" aria-hidden="true"><b id="sessProg"></b></i>
+    <div class="sbopen" id="sessBarOpen" style="display:none">
+      <div class="sbdesc" id="sessDesc"></div>
+      <div class="strip" id="sessStrip" aria-hidden="true"></div>
+      <div class="sbmeta"><span id="sessNames"></span><span id="sessLeft"></span></div>
+      <div class="sbbtns">
+        <button type="button" class="sbb" id="skipBlockBtn" onclick="skipBlock()" data-t="sess.skip">Skip block</button>
+        <button type="button" class="sbb" id="stopSessBtn" onclick="stopSession()" data-t="sess.end">End session</button>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -527,294 +669,35 @@ bdi{white-space:nowrap}
 
 <div class="wrap">
 
-<h1 data-t="title">Functional Ear Trainer</h1>
-<p class="sub" data-t="subtitle">Hear where a note sits in the key &mdash; not how far it is from the last one.</p>
-<p class="pagelink"><a href="tuner.html" data-t="link.tuner">Note detector &rarr;</a> <span class="muted" data-t="link.tuner.sub">names any note you sing or play</span></p>
-
-<!-- ===================== SETUP ===================== -->
-<details class="sec" id="secSetup" data-sec="setup">
-  <summary><span data-t="setup.title">Setup</span> <span class="sum" id="setupSum"></span></summary>
-  <div class="card pad0">
-  <details class="sub" id="subTheme"><summary><span data-t="look.title">Appearance</span> <span class="sum" id="themeSum"></span></summary>
-  <div class="subbody">
-  <div class="row" id="langRow">
-    <button class="btn sm" data-lang="en" lang="en" dir="ltr" onclick="setLang('en')">English</button>
-    <button class="btn sm" data-lang="he" lang="he" dir="rtl" onclick="setLang('he')">עברית</button>
-  </div>
-  <div class="hint" data-t="look.lang.hint">The note detector follows the language too. Plan names and notes stay as
-  they were written.</div>
-  <div class="lbl" style="margin-top:14px" data-t="look.theme">Theme</div>
-  <div class="row" id="themeRow">
-    <button class="btn sm" data-th="system" onclick="setTheme('system')" data-t="look.system">Match system</button>
-    <button class="btn sm" data-th="light"  onclick="setTheme('light')" data-t="look.light">Light</button>
-    <button class="btn sm" data-th="dark"   onclick="setTheme('dark')" data-t="look.dark">Dark</button>
-  </div>
-  <div class="lbl" style="margin-top:14px" data-t="look.colour">Colour</div>
-  <div class="row" id="accentRow">
-    <button class="btn sm" data-ac="plum"     onclick="setAccent('plum')" data-t="look.plum">Plum</button>
-    <button class="btn sm" data-ac="blue"     onclick="setAccent('blue')" data-t="look.blue">Blue</button>
-    <button class="btn sm" data-ac="steel"    onclick="setAccent('steel')" data-t="look.steel">Steel</button>
-    <button class="btn sm" data-ac="graphite" onclick="setAccent('graphite')" data-t="look.graphite">Graphite</button>
-    <button class="btn sm" data-ac="rose"     onclick="setAccent('rose')" data-t="look.rose">Rose</button>
-  </div>
-  <div class="hint" data-t="look.hint">Only the app's own colour changes &mdash; the green, amber and red of the answers
-  mean something, so they stay. The note detector and the browser tab follow it; the home-screen
-  icon is fixed.</div>
-
-  </div></details>
-
-  <details class="sub" id="subRange"><summary><span data-t="range.title">Your singing range</span> <span class="sum" id="rangeSum"></span></summary>
-  <div class="subbody">
-  <div class="row">
-    <label class="muted" for="loSel" data-t="range.lo">Lowest comfortable</label>
-    <select id="loSel"></select>
-    <button class="btn sm" onclick="auditionNote(S.voiceLo)" data-t="btn.hear">Hear</button>
-    <label class="muted" for="hiSel" style="margin-inline-start:8px" data-t="range.hi">Highest</label>
-    <select id="hiSel"></select>
-    <button class="btn sm" onclick="auditionNote(S.voiceHi)" data-t="btn.hear">Hear</button>
-  </div>
-  <div class="hint" data-t="range.hint">Sing along with each to check. Set these honestly &mdash; every note the app
-  plays is chosen so you can sing it back.</div>
-
-  </div></details>
-
-  <details class="sub" id="subKey"><summary><span data-t="key.title">Key and how often it changes</span> <span class="sum" id="keySum"></span></summary>
-  <div class="subbody">
-  <div class="row">
-    <label class="muted" for="tonicSel" data-t="key.tonic">Tonic</label>
-    <select id="tonicSel"></select>
-    <button class="btn sm" onclick="previewKey()" data-t="key.hear">Hear the key</button>
-    <button class="btn sm" onclick="newKeyNow()" data-t="key.new">Pick a new key</button>
-  </div>
-  <div class="hint" id="rangeNote"></div>
-  <label class="switch">
-    <input type="checkbox" id="hideKeySwitch" role="switch" onchange="setHideKey(this.checked)">
-    <span class="track"></span>
-    <span class="swlbl" data-t="key.hide">Hide the key</span>
-  </label>
-  <div class="hint" data-t="key.hide.hint">Nothing on screen names the key, or the notes you sing, so where the key
-  sits can&rsquo;t tell you whether to go high or low: you find <em>do</em> by ear.</div>
-  <label class="switch">
-    <input type="checkbox" id="namesSwitch" role="switch" onchange="toggleHideNotes()">
-    <span class="track"></span>
-    <span class="swlbl" data-t="sing.names">Show note names <span class="muted">while I sing</span></span>
-  </label>
-  <div class="hint" id="namesKeyNote" style="display:none" data-t="key.names.off">Off while the key is hidden.</div>
-
-  <div class="lbl" style="margin-top:14px" data-t="key.changing">Changing keys</div>
-  <div class="row" id="keyModeRow">
-    <button class="btn sm" data-km="fixed"    onclick="setKeyMode('fixed')" data-t="key.fixed">Fixed</button>
-    <button class="btn sm" data-km="session"  onclick="setKeyMode('session')" data-t="key.session">New key each session</button>
-    <button class="btn sm" data-km="question" onclick="setKeyMode('question')" data-t="key.question">Every few questions</button>
-  </div>
-  <div class="row" id="keyEveryRow" style="margin-top:8px;display:none">
-    <label class="muted" for="keyEverySel" data-t="key.every">New key every</label>
-    <select id="keyEverySel" onchange="setKeyEvery(parseInt(this.value,10))">
-      <option value="10" data-t="q10">10 questions</option>
-      <option value="8" data-t="q8">8 questions</option>
-      <option value="5" data-t="q5">5 questions</option>
-      <option value="3" data-t="q3">3 questions</option>
-      <option value="2" data-t="q2">2 questions</option>
-      <option value="1" data-t="q1hard">question (hardest)</option>
-    </select>
-  </div>
-  <div class="hint" id="keyModeHint"></div>
-
-  </div></details>
-
-  <details class="sub" id="subRef"><summary><span data-t="ref.title">Key reference</span> <span class="sum" id="refSum"></span></summary>
-  <div class="subbody">
-  <div class="row">
-    <button class="btn sm on" id="ctxDrone" onclick="setContext('drone')" data-t="ref.drone">Drone</button>
-    <button class="btn sm" id="ctxCad" onclick="setContext('cadence')" data-t="ref.cad">Cadence</button>
-    <button class="btn sm" id="ctxBoth" onclick="setContext('both')" data-t="ref.both">Cadence then drone</button>
-  </div>
-  <div class="hint" data-t="ref.hint">A drone is the strongest anchor and the one to start with. Cadence mode is closer to
-  real music and a little harder.</div>
-  <div class="lbl" style="margin-top:14px" data-t="ref.cad">Cadence</div>
-  <div class="row" id="cadModeRow">
-    <button class="btn sm" data-cm="classic" onclick="setCadMode('classic')" data-t="ref.classic">Classic</button>
-    <button class="btn sm" data-cm="mixed" onclick="setCadMode('mixed')" data-t="ref.mixed">Mixed</button>
-    <button class="btn sm" onclick="auditionCadence()" data-t="btn.hearit">Hear it</button>
-  </div>
-  <div class="row" id="cadChangeRow" style="margin-top:8px;display:none">
-    <label class="muted" for="cadChangeSel" data-t="ref.newcad">New cadence</label>
-    <select id="cadChangeSel" onchange="setCadChange(this.value)">
-      <option value="question" data-t="ref.every.q">every question</option>
-      <option value="n" data-t="ref.every.n">every few questions</option>
-      <option value="key" data-t="ref.every.key">when the key changes</option>
-      <option value="fixed" data-t="ref.every.ask">only when I ask</option>
-    </select>
-    <select id="cadEverySel" style="display:none" onchange="setCadEvery(parseInt(this.value,10))">
-      <option value="2" data-t="q2">2 questions</option>
-      <option value="3" data-t="q3">3 questions</option>
-      <option value="5" data-t="q5">5 questions</option>
-      <option value="8" data-t="q8">8 questions</option>
-    </select>
-  </div>
-  <div class="hint" id="cadHint"></div>
-  <div class="row" style="margin-top:8px">
-    <label class="muted" for="cadGapSel" data-t="ref.gap">Silence before the note</label>
-    <select id="cadGapSel" onchange="setCadGap(parseFloat(this.value))">
-      <option value="0" data-t="ref.gap.0">none</option>
-      <option value="1" data-t="ref.gap.1">1 second</option>
-      <option value="2" data-t="ref.gap.2">2 seconds</option>
-    </select>
-  </div>
-  <div class="hint" data-t="ref.gap.hint">A gap makes you hold the key in your head instead of measuring against a ringing
-  chord &mdash; harder, and closer to real singing. It applies when the reference is a cadence
-  on its own.</div>
-
-  <div class="row" style="margin-top:16px">
-    <label class="muted" for="droneVol" data-t="ref.vol">Drone volume</label>
-    <input id="droneVol" type="range" min="0" max="0.9" step="0.05" value="0.45"
-           oninput="setDroneVol(parseFloat(this.value))" style="width:150px">
-    <span class="muted" id="droneVolVal">45%</span>
-    <button class="btn sm" onclick="auditionDrone()" data-t="ref.hear">Hear the drone</button>
-  </div>
-
-  </div></details>
-
-  <details class="sub" id="subSound"><summary><span data-t="snd.title">Instrument</span> <span class="sum" id="soundSum"></span></summary>
-  <div class="subbody">
-  <div class="row" id="instRow">
-    <button class="btn sm" data-inst="midi" onclick="setInstrument('midi')" data-t="snd.midi">Piano (MIDI)</button>
-    <button class="btn sm" data-inst="synth" onclick="setInstrument('synth')" data-t="snd.synth">App synth</button>
-    <button class="btn sm" data-inst="samples" onclick="setInstrument('samples')" data-t="snd.samples">Samples</button>
-  </div>
-  <div class="hint" id="sndNow"></div>
-  <div class="hint" id="midiHint"></div>
-  <div id="velRow" style="display:none;margin-top:10px">
-    <div class="lbl" data-t="snd.vel">Touch</div>
-    <div class="row">
-      <label class="muted" for="midiVel" style="flex:0 0 74px" data-t="snd.vel.note">Note</label>
-      <input id="midiVel" type="range" min="20" max="110" step="1" value="62"
-             oninput="setMidiVel(parseInt(this.value,10))" onchange="previewVel('note')" style="width:150px">
-      <span class="muted" id="midiVelVal"></span>
-    </div>
-    <div class="row" style="margin-top:4px">
-      <label class="muted" for="cadVel" style="flex:0 0 74px" data-t="snd.vel.cad">Cadence</label>
-      <input id="cadVel" type="range" min="20" max="110" step="1" value="50"
-             oninput="setCadVel(parseInt(this.value,10))" onchange="previewVel('cad')" style="width:150px">
-      <span class="muted" id="cadVelVal"></span>
-    </div>
-  </div>
-  <div class="row" style="margin-top:8px"><button class="btn sm" onclick="auditionInstrument()" data-t="btn.hearit">Hear it</button></div>
-  <div class="lbl" style="margin-top:16px" data-t="snd.samples">Samples</div>
-  <div class="hint" id="sampleState"></div>
-  <div class="row">
-    <button class="btn sm" id="importBtn" onclick="pickSampleFile()">Import a samples zip</button>
-    <button class="btn sm" id="removeSamplesBtn" style="display:none" onclick="askRemoveSamples()">Remove the samples</button>
-    <input type="file" id="sampleFile" accept=".zip,application/zip" style="display:none"
-           onchange="importSamples(this.files[0]); this.value='';">
-  </div>
-  </div></details>
-
-  <details class="sub" id="subMic"><summary><span data-t="mic.title">Microphone</span> <span class="sum" id="micSum"></span></summary>
-  <div class="subbody">
-  <div class="row">
-    <button class="btn teal" id="micBtn" onclick="toggleMic()">Turn on the microphone</button>
-    <span class="muted" id="micStatus">Off &mdash; singing modes will ask you to grade yourself</span>
-  </div>
-  <label class="row" style="margin-top:10px;cursor:pointer">
-    <input id="micAuto" type="checkbox" onchange="setMicAuto(this.checked)"
-           style="width:18px;height:18px;accent-color:var(--fill)">
-    <span class="muted" data-t="mic.auto">Turn the microphone on when the app opens</span>
-  </label>
-  <div class="hint" data-t="mic.auto.hint">Only once you have allowed it for this site. It never asks on its own.</div>
-  <div class="row" id="micPickRow" style="display:none;margin-top:10px">
-    <label class="muted" for="micSel" data-t="mic.into">Sing into</label>
-    <select id="micSel" style="max-width:100%;flex:1 1 220px" onchange="switchMic(this.value)"></select>
-  </div>
-  <div class="row" id="micLevelRow" style="display:none;margin-top:10px">
-    <span class="muted" data-t="mic.level">Hearing</span>
-    <div class="levelbar"><div id="micLevel"></div></div>
-  </div>
-  <div class="hint" id="micLevelHint" style="display:none" data-t="mic.level.hint">Sing: the bar should move with your voice.</div>
-  <div class="warn" id="btWarn" style="display:none"></div>
-  <div class="hint"><span data-t="mic.env">Running as:</span> <span id="envLine">&mdash;</span></div>
-  <div class="warn" id="micHelp" style="display:none"></div>
-  <div class="warn" id="phoneWarn" style="display:none" data-t="mic.phones">
-    <strong>Use headphones.</strong> Without them the drone leaks into the microphone and the pitch
-    detection gets confused. Wired headphones are best. With Bluetooth headphones, sing into the
-    phone's or laptop's own microphone (pick it above) &mdash; using the headset's mic drops the
-    headphones into phone-call quality.
-  </div>
-  </div></details>
-</div>
-</details>
-
 <!-- ===================== SESSION ===================== -->
-<!-- What you touch every day stays in view: the plan, Start, and while it runs the
-     block, its clock and Pause / Skip / End. Editing plans folds away underneath. -->
+<!-- Before a session: the plan and Start. While one runs it lives in the bar at
+     the top; plans are edited in Settings > Plans and blocks. -->
 <section class="sesscard" id="sessCard">
   <div class="sessmain">
     <div class="sesstop">
-      <span class="sesshead"><span class="lbl" id="sessLbl">Session</span><span class="sessstate" id="sessState" style="display:none"></span></span>
+      <span class="lbl" id="sessCardLbl">Session</span>
       <span class="sessmeta" id="sessSum"></span>
-      <button type="button" class="textbtn sessend" id="stopSessBtn" style="display:none" onclick="stopSession()" data-t="sess.end">End session</button>
     </div>
     <div class="sessrow" id="sessIdle">
       <span class="selwrap">
-        <select id="planSel" class="plansel" aria-labelledby="sessLbl" onchange="selectPlan(this.value)"></select>
+        <select id="planSel" class="plansel" aria-labelledby="sessCardLbl" onchange="selectPlan(this.value)"></select>
         <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
       </span>
       <button type="button" class="sessgo" id="startSessBtn" onclick="startSession()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.8v14.4L19 12z"/></svg><span data-t="sess.go">Start</span></button>
     </div>
-    <div class="sessnow" id="sessRun" style="display:none">
-      <div class="sesstxt">
-        <div class="sesstitle" id="sessTitle"></div>
-        <div class="sessdesc" id="sessDesc"></div>
-      </div>
-      <div class="sessclock" id="sessClock">0:00</div>
-    </div>
-    <div class="strip" id="sessStrip" aria-hidden="true"></div>
-    <div class="sessbtns" id="sessBtns" style="display:none">
-      <button type="button" class="sessgo" id="pauseBtn" onclick="togglePause()"></button>
-      <button type="button" class="sessalt" id="skipBlockBtn" onclick="skipBlock()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.5v13L15 12z"/><rect x="16" y="5.5" width="3" height="13" rx="1"/></svg><span data-t="sess.skip">Skip block</span></button>
-    </div>
+    <div class="strip" id="planStrip" aria-hidden="true"></div>
   </div>
-  <details class="sub" id="secSession" data-sec="session">
-    <summary><span data-t="sess.edit">Plans and blocks</span></summary>
-    <div class="subbody">
-    <div class="row">
-      <label class="muted" for="planName" data-t="sess.name">Name</label>
-      <input id="planName" type="text" maxlength="28" style="flex:1 1 130px"
-             oninput="renamePlan(this.value)">
-    </div>
-    <div class="hint" id="planHint"></div>
-
-    <div id="planList"></div>
-    <div class="row" style="margin-top:10px">
-      <button class="btn sm" onclick="addBlock()" data-t="sess.add">Add a block</button>
-      <button class="btn sm" onclick="newPlan()" data-t="sess.new">New plan</button>
-      <button class="btn sm" onclick="duplicatePlan()" data-t="sess.dup">Duplicate</button>
-      <button class="btn sm" id="revertBtn" style="display:none" onclick="revertPlan()" data-t="sess.revert">Revert to repo copy</button>
-      <button class="btn sm" id="delPlanBtn" onclick="deletePlan()" data-t="sess.del">Delete plan</button>
-      <button class="btn sm" onclick="copyPlan()" data-t="sess.copy">Copy JSON</button>
-      <button class="btn sm" onclick="resetPlans()" data-t="sess.reset">Reset everything</button>
-    </div>
-    <textarea id="planJson" readonly style="display:none;width:100%;height:150px;margin-top:10px;
-      font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;border:1px solid var(--line);
-      border-radius:8px;background:var(--soft);color:var(--ink);padding:8px"></textarea>
-    <div class="hint" id="planSource"></div>
-    <div class="hint" data-t="sess.hint">Each block can carry its own mode, level, key setting, cadence style and
-    note-name hiding. Anything left on <em>keep</em> stays as you have it. Plans in
-    <code>plans/</code> in the repo load on every device; editing one here keeps your version in this
-    browser only, and <em>Copy JSON</em> gives you the text to paste back into the file.</div>
-    </div>
-  </details>
 </section>
 
 <!-- ===================== PRACTICE ===================== -->
-<h2 data-t="prac.title">Practice</h2>
 <div class="card" id="practice">
   <!-- what kind of question: one choice, so one control -->
   <div class="modepick" id="modePick">
     <button type="button" class="modebtn" id="modeBtn" aria-haspopup="listbox" aria-expanded="false"
             onclick="toggleModeMenu()">
       <span class="mk" data-t="prac.mode">Mode</span>
-      <span class="mv" id="modeName">Hear &rarr; sing &rarr; name</span>
+      <span class="sr" id="modeName">Hear &rarr; sing &rarr; name</span>
+      <span class="chips" id="steps" aria-hidden="true"></span>
       <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
     </button>
     <div class="modemenu" id="modeMenu" role="listbox" style="display:none">
@@ -825,8 +708,15 @@ bdi{white-space:nowrap}
     </div>
   </div>
   <div class="hint" id="modeHint" style="display:none"></div>
-
-  <div class="steps" id="steps"></div>
+  <div class="lvlstep">
+    <button type="button" class="stepbtn" id="lvlDown" onclick="prevLevel()" aria-label="Easier level" data-t-aria="prog.easier.aria"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"/></svg><span data-t="prog.easier">Easier</span></button>
+    <div class="lvlmid">
+      <div class="lvlk"><span data-t="hdr.level">Level</span> <b id="pLevel">1</b> <span data-t="prog.of4">of 4</span></div>
+      <div class="lvlname" id="pLevelName">Tonic triad</div>
+      <div class="lvldeg" id="pLevelDeg"></div>
+    </div>
+    <button type="button" class="stepbtn" id="lvlUp" onclick="nextLevel()" aria-label="Harder level" data-t-aria="prog.harder.aria"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg><span data-t="prog.harder">Harder</span></button>
+  </div>
 
   <!-- the one thing you press every question -->
   <button type="button" class="bigbtn" id="newBtn" onclick="newQuestion()">New note</button>
@@ -870,30 +760,15 @@ bdi{white-space:nowrap}
     </div>
   </div>
 
-  <div class="hint" id="keyNow" style="margin:4px 0 0"></div>
+  <div class="hint keyline"><span id="keyNow"></span><span id="recentNow"></span></div>
   <div class="degrees" id="degRow"></div>
 
   <div id="feedback"></div>
 </div>
 
 <!-- ===================== PROGRESS ===================== -->
-<details class="sec" id="secProgress" data-sec="progress" open>
-  <summary><span data-t="prog.title">Progress</span> <span class="sum" id="progSum"></span></summary>
-  <div class="card">
-  <!-- the level is a value you step through, so it gets a stepper -->
-  <div class="lvlstep">
-    <button type="button" class="stepbtn" id="lvlDown" onclick="prevLevel()" aria-label="Easier level" data-t-aria="prog.easier.aria"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"/></svg><span data-t="prog.easier">Easier</span></button>
-    <div class="lvlmid">
-      <div class="lvlk"><span data-t="hdr.level">Level</span> <b id="pLevel">1</b> <span data-t="prog.of4">of 4</span></div>
-      <div class="lvlname" id="pLevelName">Tonic triad</div>
-      <div class="lvldeg" id="pLevelDeg"></div>
-    </div>
-    <button type="button" class="stepbtn" id="lvlUp" onclick="nextLevel()" aria-label="Harder level" data-t-aria="prog.harder.aria"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg><span data-t="prog.harder">Harder</span></button>
-  </div>
-  <div class="stats">
-    <div class="stat"><div class="k" data-t="prog.answered">Answered</div><div class="v" id="pCount">0</div></div>
-    <div class="stat"><div class="k" data-t="prog.recent">Recent</div><div class="v" id="pRecent">&ndash;</div></div>
-  </div>
+<section class="card progcard" id="secProgress">
+  <div class="sesstop"><span class="lbl" data-t="prog.title">Progress</span><span class="sessmeta" id="progSum"></span></div>
   <div id="advice"></div>
   <div class="lbl" style="margin-top:12px" id="barsLabel">Naming accuracy by degree</div>
   <div class="bars" id="bars"></div>
@@ -901,12 +776,292 @@ bdi{white-space:nowrap}
   <div class="resetrow">
     <button type="button" class="textbtn danger" id="resetBtn" onclick="askReset()" data-t="prog.reset">Reset progress</button>
   </div>
-  </div>
-</details>
+</section>
 
-<details class="sec" id="secWhy" data-sec="why">
-  <summary data-t="why.title">Why this is different</summary>
-  <div class="card">
+</div>
+
+<!-- ===================== PANELS ===================== -->
+<!-- Settings and the Guide open over the page, from the gear and the ? -->
+<div class="pnl" id="setPanel" role="dialog" aria-modal="true" aria-labelledby="setTitle" style="display:none">
+  <div class="pnldim" onclick="closePanel()"></div>
+  <div class="pnlsheet">
+    <div class="pnlhead">
+      <h2 id="setTitle" data-t="setup.title">Settings</h2>
+      <button type="button" class="ibtn" onclick="closePanel()" aria-label="Close" data-t-aria="pnl.close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+    </div>
+    <div class="pnlbody" id="secSetup">
+  <details class="sub grp" id="subTheme"><summary><span class="gicon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></span><span data-t="look.title">Appearance</span><span class="sum" id="themeSum"></span></summary>
+  <div class="subbody">
+    <div class="field">
+      <span class="fl" data-t="look.lang">Language</span>
+      <div class="seg" id="langRow">
+        <button type="button" class="segopt" data-lang="en" lang="en" dir="ltr" onclick="setLang('en')">English</button>
+        <button type="button" class="segopt" data-lang="he" lang="he" dir="rtl" onclick="setLang('he')">עברית</button>
+      </div>
+      <div class="hint" data-t="look.lang.hint">The note detector follows the language too. Plan names and notes stay as
+  they were written.</div>
+    </div>
+    <div class="field">
+      <span class="fl" data-t="look.theme">Theme</span>
+      <div class="seg" id="themeRow">
+        <button type="button" class="segopt" data-th="system" onclick="setTheme('system')" data-t="look.system">Match system</button>
+        <button type="button" class="segopt" data-th="light"  onclick="setTheme('light')" data-t="look.light">Light</button>
+        <button type="button" class="segopt" data-th="dark"   onclick="setTheme('dark')" data-t="look.dark">Dark</button>
+      </div>
+    </div>
+    <div class="field">
+      <span class="fl" data-t="look.colour">Colour</span>
+      <div class="swatches" id="accentRow">
+        <button type="button" class="swatch" data-ac="plum"     onclick="setAccent('plum')"><i style="--c:#3d3159"></i><span data-t="look.plum">Plum</span></button>
+        <button type="button" class="swatch" data-ac="blue"     onclick="setAccent('blue')"><i style="--c:#1f56a0"></i><span data-t="look.blue">Blue</span></button>
+        <button type="button" class="swatch" data-ac="steel"    onclick="setAccent('steel')"><i style="--c:#2f5468"></i><span data-t="look.steel">Steel</span></button>
+        <button type="button" class="swatch" data-ac="graphite" onclick="setAccent('graphite')"><i style="--c:#3a3b42"></i><span data-t="look.graphite">Graphite</span></button>
+        <button type="button" class="swatch" data-ac="rose"     onclick="setAccent('rose')"><i style="--c:#9c2f57"></i><span data-t="look.rose">Rose</span></button>
+      </div>
+      <div class="hint" data-t="look.hint">Only the app's own colour changes &mdash; the green, amber and red of the answers
+  mean something, so they stay. The note detector and the browser tab follow it; the home-screen
+  icon is fixed.</div>
+    </div>
+  </div></details>
+
+  <details class="sub grp" id="subKey"><summary><span class="gicon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></span><span data-t="grp.key">Key and range</span><span class="sum" id="keySum"></span></summary>
+  <div class="subbody">
+    <section class="part">
+      <h4 data-t="range.title">Your singing range</h4>
+      <div class="srow">
+        <label class="fl" for="loSel" data-t="range.lo">Lowest comfortable</label>
+        <span class="selwrap sm"><select id="loSel" class="ssel"></select><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>
+        <button type="button" class="sbtn" onclick="auditionNote(S.voiceLo)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span data-t="btn.hear">Hear</span></button>
+      </div>
+      <div class="srow">
+        <label class="fl" for="hiSel" data-t="range.hi">Highest</label>
+        <span class="selwrap sm"><select id="hiSel" class="ssel"></select><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>
+        <button type="button" class="sbtn" onclick="auditionNote(S.voiceHi)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span data-t="btn.hear">Hear</span></button>
+      </div>
+      <div class="hint" data-t="range.hint">Sing along with each to check. Set these honestly &mdash; every note the app
+  plays is chosen so you can sing it back.</div>
+    </section>
+
+    <section class="part">
+      <h4 data-t="key.part">Key</h4>
+      <div class="srow">
+        <label class="fl" for="tonicSel" data-t="key.tonic">Tonic</label>
+        <span class="selwrap sm"><select id="tonicSel" class="ssel"></select><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>
+        <button type="button" class="sbtn" onclick="previewKey()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span data-t="btn.hear">Hear</span></button>
+        <button type="button" class="sbtn" onclick="newKeyNow()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3c2.2 0 3.3 1.2 4.4 3l2.2 4c1.1 1.8 2.2 3 4.4 3h2"/><path d="M4 17h3c1.2 0 2-.4 2.8-1.1"/><path d="M14.2 8.1C15 7.4 15.8 7 17 7h3"/><path d="M17.5 4.5 20 7l-2.5 2.5"/><path d="M17.5 14.5 20 17l-2.5 2.5"/></svg><span data-t="key.newshort">New</span></button>
+      </div>
+      <div class="hint" id="rangeNote"></div>
+      <div class="field">
+        <span class="fl" data-t="key.changing">Changing keys</span>
+        <div class="seg" id="keyModeRow">
+          <button type="button" class="segopt" data-km="fixed"    onclick="setKeyMode('fixed')" data-t="key.fixed">Fixed</button>
+          <button type="button" class="segopt" data-km="session"  onclick="setKeyMode('session')" data-t="key.session2">Each session</button>
+          <button type="button" class="segopt" data-km="question" onclick="setKeyMode('question')" data-t="key.question2">Every few</button>
+        </div>
+        <div class="srow" id="keyEveryRow" style="display:none">
+          <label class="fl" for="keyEverySel" data-t="key.every">New key every</label>
+          <span class="selwrap sm"><select id="keyEverySel" class="ssel" onchange="setKeyEvery(parseInt(this.value,10))">
+      <option value="10" data-t="q10">10 questions</option>
+      <option value="8" data-t="q8">8 questions</option>
+      <option value="5" data-t="q5">5 questions</option>
+      <option value="3" data-t="q3">3 questions</option>
+      <option value="2" data-t="q2">2 questions</option>
+      <option value="1" data-t="q1hard">question (hardest)</option>
+      </select><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>
+        </div>
+        <div class="hint" id="keyModeHint"></div>
+      </div>
+      <label class="srow switch">
+        <span class="fl"><span data-t="key.hide">Hide the key</span><small data-t="key.hide.sub">Nothing on screen names the key or the notes you sing, so you find <em>do</em> by ear.</small></span>
+        <input type="checkbox" id="hideKeySwitch" role="switch" onchange="setHideKey(this.checked)"><span class="track"></span>
+      </label>
+      <label class="srow switch">
+        <span class="fl"><span data-t="key.names">Note names while you sing</span><small id="namesKeyNote" style="display:none" data-t="key.names.off">Off while the key is hidden.</small></span>
+        <input type="checkbox" id="namesSwitch" role="switch" onchange="toggleHideNotes()"><span class="track"></span>
+      </label>
+    </section>
+
+    <section class="part">
+      <h4 data-t="ref.title">Key reference</h4>
+      <div class="field">
+        <div class="seg" id="ctxRow">
+          <button type="button" class="segopt on" id="ctxDrone" onclick="setContext('drone')" data-t="ref.drone">Drone</button>
+          <button type="button" class="segopt" id="ctxCad" onclick="setContext('cadence')" data-t="ref.cad">Cadence</button>
+          <button type="button" class="segopt" id="ctxBoth" onclick="setContext('both')" data-t="ref.both2">Both</button>
+        </div>
+        <div class="hint" id="ctxHint"></div>
+      </div>
+      <div class="srow" id="droneRow">
+        <label class="fl" for="droneVol" data-t="ref.vol">Drone volume</label>
+        <input id="droneVol" class="sslider" type="range" min="0" max="0.9" step="0.05" value="0.45"
+               oninput="setDroneVol(parseFloat(this.value))">
+        <span class="muted sval" id="droneVolVal">45%</span>
+        <button type="button" class="sbtn" onclick="auditionDrone()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span data-t="btn.hear">Hear</span></button>
+      </div>
+      <div id="cadRows">
+        <div class="srow">
+          <span class="fl" data-t="ref.cad">Cadence</span>
+          <div class="seg sm" id="cadModeRow">
+            <button type="button" class="segopt" data-cm="classic" onclick="setCadMode('classic')" data-t="ref.classic">Classic</button>
+            <button type="button" class="segopt" data-cm="mixed" onclick="setCadMode('mixed')" data-t="ref.mixed">Mixed</button>
+          </div>
+          <button type="button" class="sbtn" onclick="auditionCadence()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span data-t="btn.hear">Hear</span></button>
+        </div>
+        <div class="srow" id="cadChangeRow" style="display:none">
+          <label class="fl" for="cadChangeSel" data-t="ref.newcad">New cadence</label>
+          <span class="selwrap sm"><select id="cadChangeSel" class="ssel" onchange="setCadChoice(this.value)">
+            <option value="question" data-t="ref.every.q">every question</option>
+            <option value="n2" data-t="ref.every.2">every 2 questions</option>
+            <option value="n3" data-t="ref.every.3">every 3 questions</option>
+            <option value="n5" data-t="ref.every.5">every 5 questions</option>
+            <option value="n8" data-t="ref.every.8">every 8 questions</option>
+            <option value="key" data-t="ref.every.key">when the key changes</option>
+            <option value="fixed" data-t="ref.every.ask">only when I ask</option>
+          </select><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>
+        </div>
+        <div class="hint" id="cadHint"></div>
+      </div>
+      <div class="field" id="gapRow">
+        <span class="fl" data-t="ref.gap">Silence before the note</span>
+        <div class="seg" id="gapSeg">
+          <button type="button" class="segopt" data-gap="0" onclick="setCadGap(0)" data-t="ref.gap.0">None</button>
+          <button type="button" class="segopt" data-gap="1" onclick="setCadGap(1)" data-t="ref.gap.1">1 second</button>
+          <button type="button" class="segopt" data-gap="2" onclick="setCadGap(2)" data-t="ref.gap.2">2 seconds</button>
+        </div>
+        <div class="hint" data-t="ref.gap.sub">Makes you hold the key in your head instead of measuring against a ringing chord.</div>
+      </div>
+    </section>
+  </div></details>
+
+  <details class="sub grp" id="subSound"><summary><span class="gicon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></svg></span><span data-t="grp.sound">Sound</span><span class="sum" id="soundSum"></span></summary>
+  <div class="subbody">
+    <section class="part">
+      <div class="srow">
+        <label class="fl" for="masterVol" data-t="snd.vol">Volume</label>
+        <input id="masterVol" class="sslider" type="range" min="0" max="1" step="0.05" value="1"
+               oninput="setMasterVol(parseFloat(this.value))">
+        <span class="muted sval" id="masterVolVal">100%</span>
+      </div>
+      <div class="hint" data-t="snd.vol.hint">The app&rsquo;s own level, under the phone&rsquo;s volume buttons. The drone has its own slider in Key reference.</div>
+    </section>
+    <section class="part">
+      <h4 data-t="snd.title">Instrument</h4>
+      <div class="field">
+        <div class="seg" id="instRow">
+          <button type="button" class="segopt" data-inst="midi" onclick="setInstrument('midi')" data-t="snd.midi">Piano (MIDI)</button>
+          <button type="button" class="segopt" data-inst="synth" onclick="setInstrument('synth')" data-t="snd.synth">App synth</button>
+          <button type="button" class="segopt" data-inst="samples" onclick="setInstrument('samples')" data-t="snd.samples">Samples</button>
+        </div>
+        <div class="hint" id="sndNow"></div>
+        <div class="hint" id="midiHint"></div>
+      </div>
+  <div id="velRow" style="display:none;margin-top:10px">
+    <div class="lbl" data-t="snd.vel">Touch</div>
+    <div class="row">
+      <label class="muted" for="midiVel" style="flex:0 0 74px" data-t="snd.vel.note">Note</label>
+      <input id="midiVel" type="range" min="20" max="110" step="1" value="62"
+             oninput="setMidiVel(parseInt(this.value,10))" onchange="previewVel('note')" style="width:150px">
+      <span class="muted" id="midiVelVal"></span>
+    </div>
+    <div class="row" style="margin-top:4px">
+      <label class="muted" for="cadVel" style="flex:0 0 74px" data-t="snd.vel.cad">Cadence</label>
+      <input id="cadVel" type="range" min="20" max="110" step="1" value="50"
+             oninput="setCadVel(parseInt(this.value,10))" onchange="previewVel('cad')" style="width:150px">
+      <span class="muted" id="cadVelVal"></span>
+    </div>
+  </div>
+      <div class="srow"><button type="button" class="sbtn" onclick="auditionInstrument()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span data-t="btn.hearit">Hear it</span></button></div>
+      <h5 data-t="snd.samples">Samples</h5>
+  <div class="hint" id="sampleState"></div>
+  <div class="row">
+    <button class="btn sm" id="importBtn" onclick="pickSampleFile()">Import a samples zip</button>
+    <button class="btn sm" id="removeSamplesBtn" style="display:none" onclick="askRemoveSamples()">Remove the samples</button>
+    <input type="file" id="sampleFile" accept=".zip,application/zip" style="display:none"
+           onchange="importSamples(this.files[0]); this.value='';">
+  </div>
+    </section>
+
+    <section class="part">
+      <h4 data-t="mic.title">Microphone</h4>
+      <div class="row">
+        <button class="btn teal" id="micBtn" onclick="toggleMic()">Turn on the microphone</button>
+        <span class="muted" id="micStatus">Off &mdash; singing modes will ask you to grade yourself</span>
+      </div>
+      <label class="srow switch">
+        <span class="fl"><span data-t="mic.auto">Turn the microphone on when the app opens</span><small data-t="mic.auto.hint">Only once you have allowed it for this site. It never asks on its own.</small></span>
+        <input id="micAuto" type="checkbox" role="switch" onchange="setMicAuto(this.checked)"><span class="track"></span>
+      </label>
+      <div class="srow" id="micPickRow" style="display:none">
+        <label class="fl" for="micSel" data-t="mic.into">Sing into</label>
+        <span class="selwrap sm grow"><select id="micSel" class="ssel" onchange="switchMic(this.value)"></select><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>
+      </div>
+      <div class="srow" id="micLevelRow" style="display:none">
+        <span class="fl" data-t="mic.level">Hearing</span>
+        <div class="levelbar"><div id="micLevel"></div></div>
+      </div>
+      <div class="hint" id="micLevelHint" style="display:none" data-t="mic.level.hint">Sing: the bar should move with your voice.</div>
+  <div class="warn" id="btWarn" style="display:none"></div>
+  <div class="hint"><span data-t="mic.env">Running as:</span> <span id="envLine">&mdash;</span></div>
+  <div class="warn" id="micHelp" style="display:none"></div>
+  <div class="warn" id="phoneWarn" style="display:none" data-t="mic.phones">
+    <strong>Use headphones.</strong> Without them the drone leaks into the microphone and the pitch
+    detection gets confused. Wired headphones are best. With Bluetooth headphones, sing into the
+    phone's or laptop's own microphone (pick it above) &mdash; using the headset's mic drops the
+    headphones into phone-call quality.
+  </div>
+    </section>
+  </div></details>
+  <details class="sub grp" id="subPlans"><summary><span class="gicon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg></span><span data-t="sess.edit">Plans and blocks</span><span class="sum" id="plansSum"></span></summary>
+  <div class="subbody">
+    <div class="srow">
+      <label class="fl" for="planEditSel" data-t="plans.editing">Editing</label>
+      <span class="selwrap sm grow"><select id="planEditSel" class="ssel" onchange="selectPlan(this.value)"></select><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>
+    </div>
+    <div class="row">
+      <label class="muted" for="planName" data-t="sess.name">Name</label>
+      <input id="planName" type="text" maxlength="28" style="flex:1 1 130px"
+             oninput="renamePlan(this.value)">
+    </div>
+    <div class="hint" id="planHint"></div>
+
+    <div id="planList"></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn sm" onclick="addBlock()" data-t="sess.add">Add a block</button>
+      <button class="btn sm" onclick="newPlan()" data-t="sess.new">New plan</button>
+      <button class="btn sm" onclick="duplicatePlan()" data-t="sess.dup">Duplicate</button>
+      <button class="btn sm" id="revertBtn" style="display:none" onclick="revertPlan()" data-t="sess.revert">Revert to repo copy</button>
+      <button class="btn sm" id="delPlanBtn" onclick="deletePlan()" data-t="sess.del">Delete plan</button>
+      <button class="btn sm" onclick="copyPlan()" data-t="sess.copy">Copy JSON</button>
+      <button class="btn sm" onclick="resetPlans()" data-t="sess.reset">Reset everything</button>
+    </div>
+    <textarea id="planJson" readonly style="display:none;width:100%;height:150px;margin-top:10px;
+      font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;border:1px solid var(--line);
+      border-radius:8px;background:var(--soft);color:var(--ink);padding:8px"></textarea>
+    <div class="hint" id="planSource"></div>
+    <div class="hint" data-t="sess.hint">Each block can carry its own mode, level, key setting, cadence style and
+    note-name hiding. Anything left on <em>keep</em> stays as you have it. Plans in
+    <code>plans/</code> in the repo load on every device; editing one here keeps your version in this
+    browser only, and <em>Copy JSON</em> gives you the text to paste back into the file.</div>
+  </div></details>
+    </div>
+  </div>
+</div>
+
+<div class="pnl" id="guidePanel" role="dialog" aria-modal="true" aria-labelledby="guideTitle" style="display:none">
+  <div class="pnldim" onclick="closePanel()"></div>
+  <div class="pnlsheet">
+    <div class="pnlhead">
+      <h2 id="guideTitle" data-t="guide.panel">Guide</h2>
+      <button type="button" class="ibtn" onclick="closePanel()" aria-label="Close" data-t-aria="pnl.close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+    </div>
+    <div class="pnlbody">
+<h1 class="gtitle" data-t="title">Functional Ear Trainer</h1>
+<p class="sub" data-t="subtitle">Hear where a note sits in the key &mdash; not how far it is from the last one.</p>
+<p class="pagelink"><a href="tuner.html" data-t="link.tuner">Note detector &rarr;</a> <span class="muted" data-t="link.tuner.sub">names any note you sing or play</span></p>
+
+<section class="gsec" id="secWhy">
+  <h3 data-t="why.title">Why this is different</h3>
+  <div>
   <p style="margin-bottom:8px" data-t="why.p1">Naming isolated intervals is hard because two notes in a vacuum give your ear
   nothing to hold onto. Here a <strong>tonic is always present</strong> &mdash; as a drone or a cadence
   &mdash; so every note has a fixed reference and a recognisable <em>character</em> rather than a
@@ -915,15 +1070,15 @@ bdi{white-space:nowrap}
   <a href="#guide" style="color:var(--plum)">practice notes</a> below. Intervals become easy later,
   as a side effect.</p>
   </div>
-</details>
+</section>
 
-<details class="sec" id="secGuide" data-sec="guide">
-  <summary id="guide" data-t="guide.title">How to practise</summary>
-  <div class="card">
+<section class="gsec" id="secGuide">
+  <h3 id="guide" data-t="guide.title">How to practise</h3>
+  <div>
   <p data-t="guide.p1"><strong>Ten to twelve minutes a day, not an hour a week.</strong> This is a memory task, and memory
   responds to frequency far more than duration.</p>
   <p class="muted" style="margin-bottom:14px" data-t="guide.p2">What to do <em>in</em> a session is the
-  <a href="#sessCard" style="color:var(--plum)">Session plan</a> above &mdash; that is the thing that
+  <a href="#" onclick="openPanel('set','subPlans');return false" style="color:var(--plum)">session plan</a> in Settings &mdash; that is the thing that
   actually runs, so it is the only description of a session worth keeping. What follows is the reasoning
   behind it, which is what you need when you build a plan of your own.</p>
 
@@ -970,11 +1125,12 @@ bdi{white-space:nowrap}
   two people confuse. If you stall, that&rsquo;s expected, not a sign this isn&rsquo;t working. Step back on
   the ladder for a few days and come back to it.</p>
   </div>
-</details>
+</section>
 
 <p class="muted" style="margin-top:22px" data-t="footer">Progress is saved in this browser only. Nothing is uploaded, and
 the microphone audio never leaves this page.</p>
-
+    </div>
+  </div>
 </div>
 
 <script src="he.js"></script>
@@ -1750,7 +1906,7 @@ function renderSound(){
   var loading=(src==='synth' && localChoice()==='samples' && S.instrument!=='midi' && sampleBusy==='loading');
   var row=document.getElementById('instRow');
   if(row && row.querySelectorAll){
-    var bs=row.querySelectorAll('.btn');
+    var bs=row.querySelectorAll('button');
     for(var i=0;i<bs.length;i++){
       var k=bs[i].getAttribute('data-inst');
       if(!k) continue;
@@ -1797,6 +1953,7 @@ function renderSound(){
   renderVel();
   renderSummaries();
 }
+function volWords(){ return S.masterVol<1 ? ' \u00b7 '+Math.round(S.masterVol*100)+'%' : ''; }
 function instrumentWords(){
   var src=soundSource();
   return src==='midi' ? _('piano (MIDI)') : src==='samples' ? _('samples') : _('app synth');
@@ -1887,6 +2044,9 @@ function duckDrone(on){
    the master gain, so this scales the lot. The drone slider stays as a balance. */
 function setMasterVol(v){
   S.masterVol=v;
+  var o=document.getElementById('masterVolVal');
+  if(o) o.textContent=Math.round(v*100)+'%';
+  setSum('soundSum', instrumentWords() + (micStream ? _(' \u00b7 mic on') : '') + volWords());
   if(master && ac){
     master.gain.cancelScheduledValues(ac.currentTime);
     master.gain.setValueAtTime(master.gain.value, ac.currentTime);
@@ -2239,13 +2399,13 @@ function checkEnvironmentInner(){
       (isMobile() ? _(' · mobile') : '');
   }
 }
-/* While Setup > Microphone is open, show how much the microphone hears. */
+/* While Settings > Sound is open, show how much the microphone hears. */
 var levelRaf=null;
 function micLevelLoop(){
   levelRaf=null;
-  var sec=document.getElementById('subMic'), row=document.getElementById('micLevelRow'),
+  var sec=document.getElementById('subSound'), row=document.getElementById('micLevelRow'),
       hint=document.getElementById('micLevelHint'), bar=document.getElementById('micLevel');
-  var on=!!(micStream && analyser && sec && sec.open);
+  var on=!!(micStream && analyser && sec && sec.open && openPanelId==='setPanel');
   if(row) row.style.display = on ? 'flex' : 'none';
   if(hint) hint.style.display = on ? '' : 'none';
   if(!on) return;
@@ -2257,7 +2417,7 @@ function micLevelLoop(){
 }
 function startLevel(){ if(!levelRaf) levelRaf=requestAnimationFrame(micLevelLoop); }
 try{
-  var __sm=document.getElementById('subMic');
+  var __sm=document.getElementById('subSound');
   if(__sm && __sm.addEventListener) __sm.addEventListener('toggle', startLevel);
 }catch(e){}
 function stopMic(){
@@ -2303,8 +2463,6 @@ function renderHideNotes(){
   var t=document.getElementById('tNote');
   if(t && namesHidden() && t.textContent!=='—') t.textContent=_('note hidden');
 }
-/* the key in the header, when it is hidden */
-var EYE_OFF='<svg class="eyeoff" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.4-6.2 9.5-6.2 9.5 6.2 9.5 6.2-3.4 6.2-9.5 6.2S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/><path d="M4 4l16 16"/></svg>';
 function setHideKey(on){
   S.hideKey=!!on;
   buildTonicSelect();
@@ -2424,7 +2582,8 @@ function renderMode(){
     var m=b.getAttribute('data-mode'), on=(m===S.mode);
     b.classList.toggle('on', on);
     b.setAttribute('aria-selected', String(on));
-    b.innerHTML='<b>'+_(MODE_NAMES[m])+'</b><span>'+_(MODE_HINTS[m])+'</span>';
+    b.innerHTML='<b>'+_(MODE_NAMES[m])+'</b><span class="chips">'+chipsHtml(stepsFor(m),-1)+'</span>'+
+                '<span class="d">'+_(MODE_HINTS[m])+'</span>';
   });
   /* the one thing worth saying outside the menu: you are grading yourself */
   var h=document.getElementById('modeHint');
@@ -2470,22 +2629,45 @@ function setContext(c){
     var b=document.getElementById(CTX_BTN[k]);
     if(b) b.classList.toggle('on', k===c);
   });
+  renderReference();
+  renderSummaries();
   save();
+}
+/* Settings > Key and range > Key reference shows only what applies: the drone's
+   volume unless it is cadence alone; the cadence's style whenever a cadence plays
+   (which includes a drone-only reference once keys change every few questions,
+   since a cadence announces each new key); the silence only for cadence alone. */
+var CTX_HINTS = { drone:'The strongest anchor, and the one to start with.',
+                  cadence:'Closer to real music, and a little harder.',
+                  both:'A cadence sets the key, then the drone holds it.' };
+function renderReference(){
+  var h=document.getElementById('ctxHint');
+  if(h) h.textContent=_(CTX_HINTS[S.context]||CTX_HINTS.drone);
+  showEl('droneRow', S.context!=='cadence');
+  showEl('cadRows', S.context!=='drone' || S.keyMode==='question');
+  showEl('gapRow', S.context==='cadence');
+}
+/* A mode is its steps: the picker shows them, and they light up as a question goes. */
+function stepsFor(m){
+  return m==='both' ? [_('Hear it'),_('Sing it'),_('Name it')]
+       : m==='match' ? [_('Hear it'),_('Sing it')]
+       : m==='produce' ? [_('Read the name'),_('Sing it')]
+       : [_('Hear it'),_('Name it')];
+}
+function chipsHtml(seq, idx){
+  return seq.map(function(s,i){
+    var cls = i<idx ? 'c done' : (i===idx ? 'c active' : 'c');
+    return (i ? '<i>\u2192</i>' : '')+'<span class="'+cls+'">'+s+'</span>';
+  }).join('');
 }
 function renderSteps(){
   var el=document.getElementById('steps');
-  var seq = S.mode==='both' ? [_('Hear it'),_('Sing it'),_('Name it')]
-          : S.mode==='match' ? [_('Hear it'),_('Sing it')]
-          : S.mode==='produce' ? [_('Read the name'),_('Sing it')]
-          : [_('Hear it'),_('Name it')];
+  var seq=stepsFor(S.mode);
   var idx = S.phase==='idle' ? -1
           : S.phase==='hear' ? 0
           : S.phase==='sing' ? 1
           : S.phase==='name' ? seq.length-1 : seq.length;
-  el.innerHTML = seq.map(function(s,i){
-    var cls = i<idx ? 'step done' : (i===idx ? 'step active' : 'step');
-    return '<div class="'+cls+'">'+s+'</div>';
-  }).join('');
+  if(el) el.innerHTML = chipsHtml(seq, idx);
   renderNextBtn();
 }
 function resetQuestionUI(){
@@ -2718,7 +2900,6 @@ function answer(n){
 
 /* ---------- progress ---------- */
 function updateProgress(){
-  document.getElementById('hLevel').textContent=S.level+1;
   document.getElementById('pLevel').textContent=S.level+1;
   document.getElementById('pLevelName').textContent=_(LEVELS[S.level].name);
   var deg=document.getElementById('pLevelDeg');
@@ -2727,11 +2908,10 @@ function updateProgress(){
   var dn=document.getElementById('lvlDown'), up=document.getElementById('lvlUp');
   if(dn) dn.disabled = S.level<=0;
   if(up) up.disabled = S.level>=LEVELS.length-1;
-  document.getElementById('pCount').textContent=S.answered;
   var ra=recentAccuracy();
-  var txt = ra===null?'–':Math.round(ra*100)+'%';
-  document.getElementById('pRecent').textContent=txt;
-  document.getElementById('hAcc').textContent=txt;
+  /* the one live score: it is what moves you along the key ladder */
+  var rn=document.getElementById('recentNow');
+  if(rn) rn.innerHTML = ra===null ? '' : _('Last {n}: <b>{p}%</b>', {n:S.recent.length, p:Math.round(ra*100)});
 
   var kind=scoredKind();
   document.getElementById('barsLabel').textContent =
@@ -2855,17 +3035,12 @@ function buildTonicSelect(){
   updateKeyNote();
 }
 function updateKeyNote(){
-  var hk=document.getElementById('hKey');
-  if(hk){
-    if(S.hideKey){ hk.innerHTML=EYE_OFF; hk.setAttribute('aria-label', _('hidden')); }
-    else { hk.textContent=keyName(S.tonic); hk.setAttribute('aria-label', keyName(S.tonic)); }
-  }
   updateKeyNow();
   var s=keySpan(), dr=droneRootFor(S.tonic), note=document.getElementById('rangeNote');
   if(!note) return;
   note.innerHTML = (S.hideKey
       ? _('The key is hidden. Every note at this level stays inside your range.')
-      : _('At this level the notes run {a}&ndash;{b}, inside your range. The drone sits on {e} and {f}.',
+      : _('Notes at this level: {a}&ndash;{b}. Drone: {e} and {f}.',
           {a:noteName(S.tonic+s.lo), b:noteName(S.tonic+s.hi), e:noteName(dr), f:noteName(dr+7)}))+
     (s.fits ? '' : ' '+_('Your range is narrower than this level needs, so a note that would fall outside it comes in the octave that fits.'));
 }
@@ -2913,12 +3088,12 @@ function applyTheme(){
   if(fav && fav.setAttribute) fav.setAttribute('href', faviconFor(ACCENTS[S.accent]||ACCENTS.plum));
   var ar=document.getElementById('accentRow');
   if(ar && ar.querySelectorAll){
-    var as=ar.querySelectorAll('.btn');
+    var as=ar.querySelectorAll('button');
     for(var j=0;j<as.length;j++) as[j].classList.toggle('on', as[j].getAttribute('data-ac')===S.accent);
   }
   var row=document.getElementById('themeRow');
   if(row && row.querySelectorAll){
-    var bs=row.querySelectorAll('.btn');
+    var bs=row.querySelectorAll('button');
     for(var i=0;i<bs.length;i++) bs[i].classList.toggle('on', bs[i].getAttribute('data-th')===S.theme);
   }
 }
@@ -2962,7 +3137,7 @@ function applyLang(){
   translatePage();
   var row=document.getElementById('langRow');
   if(row && row.querySelectorAll){
-    var bs=row.querySelectorAll('.btn');
+    var bs=row.querySelectorAll('button');
     for(var i=0;i<bs.length;i++) bs[i].classList.toggle('on', bs[i].getAttribute('data-lang')===S.lang);
   }
 }
@@ -2995,12 +3170,9 @@ try{
 
 /* ---------- key rotation ---------- */
 var KEYMODE_HINTS = {
-  fixed:    'Always the key selected above. Fine for a first week at a level, but a single key lets you '+
-            'start recognising absolute pitches instead of scale degrees.',
-  session:  'A different key each time you open the app. The recommended default: no single key gets '+
-            'the chance to stick, and within a session you can settle in.',
-  question: 'A new key every few questions, announced by a cadence. Start at 10 or 8 and work down '+
-            'the ladder in the session guide; every question is the real test of a level.'
+  fixed:    'Always the key above. Fine for a first week at a level, but one key lets you lean on absolute pitch.',
+  session:  'A new key each time you open the app. The recommended default.',
+  question: 'A new key every few questions, announced by a cadence. Work down the ladder in the guide.'
 };
 /* The key-change ladder from the session guide. Index 0 is "each session". */
 var LADDER=[0,10,8,5,3,2,1];
@@ -3067,18 +3239,19 @@ function setKeyMode(m){
 function renderKeyMode(){
   var row=document.getElementById('keyModeRow');
   if(row){
-    var bs=row.querySelectorAll ? row.querySelectorAll('.btn') : [];
+    var bs=row.querySelectorAll ? row.querySelectorAll('button') : [];
     for(var i=0;i<bs.length;i++) bs[i].classList.toggle('on', bs[i].getAttribute('data-km')===S.keyMode);
   }
   var h=document.getElementById('keyModeHint');
   if(h){
     var n=rotationKeys().length;
     h.textContent = _(KEYMODE_HINTS[S.keyMode]) +
-      (S.keyMode==='fixed' ? '' : n===1 ? _('  (1 key fit your range.)') : _('  ({n} keys fit your range.)', {n:n}));
+      (S.keyMode==='fixed' ? '' : n===1 ? _(' 1 key fits your range at this level.') : _(' {n} keys fit your range at this level.', {n:n}));
   }
   renderSummaries();
   var er=document.getElementById('keyEveryRow');
   if(er) er.style.display = S.keyMode==='question' ? 'flex' : 'none';
+  renderReference();
   var es=document.getElementById('keyEverySel');
   if(es) es.value=String(S.keyEvery);
   var li=S.keyMode==='fixed' ? -1 : ladderIndex();
@@ -3130,7 +3303,8 @@ function autoStartMic(){
 /* ---------- collapsing sections ----------
    Each section remembers whether you left it open, and its summary carries the
    one line you would otherwise open it to read. */
-var SECTIONS = { why:'secWhy', setup:'secSetup', session:'secSession', progress:'secProgress', guide:'secGuide' };
+/* Since v29 nothing on the page folds: Settings and the Guide are panels. */
+var SECTIONS = {};
 function applySections(){
   Object.keys(SECTIONS).forEach(function(k){
     var el=document.getElementById(SECTIONS[k]);
@@ -3145,8 +3319,6 @@ function wireSections(){
     el.addEventListener('toggle', function(){ S.open[k]=!!el.open; save(); });
   });
 }
-var SUBS = { subTheme:'themeSum', subRange:'rangeSum', subKey:'keySum', subSound:'soundSum',
-             subRef:'refSum', subMic:'micSum' };
 function setSum(id, text){
   var el=document.getElementById(id);
   if(el) el.textContent=text;
@@ -3159,34 +3331,18 @@ function renderSubSummaries(){
   setSum('themeSum', (S.lang==='he' ? 'עברית \u00b7 ' : '')+
                      (S.theme==='system' ? _('follows your system') : _(S.theme))+
                      ' \u00b7 '+_(S.accent||'plum'));
-  setSum('rangeSum', _('{a} to {b}', {a:noteName(S.voiceLo), b:noteName(S.voiceHi)}));
   setSum('keySum', keyWord()+' \u00b7 '+
     (S.keyMode==='fixed' ? _('fixed') :
      S.keyMode==='session' ? _('new each session') :
-     S.keyEvery===1 ? _('new every question') : _('new every {n}', {n:S.keyEvery})));
-  setSum('refSum', refWords()+
-    (S.context==='drone' ? '' : ' \u00b7 '+(S.cadMode==='mixed' ? _('mixed cadences') : _('classic cadence'))));
-  setSum('micSum', micStream ? _('on') : _('off'));
-  setSum('soundSum', instrumentWords());
+     S.keyEvery===1 ? _('new every question') : _('new every {n}', {n:S.keyEvery}))+' \u00b7 '+refWords());
+  setSum('soundSum', instrumentWords() + (micStream ? _(' \u00b7 mic on') : '') + volWords());
 }
 function renderSummaries(){
   renderSubSummaries();
-  var set=document.getElementById('setupSum');
-  if(set){
-    set.textContent = keyWord() + ' \u00b7 ' +
-      (S.keyMode==='fixed' ? _('one key') :
-       S.keyMode==='session' ? _('key each session') :
-       S.keyEvery===1 ? _('key every question') : _('key every {n}', {n:S.keyEvery})) + ' \u00b7 ' +
-      refWords() +
-      (S.context!=='drone' && S.cadMode==='mixed' ? _(' (mixed)') : '') +
-      (micStream ? _(' \u00b7 mic on') : '') +
-      (soundSource()==='synth' ? '' : ' \u00b7 '+instrumentWords());
-  }
   var pr=document.getElementById('progSum');
   if(pr){
     var ra=recentAccuracy();
-    pr.textContent = _('Level {l} \u00b7 {n} answered', {l:S.level+1, n:S.answered})+
-      (ra===null ? '' : _(' \u00b7 {p}% recent', {p:Math.round(ra*100)}));
+    pr.textContent = _('{n} answered', {n:S.answered});
   }
 }
 
@@ -3527,6 +3683,37 @@ try{
   }
 }catch(e){}
 
+/* ---------- panels: Settings and the Guide, over the page ---------- */
+var PANELS = { set:'setPanel', guide:'guidePanel' }, openPanelId=null, panelOpener=null;
+function openPanel(which, group){
+  var id=PANELS[which];
+  if(!id) return;
+  if(openPanelId && openPanelId!==id) closePanel(true);
+  var el=document.getElementById(id);
+  if(!el) return;
+  if(!openPanelId){ try{ panelOpener=document.activeElement||null; }catch(e){ panelOpener=null; } }
+  el.style.display='flex';
+  openPanelId=id;
+  try{ document.documentElement.classList.add('pnl-open'); }catch(e){}
+  toggleModeMenu(false);
+  if(group){
+    var g=document.getElementById(group);
+    if(g){ g.open=true; if(g.scrollIntoView) setTimeout(function(){ try{ g.scrollIntoView({block:'start'}); }catch(e){} }, 0); }
+  }
+  var c=el.querySelector ? el.querySelector('.pnlhead .ibtn') : null;
+  if(c && c.focus) try{ c.focus(); }catch(e){}
+  if(which==='set') startLevel();
+}
+function closePanel(keepFocus){
+  if(!openPanelId) return;
+  var el=document.getElementById(openPanelId);
+  if(el) el.style.display='none';
+  openPanelId=null;
+  try{ document.documentElement.classList.remove('pnl-open'); }catch(e){}
+  if(!keepFocus && panelOpener && panelOpener.focus) try{ panelOpener.focus(); }catch(e){}
+  panelOpener=null;
+}
+
 /* ---------- the modal ---------- */
 function showModal(kicker, title, body, go, finished){
   var m=document.getElementById('blockModal');
@@ -3558,85 +3745,104 @@ var ICON_PLAY='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.8v14.4L
 var ICON_PAUSE='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4.5" width="4.2" height="15" rx="1.2"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1.2"/></svg>';
 function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 function showEl(id, on){ var e=document.getElementById(id); if(e) e.style.display = on ? '' : 'none'; }
-/* The session card: idle it offers the plan and Start; running it shows the
-   block, its clock, where you are in the plan, and Pause / Skip / End. */
-function renderSessCard(){
-  var card=document.getElementById('sessCard');
-  if(!card) return;
-  var p=currentPlan(), b=RUN.on ? p.blocks[RUN.idx] : null;
-  card.classList.toggle('running', !!RUN.on);
-  card.classList.toggle('paused', !!(RUN.on && RUN.paused));
-  showEl('sessIdle', !RUN.on); showEl('sessRun', !!RUN.on); showEl('sessBtns', !!RUN.on);
-  var lbl=document.getElementById('sessLbl');
-  if(lbl) lbl.textContent = RUN.on ? _('Block {i} of {n}', {i:RUN.idx+1, n:p.blocks.length}) : _('Session');
-  showEl('sessSum', !RUN.on); showEl('sessState', !!RUN.on); showEl('stopSessBtn', !!RUN.on);
-  var meta=document.getElementById('sessSum');
-  if(meta) meta.textContent = _('{n} min', {n:planMinutes(p)})+' \u00b7 '+
-    (p.blocks.length===1 ? _('1 block') : _('{n} blocks', {n:p.blocks.length}));
-  var state=document.getElementById('sessState');
-  if(state && RUN.on){
-    var st = RUN.waiting ? 'ready' : RUN.paused ? 'paused' : 'running';
-    state.className='sessstate '+st;
-    state.textContent = st==='ready' ? _('ready') : st==='paused' ? _('paused') : _('running');
-  }
-  var t=document.getElementById('sessTitle'), ds=document.getElementById('sessDesc');
-  if(t) t.textContent = b ? blockTitle(b) : '';
-  /* the summary without its minutes: the clock beside it has them */
-  if(ds) ds.textContent = b ? blockSummary(b).split(' \u00b7 ').slice(1).join(' \u00b7 ') + (b.note ? ' \u2014 ' + iso(b.note) : '') : '';
-  var strip=document.getElementById('sessStrip');
-  if(strip) strip.innerHTML = p.blocks.map(function(bl,i){
-    var cls = !RUN.on ? '' : i<RUN.idx ? 'done' : i===RUN.idx ? 'now' : '';
+/* Before a session: the card with the plan and Start. While one runs, the card
+   steps aside and the session is the slim bar under the top bar. */
+function stripHtml(p, live){
+  return p.blocks.map(function(bl,i){
+    var cls = !live ? '' : i<RUN.idx ? 'done' : i===RUN.idx ? 'now' : '';
     return '<i class="'+cls+'" style="--m:'+Math.max(1, bl.mins||1)+'" title="'+
            esc(blockTitle(bl)+' \u00b7 '+_('{n} min', {n:bl.mins}))+'">'+(cls==='now' ? '<b></b>' : '')+'</i>';
   }).join('');
-  var pause=document.getElementById('pauseBtn');
-  if(pause) pause.innerHTML = (RUN.waiting || RUN.paused ? ICON_PLAY : ICON_PAUSE)+'<span>'+
-    (RUN.waiting ? _('Start block') : RUN.paused ? _('Resume') : _('Pause'))+'</span>';
+}
+function renderSessCard(){
+  var p=currentPlan();
+  showEl('sessCard', !RUN.on);
+  var lbl=document.getElementById('sessCardLbl');
+  if(lbl) lbl.textContent=_('Session');
+  var meta=document.getElementById('sessSum');
+  if(meta) meta.textContent = _('{n} min', {n:planMinutes(p)})+' \u00b7 '+
+    (p.blocks.length===1 ? _('1 block') : _('{n} blocks', {n:p.blocks.length}));
+  var ps=document.getElementById('planStrip');
+  if(ps) ps.innerHTML=stripHtml(p, false);
+  renderSessBar();
+}
+var sessBarOpen=false;
+function toggleSessBar(force){
+  sessBarOpen = force!==undefined ? !!force : !sessBarOpen;
+  renderSessBar();
+}
+function renderSessBar(){
+  var bar=document.getElementById('sessBar');
+  if(!bar) return;
+  showEl('sessBar', !!RUN.on);
+  var top=document.getElementById('topbar');
+  if(top) top.classList.toggle('running', !!RUN.on);
+  if(!RUN.on){ sessBarOpen=false; return; }
+  var p=currentPlan(), b=p.blocks[RUN.idx];
+  bar.classList.toggle('paused', !!RUN.paused);
+  bar.classList.toggle('open', sessBarOpen);
+  showEl('sessBarOpen', sessBarOpen);
+  var tg=document.getElementById('sessBarToggle');
+  if(tg) tg.setAttribute('aria-expanded', String(sessBarOpen));
+  var t=document.getElementById('sessTitle');
+  if(t) t.textContent = b ? blockTitle(b) : '';
+  var l=document.getElementById('sessLbl');
+  if(l) l.textContent = _('Block {i} of {n}', {i:RUN.idx+1, n:p.blocks.length}) +
+    (RUN.waiting ? ' \u00b7 '+_('ready') : RUN.paused ? ' \u00b7 '+_('paused') : '');
+  /* the summary without its minutes: the clock has them */
+  var ds=document.getElementById('sessDesc');
+  if(ds) ds.textContent = b ? blockSummary(b).split(' \u00b7 ').slice(1).join(' \u00b7 ') + (b.note ? ' \u2014 ' + iso(b.note) : '') : '';
+  var nm=document.getElementById('sessNames');
+  if(nm) nm.textContent = p.blocks.map(function(x){ return iso(blockTitle(x)); }).join(' \u00b7 ');
+  var st=document.getElementById('sessStrip');
+  if(st) st.innerHTML=stripHtml(p, true);
+  var pb=document.getElementById('pauseBtn');
+  if(pb){
+    var word = RUN.waiting ? _('Start block') : RUN.paused ? _('Resume') : _('Pause');
+    pb.innerHTML = (RUN.waiting || RUN.paused ? ICON_PLAY : ICON_PAUSE)+'<span class="sr">'+word+'</span>';
+    pb.setAttribute('aria-label', word);
+  }
   renderSessClock();
 }
-/* the clock and the current block's share of the strip; every tick */
+/* every tick: the clock, the line under the bar, the current block's share of the strip */
 function renderSessClock(){
   if(!RUN.on) return;
-  var b=currentPlan().blocks[RUN.idx];
+  var p=currentPlan(), b=p.blocks[RUN.idx];
   if(!b) return;
   var total=Math.max(1, b.mins*60000);
   var left = RUN.waiting ? total : RUN.paused ? RUN.left : Math.max(0, RUN.endAt-Date.now());
+  var frac=Math.min(1, Math.max(0, 1-left/total)), pct=(100*frac).toFixed(1)+'%';
   var c=document.getElementById('sessClock');
   if(c) c.textContent=fmtClock(left);
+  var pr=document.getElementById('sessProg');
+  if(pr) pr.style.width=pct;
   var strip=document.getElementById('sessStrip');
   var now=strip && strip.querySelector ? strip.querySelector('i.now>b') : null;
-  if(now) now.style.width=Math.min(100, Math.max(0, 100*(1-left/total))).toFixed(1)+'%';
+  if(now) now.style.width=pct;
+  var rest=0;
+  for(var i=RUN.idx+1;i<p.blocks.length;i++) rest+=(p.blocks[i].mins||0)*60000;
+  var lf=document.getElementById('sessLeft');
+  if(lf) lf.textContent=_('{n} min left', {n:Math.ceil((left+rest)/60000)});
 }
-function renderTimer(){
-  renderSessClock();
-  var pill=document.getElementById('timerPill'), bar=document.getElementById('topbar');
-  if(bar) bar.classList.toggle('running', !!RUN.on);
-  if(!pill) return;
-  if(!RUN.on){ pill.style.display='none'; return; }
-  var p=currentPlan(), b=p.blocks[RUN.idx];
-  pill.style.display='';
-  pill.classList.toggle('paused', RUN.paused);
-  document.getElementById('timerBlock').textContent = b ? blockTitle(b) : '\u2014';
-  var left = RUN.waiting ? (b ? b.mins*60000 : 0)
-           : RUN.paused ? RUN.left : (RUN.endAt-Date.now());
-  document.getElementById('timerLeft').textContent =
-    RUN.waiting ? _('tap to start') : fmtClock(left) + (RUN.paused ? _(' \u2014 tap to resume') : '');
-}
+function renderTimer(){ renderSessClock(); }
 function renderSession(){
-  renderTimer();
   var p=currentPlan();
-  var sel=document.getElementById('planSel');
-  if(sel){
-    var repoOpts='', mine='';
-    plans().forEach(function(pl){
-      var o='<option value="'+pl.id+'"'+(pl.id===S.planId?' selected':'')+'>'+
-            String(pl.name).replace(/</g,'&lt;')+(isEdited(pl.id) ? _(' \u00b7 edited') : '')+'</option>';
-      if(isRepo(pl.id)) repoOpts+=o; else mine+=o;
-    });
+  /* the plan to run (on the session card) and the plan to edit (in Settings) are one choice */
+  var repoOpts='', mine='';
+  plans().forEach(function(pl){
+    var o='<option value="'+pl.id+'"'+(pl.id===S.planId?' selected':'')+'>'+
+          String(pl.name).replace(/</g,'&lt;')+(isEdited(pl.id) ? _(' \u00b7 edited') : '')+'</option>';
+    if(isRepo(pl.id)) repoOpts+=o; else mine+=o;
+  });
+  ['planSel','planEditSel'].forEach(function(id){
+    var sel=document.getElementById(id);
+    if(!sel) return;
     sel.innerHTML = (repoOpts ? '<optgroup label="'+_('From the repo')+'">'+repoOpts+'</optgroup>' : '')+
                     (mine ? '<optgroup label="'+_('Made here')+'">'+mine+'</optgroup>' : '');
     sel.value=S.planId;
-  }
+    sel.disabled=!!RUN.on;
+  });
+  setSum('plansSum', p.name);
   var nm=document.getElementById('planName');
   if(nm && nm.value!==p.name) nm.value=p.name;
   renderSessCard();
@@ -3826,6 +4032,12 @@ function setCadChange(c){
   S.cadChange=c; S.cadCount=0; renderCadence(); save();
 }
 function setCadEvery(n){ if(n>0){ S.cadEvery=n; S.cadCount=0; renderCadence(); save(); } }
+/* one picker: "every 3 questions" is the every-few setting and its number together */
+function setCadChoice(v){
+  var m=/^n(\d+)$/.exec(v);
+  if(m){ S.cadEvery=parseInt(m[1],10); setCadChange('n'); }
+  else setCadChange(v);
+}
 function setCadGap(sec){ S.cadGap = sec>0 ? sec : 0; renderCadence(); save(); }
 function cadChangeWords(){
   return S.cadChange==='question' ? _('a different one every question') :
@@ -3837,7 +4049,7 @@ function renderCadence(){
   renderSummaries();
   var row=document.getElementById('cadModeRow');
   if(row){
-    var bs=row.querySelectorAll ? row.querySelectorAll('.btn') : [];
+    var bs=row.querySelectorAll ? row.querySelectorAll('button') : [];
     for(var i=0;i<bs.length;i++){
       var k=bs[i].getAttribute('data-cm');
       if(k) bs[i].classList.toggle('on', k===S.cadMode);
@@ -3845,11 +4057,14 @@ function renderCadence(){
   }
   var cr=document.getElementById('cadChangeRow');
   if(cr) cr.style.display = S.cadMode==='mixed' ? 'flex' : 'none';
-  var cs=document.getElementById('cadChangeSel'); if(cs) cs.value=S.cadChange;
-  var es=document.getElementById('cadEverySel');
-  if(es){ es.style.display = (S.cadMode==='mixed' && S.cadChange==='n') ? '' : 'none';
-          es.value=String(S.cadEvery); }
-  var gs=document.getElementById('cadGapSel'); if(gs) gs.value=String(S.cadGap);
+  var cs=document.getElementById('cadChangeSel');
+  if(cs) cs.value = S.cadChange==='n' ? 'n'+([2,3,5,8].indexOf(S.cadEvery)>=0 ? S.cadEvery : 3) : S.cadChange;
+  var gs=document.getElementById('gapSeg');
+  if(gs && gs.querySelectorAll){
+    var gb=gs.querySelectorAll('button');
+    for(var g=0;g<gb.length;g++) gb[g].classList.toggle('on', parseFloat(gb[g].getAttribute('data-gap'))===S.cadGap);
+  }
+  renderReference();
   var h=document.getElementById('cadHint');
   if(h){
     h.textContent = S.cadMode==='classic'
@@ -3992,6 +4207,8 @@ applyTheme();
   if(sl){ sl.value=S.droneVol; }
   var mv=document.getElementById('masterVol');
   if(mv){ mv.value=S.masterVol; }
+  var mvv=document.getElementById('masterVolVal');
+  if(mvv) mvv.textContent=Math.round(S.masterVol*100)+'%';
   var out=document.getElementById('droneVolVal');
   if(out) out.textContent=Math.round(S.droneVol*100)+'%';
 })();
@@ -4002,7 +4219,11 @@ resetQuestionUI();
 updateProgress();
 try{ document.documentElement.classList.remove('lang-pending'); }catch(e){}
 window.addEventListener('keydown', function(e){
-  if(e.key==='Escape'){ toggleModeMenu(false); return; }
+  if(e.key==='Escape'){ if(openPanelId){ closePanel(); return; } toggleModeMenu(false); return; }
+  if(openPanelId) return;
+  /* typing a space in a plan's name is not a request for a new note */
+  var t=e.target, tag=(t && t.tagName ? String(t.tagName).toLowerCase() : '');
+  if(tag==='input' || tag==='textarea' || tag==='select' || (t && t.isContentEditable)) return;
   if(e.key===' '){ e.preventDefault(); newQuestion(); return; }
   if(S.phase==='name'){
     var n=parseInt(e.key,10);
